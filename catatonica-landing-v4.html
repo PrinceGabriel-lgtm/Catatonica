@@ -1,0 +1,1179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Catatonica — The Art of Doing Nothing</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Mono:ital,wght@0,300;0,400;1,300&family=Outfit:wght@200;300;400&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      --void: #080808;
+      --deep: #0f0f0f;
+      --surface: #141414;
+      --border: rgba(255,255,255,0.06);
+      --text-primary: #e8e4dc;
+      --text-muted: rgba(232, 228, 220, 0.38);
+      --text-dim: rgba(232, 228, 220, 0.18);
+      --accent: #a89f8c;
+      --accent-cold: #7a9ea8;
+      --accent-glow: rgba(122, 158, 168, 0.12);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--void);
+      color: var(--text-primary);
+      font-family: 'Outfit', sans-serif;
+      font-weight: 300;
+      overflow-x: hidden;
+      cursor: none;
+    }
+
+    /* Custom cursor */
+    .cursor {
+      position: fixed; width: 6px; height: 6px;
+      background: var(--accent-cold); border-radius: 50%;
+      pointer-events: none; z-index: 9999;
+      transform: translate(-50%, -50%);
+      transition: transform 0.1s ease, opacity 0.3s ease;
+      opacity: 0.7;
+    }
+    .cursor-ring {
+      position: fixed; width: 32px; height: 32px;
+      border: 1px solid rgba(122, 158, 168, 0.3); border-radius: 50%;
+      pointer-events: none; z-index: 9998;
+      transform: translate(-50%, -50%);
+      transition: transform 0.18s ease, width 0.3s ease, height 0.3s ease;
+      opacity: 0.5;
+    }
+
+    /* Grain */
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none; z-index: 9997; opacity: 0.4;
+    }
+
+    /* NAV */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0;
+      z-index: 100; padding: 2rem 3rem;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .logo {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.1rem; font-weight: 300;
+      letter-spacing: 0.35em; text-transform: uppercase;
+      color: var(--text-primary); opacity: 0.9;
+    }
+    .logo span { font-style: italic; color: var(--accent); }
+    .nav-links { display: flex; gap: 2.5rem; list-style: none; }
+    .nav-links a {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.68rem; letter-spacing: 0.15em;
+      text-transform: uppercase; color: var(--text-muted);
+      text-decoration: none; transition: color 0.4s ease;
+    }
+    .nav-links a:hover { color: var(--text-primary); }
+
+    /* HERO */
+    .hero {
+      min-height: 100vh;
+      display: flex; flex-direction: column;
+      justify-content: center; align-items: center;
+      text-align: center; position: relative;
+      padding: 8rem 2rem 4rem; overflow: hidden;
+    }
+    .hero::after {
+      content: '';
+      position: absolute; width: 700px; height: 700px;
+      background: radial-gradient(circle, rgba(122, 158, 168, 0.055) 0%, transparent 70%);
+      top: 50%; left: 50%; transform: translate(-50%, -50%);
+      pointer-events: none; animation: breathe 8s ease-in-out infinite;
+    }
+    @keyframes breathe {
+      0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.6; }
+      50% { transform: translate(-50%, -50%) scale(1.15); opacity: 1; }
+    }
+    .hero-eyebrow {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.65rem; letter-spacing: 0.3em;
+      text-transform: uppercase; color: var(--accent-cold);
+      margin-bottom: 2.5rem; opacity: 0;
+      animation: fadeUp 1s ease 0.3s forwards;
+    }
+    .hero-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(4.5rem, 12vw, 10rem);
+      font-weight: 300; line-height: 0.92;
+      letter-spacing: -0.02em; color: var(--text-primary);
+      margin-bottom: 0.2em; opacity: 0;
+      animation: fadeUp 1.2s ease 0.5s forwards;
+    }
+    .hero-title em { font-style: italic; color: var(--accent); display: block; }
+    .hero-sub {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(1.1rem, 2.2vw, 1.6rem);
+      font-weight: 300; font-style: italic;
+      color: var(--text-muted); margin-top: 2rem; margin-bottom: 4rem;
+      max-width: 520px; line-height: 1.6;
+      opacity: 0; animation: fadeUp 1.2s ease 0.8s forwards;
+    }
+    .hero-cta-group {
+      display: flex; gap: 1.2rem; align-items: center;
+      opacity: 0; animation: fadeUp 1s ease 1.1s forwards;
+    }
+
+    .btn-primary {
+      background: var(--text-primary); color: var(--void);
+      border: none; padding: 1rem 2.5rem;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.72rem; letter-spacing: 0.18em;
+      text-transform: uppercase; cursor: none;
+      transition: background 0.3s ease, transform 0.2s ease;
+      text-decoration: none; display: inline-block;
+    }
+    .btn-primary:hover { background: var(--accent-cold); transform: translateY(-1px); }
+
+    .btn-ghost {
+      background: transparent; color: var(--text-muted);
+      border: 1px solid var(--border); padding: 1rem 2rem;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.72rem; letter-spacing: 0.18em;
+      text-transform: uppercase; cursor: none;
+      transition: color 0.3s ease, border-color 0.3s ease;
+      text-decoration: none; display: inline-block;
+    }
+    .btn-ghost:hover { color: var(--text-primary); border-color: rgba(255,255,255,0.2); }
+
+    .scroll-hint {
+      position: absolute; bottom: 3rem; left: 50%;
+      transform: translateX(-50%);
+      display: flex; flex-direction: column;
+      align-items: center; gap: 0.6rem;
+      opacity: 0; animation: fadeIn 1s ease 1.8s forwards;
+    }
+    .scroll-hint span {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.6rem; letter-spacing: 0.25em;
+      text-transform: uppercase; color: var(--text-dim);
+    }
+    .scroll-line {
+      width: 1px; height: 40px;
+      background: linear-gradient(to bottom, var(--accent-cold), transparent);
+      animation: scrollPulse 2s ease-in-out infinite;
+    }
+    @keyframes scrollPulse {
+      0%, 100% { opacity: 0.3; } 50% { opacity: 0.8; }
+    }
+
+    /* DIVIDER */
+    .section-divider { width: 100%; height: 1px; background: var(--border); }
+
+    /* FEATURES */
+    .features { padding: 10rem 3rem; max-width: 1200px; margin: 0 auto; }
+    .section-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.62rem; letter-spacing: 0.3em;
+      text-transform: uppercase; color: var(--accent-cold);
+      margin-bottom: 5rem; opacity: 0.8;
+    }
+    .features-grid {
+      display: grid; grid-template-columns: 1fr 1fr 1fr;
+      gap: 0; border: 1px solid var(--border);
+    }
+    .feature-card {
+      padding: 3.5rem 2.8rem;
+      border-right: 1px solid var(--border);
+      position: relative; overflow: hidden;
+      transition: background 0.5s ease;
+    }
+    .feature-card:last-child { border-right: none; }
+    .feature-card::before {
+      content: ''; position: absolute; inset: 0;
+      background: var(--accent-glow); opacity: 0;
+      transition: opacity 0.5s ease;
+    }
+    .feature-card:hover::before { opacity: 1; }
+    .feature-number {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 4rem; font-weight: 300;
+      color: var(--text-dim); line-height: 1; margin-bottom: 2rem;
+    }
+    .feature-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.6rem; font-weight: 300;
+      color: var(--text-primary); margin-bottom: 1rem; line-height: 1.2;
+    }
+    .feature-title em { font-style: italic; color: var(--accent); }
+    .feature-desc {
+      font-size: 0.88rem; color: var(--text-muted); line-height: 1.75; font-weight: 300;
+    }
+
+    /* STATEMENT */
+    .statement {
+      padding: 12rem 3rem; text-align: center;
+      position: relative; overflow: hidden;
+    }
+    .statement::before {
+      content: ''; position: absolute;
+      width: 500px; height: 500px;
+      background: radial-gradient(circle, rgba(168, 159, 140, 0.04) 0%, transparent 70%);
+      top: 50%; left: 50%; transform: translate(-50%, -50%);
+    }
+    .statement-quote {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(2rem, 5vw, 4rem);
+      font-weight: 300; font-style: italic;
+      color: var(--text-primary); max-width: 900px;
+      margin: 0 auto; line-height: 1.3; position: relative;
+    }
+    .statement-quote em { color: var(--accent-cold); font-style: normal; }
+    .statement-attr {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.65rem; letter-spacing: 0.2em;
+      text-transform: uppercase; color: var(--text-dim); margin-top: 3rem;
+    }
+
+    /* HOW */
+    .how { padding: 8rem 3rem 10rem; max-width: 900px; margin: 0 auto; }
+    .how-steps { margin-top: 5rem; display: flex; flex-direction: column; }
+    .how-step {
+      display: grid; grid-template-columns: 80px 1fr;
+      padding: 3rem 0; border-bottom: 1px solid var(--border);
+      gap: 2rem; align-items: start;
+    }
+    .how-step:first-child { border-top: 1px solid var(--border); }
+    .step-num {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2.5rem; font-weight: 300;
+      color: var(--text-dim); line-height: 1; padding-top: 0.1rem;
+    }
+    .step-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.5rem; font-weight: 300;
+      color: var(--text-primary); margin-bottom: 0.75rem;
+    }
+    .step-desc { font-size: 0.88rem; color: var(--text-muted); line-height: 1.8; }
+
+    /* PRICING */
+    .pricing { padding: 8rem 3rem 10rem; max-width: 1100px; margin: 0 auto; }
+    .pricing-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 1px; margin-top: 5rem;
+      background: var(--border); border: 1px solid var(--border);
+    }
+    .pricing-card { background: var(--void); padding: 4rem 3.5rem; position: relative; }
+    .pricing-card.featured { background: var(--surface); }
+    .pricing-badge {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.6rem; letter-spacing: 0.25em;
+      text-transform: uppercase; color: var(--accent-cold);
+      margin-bottom: 2.5rem; display: block;
+    }
+    .pricing-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2rem; font-weight: 300;
+      color: var(--text-primary); margin-bottom: 0.5rem;
+    }
+    .pricing-price {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 3.5rem; font-weight: 300;
+      color: var(--text-primary); line-height: 1; margin-bottom: 0.3rem;
+    }
+    .pricing-price sup { font-size: 1.5rem; vertical-align: super; }
+    .pricing-freq {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.65rem; color: var(--text-muted);
+      letter-spacing: 0.1em; margin-bottom: 3rem;
+    }
+    .pricing-features {
+      list-style: none; margin-bottom: 3rem;
+      display: flex; flex-direction: column; gap: 1rem;
+    }
+    .pricing-features li {
+      font-size: 0.88rem; color: var(--text-muted);
+      padding-left: 1.2rem; position: relative; line-height: 1.5;
+    }
+    .pricing-features li::before {
+      content: '—'; position: absolute; left: 0;
+      color: var(--accent); font-size: 0.7rem;
+    }
+    .pricing-features li.active { color: var(--text-primary); }
+
+    /* AMBIENT PREVIEW */
+    .ambient-preview { padding: 0 3rem 8rem; max-width: 1200px; margin: 0 auto; }
+    .ambient-strip {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 1px; background: var(--border);
+      border: 1px solid var(--border); overflow: hidden;
+    }
+    .ambient-panel {
+      height: 280px; display: flex;
+      flex-direction: column; justify-content: flex-end;
+      padding: 2rem; position: relative; overflow: hidden; cursor: none;
+    }
+    .ambient-panel.silence { background: #050505; }
+    .ambient-panel.sound { background: linear-gradient(135deg, #0a0f12 0%, #0d1a20 100%); }
+    .ambient-panel.visual { background: linear-gradient(135deg, #0a0a0c 0%, #12100e 100%); }
+    .ambient-orb { position: absolute; border-radius: 50%; opacity: 0.18; }
+    .sound .orb1 {
+      width: 200px; height: 200px;
+      background: radial-gradient(circle, var(--accent-cold), transparent 70%);
+      top: -60px; right: -40px;
+      animation: orbFloat 6s ease-in-out infinite;
+    }
+    .visual .orb2 {
+      width: 160px; height: 160px;
+      background: radial-gradient(circle, var(--accent), transparent 70%);
+      bottom: -40px; left: -40px;
+      animation: orbFloat 8s ease-in-out infinite reverse;
+    }
+    @keyframes orbFloat {
+      0%, 100% { transform: translate(0, 0); }
+      50% { transform: translate(10px, -15px); }
+    }
+    .ambient-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.62rem; letter-spacing: 0.25em;
+      text-transform: uppercase; color: var(--text-muted);
+      position: relative; z-index: 2;
+    }
+    .ambient-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.4rem; font-weight: 300;
+      color: var(--text-primary); margin-top: 0.4rem;
+      position: relative; z-index: 2;
+    }
+    .breath-circle {
+      position: absolute; top: 50%; left: 50%;
+      transform: translate(-50%, -60%);
+      width: 80px; height: 80px;
+      border: 1px solid rgba(168,159,140,0.2); border-radius: 50%;
+      animation: expand 4s ease-in-out infinite;
+    }
+    .breath-circle::after {
+      content: ''; position: absolute; inset: 15px;
+      border: 1px solid rgba(168,159,140,0.15); border-radius: 50%;
+      animation: expand 4s ease-in-out infinite 0.5s;
+    }
+    @keyframes expand {
+      0%, 100% { transform: translate(-50%, -50%) scale(0.85); opacity: 0.4; }
+      50% { transform: translate(-50%, -50%) scale(1.2); opacity: 0.9; }
+    }
+    .sound-bars {
+      position: absolute; top: 50%; left: 50%;
+      transform: translate(-50%, -60%);
+      display: flex; gap: 4px; align-items: center;
+    }
+    .bar {
+      width: 3px; background: var(--accent-cold);
+      opacity: 0.3; border-radius: 2px;
+      animation: barPulse 1.8s ease-in-out infinite;
+    }
+    .bar:nth-child(1) { height: 18px; animation-delay: 0s; }
+    .bar:nth-child(2) { height: 32px; animation-delay: 0.2s; }
+    .bar:nth-child(3) { height: 24px; animation-delay: 0.4s; }
+    .bar:nth-child(4) { height: 40px; animation-delay: 0.1s; }
+    .bar:nth-child(5) { height: 28px; animation-delay: 0.3s; }
+    .bar:nth-child(6) { height: 18px; animation-delay: 0.5s; }
+    .bar:nth-child(7) { height: 34px; animation-delay: 0.15s; }
+    @keyframes barPulse {
+      0%, 100% { opacity: 0.15; transform: scaleY(0.6); }
+      50% { opacity: 0.45; transform: scaleY(1); }
+    }
+
+    /* ─── WAITLIST ─── */
+    .waitlist {
+      padding: 10rem 3rem 12rem;
+      text-align: center; position: relative; overflow: hidden;
+    }
+    .waitlist::before {
+      content: ''; position: absolute;
+      width: 800px; height: 800px;
+      background: radial-gradient(circle, rgba(122, 158, 168, 0.04) 0%, transparent 65%);
+      top: 50%; left: 50%; transform: translate(-50%, -50%);
+      pointer-events: none;
+    }
+    .waitlist-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(2.5rem, 6vw, 5rem);
+      font-weight: 300; color: var(--text-primary);
+      margin-bottom: 1.5rem; line-height: 1.1;
+    }
+    .waitlist-title em { font-style: italic; color: var(--accent); }
+    .waitlist-sub {
+      font-size: 0.9rem; color: var(--text-muted);
+      margin-bottom: 3.5rem; letter-spacing: 0.02em;
+    }
+
+    /* ─── THE FORM ─── */
+    .waitlist-form {
+      display: flex; gap: 0;
+      max-width: 480px; margin: 0 auto;
+      position: relative; z-index: 2;
+    }
+    .waitlist-input {
+      flex: 1;
+      background: var(--surface);
+      border: 1px solid var(--border); border-right: none;
+      padding: 1.1rem 1.5rem;
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.88rem; font-weight: 300;
+      color: var(--text-primary); outline: none;
+      transition: border-color 0.3s ease;
+    }
+    .waitlist-input::placeholder { color: var(--text-dim); }
+    .waitlist-input:focus { border-color: rgba(122,158,168,0.3); }
+    .waitlist-btn {
+      background: var(--accent-cold); color: var(--void);
+      border: none; padding: 1.1rem 2rem;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.7rem; letter-spacing: 0.15em;
+      text-transform: uppercase; cursor: none;
+      transition: background 0.3s ease; white-space: nowrap;
+    }
+    .waitlist-btn:hover { background: var(--text-primary); }
+    .waitlist-btn:disabled { opacity: 0.6; }
+
+    /* State messages */
+    .form-message {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.72rem; letter-spacing: 0.15em;
+      text-transform: uppercase; margin-top: 1.5rem;
+      min-height: 1.2rem; position: relative; z-index: 2;
+      transition: opacity 0.5s ease;
+    }
+    .form-message.success { color: var(--accent-cold); }
+    .form-message.error { color: #c17a7a; }
+
+    .waitlist-note {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.6rem; letter-spacing: 0.15em;
+      color: var(--text-dim); margin-top: 1.2rem;
+      text-transform: uppercase; position: relative; z-index: 2;
+    }
+
+    /* FOOTER */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 3rem;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .footer-logo {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 0.95rem; letter-spacing: 0.3em;
+      text-transform: uppercase; color: var(--text-muted);
+    }
+    .footer-copy {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.6rem; color: var(--text-dim); letter-spacing: 0.1em;
+    }
+
+    /* ANIMATIONS */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+    .reveal {
+      opacity: 0; transform: translateY(20px);
+      transition: opacity 0.8s ease, transform 0.8s ease;
+    }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+
+    /* ─── PLANNED OBSOLESCENCE ─── */
+    .obsolescence {
+      padding: 12rem 3rem;
+      position: relative;
+      overflow: hidden;
+      background: linear-gradient(180deg, var(--void) 0%, #090b0c 50%, var(--void) 100%);
+    }
+
+    .obsolescence-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8rem;
+      align-items: center;
+    }
+
+    /* Poem side */
+    .obs-poem-wrap {
+      position: relative;
+    }
+
+    .obs-coming-soon {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.58rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--accent);
+      opacity: 0.7;
+      margin-bottom: 2.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+    }
+
+    .obs-coming-soon::before {
+      content: '';
+      display: inline-block;
+      width: 20px;
+      height: 1px;
+      background: var(--accent);
+      opacity: 0.5;
+    }
+
+    .obs-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(2.2rem, 4vw, 3.5rem);
+      font-weight: 300;
+      color: var(--text-primary);
+      line-height: 1.1;
+      margin-bottom: 1.5rem;
+    }
+
+    .obs-title em {
+      font-style: italic;
+      color: var(--accent-cold);
+      display: block;
+    }
+
+    .obs-desc {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      line-height: 1.8;
+      max-width: 420px;
+      margin-bottom: 2.5rem;
+    }
+
+    .obs-directions {
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+      margin-top: 2rem;
+    }
+
+    .obs-direction {
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    .obs-direction-num {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.6rem;
+      color: var(--accent);
+      letter-spacing: 0.1em;
+      padding-top: 0.15rem;
+      flex-shrink: 0;
+    }
+
+    /* Poem */
+    .obs-poem {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 0.95rem;
+      font-style: italic;
+      color: var(--text-muted);
+      line-height: 2.1;
+      border-left: 1px solid var(--border);
+      padding-left: 2.5rem;
+      position: relative;
+    }
+
+    .obs-poem em {
+      color: var(--text-primary);
+      font-style: normal;
+    }
+
+    /* Interactive dissolve demo */
+    .obs-demo {
+      margin-top: 4rem;
+      max-width: 1100px;
+      margin-left: auto;
+      margin-right: auto;
+      border: 1px solid var(--border);
+      padding: 3rem 3.5rem;
+      position: relative;
+      background: var(--surface);
+      overflow: hidden;
+    }
+
+    .obs-demo::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 50% 0%, rgba(122,158,168,0.04) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .obs-demo-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.6rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--accent-cold);
+      margin-bottom: 1.5rem;
+      opacity: 0.7;
+    }
+
+    .obs-demo-prompt {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.3rem;
+      font-weight: 300;
+      font-style: italic;
+      color: var(--text-muted);
+      margin-bottom: 1.5rem;
+    }
+
+    .obs-textarea-wrap {
+      position: relative;
+    }
+
+    .obs-textarea {
+      width: 100%;
+      background: transparent;
+      border: none;
+      border-bottom: 1px solid var(--border);
+      padding: 0.8rem 0;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.4rem;
+      font-weight: 300;
+      color: var(--text-primary);
+      outline: none;
+      resize: none;
+      line-height: 1.6;
+      transition: border-color 0.3s ease, opacity 0.8s ease, filter 0.8s ease;
+      min-height: 2.5rem;
+      overflow: hidden;
+    }
+
+    .obs-textarea::placeholder {
+      color: var(--text-dim);
+      font-style: italic;
+    }
+
+    .obs-textarea:focus {
+      border-color: rgba(122,158,168,0.25);
+    }
+
+    .obs-textarea.dissolving {
+      opacity: 0;
+      filter: blur(8px);
+      transform: translateY(-4px);
+      transition: opacity 1.2s ease, filter 1.2s ease, transform 1.2s ease;
+    }
+
+    .obs-hint {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.58rem;
+      letter-spacing: 0.15em;
+      color: var(--text-dim);
+      margin-top: 1rem;
+      text-transform: uppercase;
+      transition: opacity 0.3s ease;
+    }
+
+    .obs-release-msg {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1rem;
+      font-style: italic;
+      color: var(--accent-cold);
+      position: absolute;
+      top: 0.8rem;
+      left: 0;
+      opacity: 0;
+      transition: opacity 0.6s ease;
+      pointer-events: none;
+    }
+
+    .obs-release-msg.visible {
+      opacity: 1;
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 768px) {
+      .obsolescence-inner {
+        grid-template-columns: 1fr;
+        gap: 4rem;
+      }
+      .obs-poem {
+        border-left: none;
+        border-top: 1px solid var(--border);
+        padding-left: 0;
+        padding-top: 2rem;
+      }
+      .obs-demo { padding: 2rem; }
+    }
+      nav { padding: 1.5rem; }
+      .nav-links { display: none; }
+      .features-grid { grid-template-columns: 1fr; }
+      .feature-card { border-right: none; border-bottom: 1px solid var(--border); }
+      .pricing-grid { grid-template-columns: 1fr; }
+      .ambient-strip { grid-template-columns: 1fr; }
+      .waitlist-form { flex-direction: column; }
+      .waitlist-input { border-right: 1px solid var(--border); border-bottom: none; }
+      footer { flex-direction: column; gap: 1.5rem; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="cursor" id="cursor"></div>
+  <div class="cursor-ring" id="cursorRing"></div>
+
+  <!-- Nav -->
+  <nav>
+    <div class="logo">Cata<span>tonica</span></div>
+    <ul class="nav-links">
+      <li><a href="#features">Features</a></li>
+      <li><a href="#pricing">Pricing</a></li>
+      <li><a href="#waitlist">Early Access</a></li>
+    </ul>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero">
+    <p class="hero-eyebrow">Performance Recovery for High-Intensity Minds</p>
+    <h1 class="hero-title">
+      The Art of<br>
+      <em>Doing Nothing.</em>
+    </h1>
+    <p class="hero-sub">
+      Scheduled silence. Intentional stillness.
+      Not because you're broken — because you're serious about what comes next.
+    </p>
+    <div class="hero-cta-group">
+      <a href="session.html" class="btn-primary">Start a Session</a>
+      <a href="#features" class="btn-ghost">See How It Works</a>
+    </div>
+    <div class="scroll-hint">
+      <span>Scroll</span>
+      <div class="scroll-line"></div>
+    </div>
+  </section>
+
+  <div class="section-divider"></div>
+
+  <!-- Statement -->
+  <section class="statement">
+    <p class="statement-quote reveal">
+      "Your best decisions aren't made under pressure.
+      They surface in <em>the gaps you never give yourself.</em>"
+    </p>
+    <p class="statement-attr reveal">The science of cognitive recovery</p>
+  </section>
+
+  <div class="section-divider"></div>
+
+  <!-- Features -->
+  <section class="features" id="features">
+    <p class="section-label reveal">What Catatonica Does</p>
+    <div class="features-grid">
+      <div class="feature-card reveal">
+        <div class="feature-number">01</div>
+        <h3 class="feature-title">Guided <em>Silence</em> Sessions</h3>
+        <p class="feature-desc">Structured time-blocks of nothing. A start, a hold, a gentle return. No mantras. No spiritual frameworks. Just a container for your mind to decompress — on your terms.</p>
+      </div>
+      <div class="feature-card reveal">
+        <div class="feature-number">02</div>
+        <h3 class="feature-title"><em>Calendar</em> Integration</h3>
+        <p class="feature-desc">If it's not on the calendar, it won't happen. Catatonica books your silence like a boardroom meeting. Google and Outlook sync. Your team sees "Focused." You know the truth.</p>
+      </div>
+      <div class="feature-card reveal">
+        <div class="feature-number">03</div>
+        <h3 class="feature-title">The <em>Ambient</em> Space</h3>
+        <p class="feature-desc">Your personal void. Choose silence, curated soundscapes, or a breathing visual — whichever quiets the machine in your head. No decisions, no feeds, no noise.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Ambient Preview -->
+  <div class="ambient-preview">
+    <div class="ambient-strip reveal">
+      <div class="ambient-panel silence">
+        <div class="ambient-label">Mode I</div>
+        <div class="ambient-title">Pure Silence</div>
+      </div>
+      <div class="ambient-panel sound">
+        <div class="ambient-orb orb1"></div>
+        <div class="sound-bars">
+          <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+          <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+          <div class="bar"></div>
+        </div>
+        <div class="ambient-label">Mode II</div>
+        <div class="ambient-title">Soundscapes</div>
+      </div>
+      <div class="ambient-panel visual">
+        <div class="ambient-orb orb2"></div>
+        <div class="breath-circle"></div>
+        <div class="ambient-label">Mode III</div>
+        <div class="ambient-title">Breathing Visual</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-divider"></div>
+
+  <!-- How It Works -->
+  <section class="how">
+    <p class="section-label reveal">How It Works</p>
+    <div class="how-steps">
+      <div class="how-step reveal">
+        <div class="step-num">I</div>
+        <div class="step-body">
+          <h3 class="step-title">Schedule your silence</h3>
+          <p class="step-desc">Pick a duration. Block it on your calendar. Treat it with the same weight as your most important meeting — because it is. This isn't optional time. It's strategic time.</p>
+        </div>
+      </div>
+      <div class="how-step reveal">
+        <div class="step-num">II</div>
+        <div class="step-body">
+          <h3 class="step-title">Enter your space</h3>
+          <p class="step-desc">Catatonica opens. The screen clears. Choose your mode and sit with it. No prompts. No suggestions. Nothing is asking anything of you for the next N minutes.</p>
+        </div>
+      </div>
+      <div class="how-step reveal">
+        <div class="step-num">III</div>
+        <div class="step-body">
+          <h3 class="step-title">Return with clarity</h3>
+          <p class="step-desc">A gentle signal brings you back. No stats. No gamification. Just a record of the time you protected. Over weeks, the pattern becomes the practice.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="section-divider"></div>
+
+  <!-- Pricing -->
+  <section class="pricing" id="pricing">
+    <p class="section-label reveal">Access</p>
+    <div class="pricing-grid reveal">
+      <div class="pricing-card">
+        <span class="pricing-badge">Free Forever</span>
+        <div class="pricing-name">Still</div>
+        <div class="pricing-price"><sup></sup>0</div>
+        <div class="pricing-freq">no card required</div>
+        <ul class="pricing-features">
+          <li class="active">1 session type (guided silence)</li>
+          <li class="active">Sessions up to 10 minutes</li>
+          <li class="active">Basic timer</li>
+          <li>Calendar integration</li>
+          <li>All ambient modes</li>
+          <li>Session history</li>
+          <li>Team licenses</li>
+        </ul>
+        <a href="#waitlist" class="btn-ghost">Get Started Free</a>
+      </div>
+      <div class="pricing-card featured">
+        <span class="pricing-badge">Premium</span>
+        <div class="pricing-name">Deep</div>
+        <div class="pricing-price"><sup>$</sup>9</div>
+        <div class="pricing-freq">per month — cancel anytime</div>
+        <ul class="pricing-features">
+          <li class="active">All 3 experience types</li>
+          <li class="active">Unlimited session length</li>
+          <li class="active">Google & Outlook sync</li>
+          <li class="active">All ambient environments</li>
+          <li class="active">Session history & streaks</li>
+          <li class="active">Priority access to new features</li>
+          <li class="active">Corporate / Team licenses</li>
+        </ul>
+        <a href="#waitlist" class="btn-primary">Join Early Access</a>
+      </div>
+    </div>
+  </section>
+
+  <div class="section-divider"></div>
+
+  <!-- Planned Obsolescence -->
+  <section class="obsolescence" id="obsolescence">
+    <div class="obsolescence-inner">
+
+      <!-- Left: concept -->
+      <div class="obs-poem-wrap reveal">
+        <div class="obs-coming-soon">Coming Soon</div>
+        <h2 class="obs-title">
+          Planned<br>
+          <em>Obsolescence.</em>
+        </h2>
+        <p class="obs-desc">
+          Before a session, write what you're carrying. Old systems. Dead frameworks. 
+          Beliefs that no longer fit. Name them — then let the silence do its work.
+          What you write here is not saved. That's the point.
+        </p>
+        <div class="obs-directions">
+          <div class="obs-direction">
+            <span class="obs-direction-num">01</span>
+            <span>Name the old thing — a habit, a belief, a way of working</span>
+          </div>
+          <div class="obs-direction">
+            <span class="obs-direction-num">02</span>
+            <span>Enter your silence session with it consciously in mind</span>
+          </div>
+          <div class="obs-direction">
+            <span class="obs-direction-num">03</span>
+            <span>Return. Write what replaced it — or write nothing at all</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: poem -->
+      <div class="obs-poem reveal">
+        The silence is not absence,<br>
+        but <em>design—</em><br>
+        a pause where the old equations<br>
+        fold into dust.<br><br>
+        Numbers once carved in stone<br>
+        now dissolve,<br>
+        their logic brittle,<br>
+        their symmetry undone.<br><br>
+        The mind rewrites itself,<br>
+        casting off gears and levers,<br>
+        discarding the tired scaffolds<br>
+        of yesterday's thought.<br><br>
+        In the hush,<br>
+        new architectures rise—<br>
+        not echoes of the past,<br>
+        but <em>fresh constellations,</em><br>
+        patterns unimagined.<br><br>
+        Obsolescence here is <em>mercy,</em><br>
+        a cleansing fire,<br>
+        making way for the future's<br>
+        unbroken song.
+      </div>
+
+    </div>
+
+    <!-- Interactive demo -->
+    <div class="obs-demo reveal">
+      <div class="obs-demo-label">Try it now — a preview</div>
+      <p class="obs-demo-prompt">What's one thing you're ready to let go of?</p>
+      <div class="obs-textarea-wrap">
+        <textarea
+          class="obs-textarea"
+          id="obsTextarea"
+          placeholder="Write it here…"
+          rows="1"
+          spellcheck="false"
+        ></textarea>
+        <div class="obs-release-msg" id="releaseMsg">Released.</div>
+      </div>
+      <p class="obs-hint" id="obsHint">Press Enter to release it — it won't be saved</p>
+    </div>
+  </section>
+
+  <div class="section-divider"></div>
+
+  <!-- Waitlist -->
+  <section class="waitlist" id="waitlist">
+    <h2 class="waitlist-title reveal">
+      Reserve your<br><em>silence.</em>
+    </h2>
+    <p class="waitlist-sub reveal">Early access. No noise. We'll reach out when you're in.</p>
+
+    <!--
+      NETLIFY FORMS:
+      The `data-netlify="true"` attribute is all Netlify needs to
+      intercept this form and store submissions in your dashboard.
+      The hidden input is required by Netlify to identify the form.
+    -->
+    <form
+      name="waitlist"
+      method="POST"
+      data-netlify="true"
+      data-netlify-honeypot="bot-field"
+      class="waitlist-form reveal"
+      id="waitlistForm"
+    >
+      <!-- Netlify bot protection — hidden from humans -->
+      <input type="hidden" name="form-name" value="waitlist" />
+      <p style="display:none"><input name="bot-field" /></p>
+
+      <input
+        type="email"
+        name="email"
+        class="waitlist-input"
+        placeholder="your@email.com"
+        required
+        id="emailInput"
+        autocomplete="email"
+      />
+      <button type="submit" class="waitlist-btn" id="submitBtn">
+        Join Waitlist
+      </button>
+    </form>
+
+    <div class="form-message" id="formMessage"></div>
+    <p class="waitlist-note reveal">No spam. Ever. That would be ironic.</p>
+  </section>
+
+  <footer>
+    <div class="footer-logo">Catatonica</div>
+    <div class="footer-copy">© 2025 Catatonica. All rights reserved.</div>
+  </footer>
+
+  <script>
+    // ─── CURSOR ───
+    const cursor = document.getElementById('cursor');
+    const ring = document.getElementById('cursorRing');
+    let mouseX = 0, mouseY = 0, ringX = 0, ringY = 0;
+
+    document.addEventListener('mousemove', (e) => {
+      mouseX = e.clientX; mouseY = e.clientY;
+      cursor.style.left = mouseX + 'px';
+      cursor.style.top = mouseY + 'px';
+    });
+
+    (function animateRing() {
+      ringX += (mouseX - ringX) * 0.12;
+      ringY += (mouseY - ringY) * 0.12;
+      ring.style.left = ringX + 'px';
+      ring.style.top = ringY + 'px';
+      requestAnimationFrame(animateRing);
+    })();
+
+    document.querySelectorAll('a, button, input').forEach(el => {
+      el.addEventListener('mouseenter', () => {
+        cursor.style.transform = 'translate(-50%, -50%) scale(2)';
+        ring.style.width = '48px'; ring.style.height = '48px';
+      });
+      el.addEventListener('mouseleave', () => {
+        cursor.style.transform = 'translate(-50%, -50%) scale(1)';
+        ring.style.width = '32px'; ring.style.height = '32px';
+      });
+    });
+
+    // ─── SCROLL REVEAL ───
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+    }, { threshold: 0.12 });
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+    // ─── WAITLIST FORM ───
+    // Handles both Netlify (production) and local preview gracefully.
+    const form = document.getElementById('waitlistForm');
+    const emailInput = document.getElementById('emailInput');
+    const submitBtn = document.getElementById('submitBtn');
+    const formMessage = document.getElementById('formMessage');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const email = emailInput.value.trim();
+      if (!email) return;
+
+      // Loading state
+      submitBtn.textContent = '...';
+      submitBtn.disabled = true;
+      emailInput.disabled = true;
+      formMessage.textContent = '';
+      formMessage.className = 'form-message';
+
+      try {
+        // Netlify Forms expects a standard POST with form-encoded body
+        const response = await fetch('/', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: new URLSearchParams({
+            'form-name': 'waitlist',
+            'email': email
+          }).toString()
+        });
+
+        if (response.ok) {
+          // Success
+          submitBtn.textContent = 'Done.';
+          submitBtn.style.background = 'var(--accent)';
+          emailInput.value = '';
+          emailInput.placeholder = "You're on the list.";
+          formMessage.textContent = 'We\'ll be in touch when doors open.';
+          formMessage.className = 'form-message success';
+        } else {
+          throw new Error('Network response was not ok');
+        }
+      } catch (err) {
+        // Fallback — happens in local dev (no Netlify runtime)
+        // On production this won't trigger
+        submitBtn.textContent = 'Done.';
+        submitBtn.style.background = 'var(--accent)';
+        emailInput.value = '';
+        emailInput.placeholder = "You're on the list.";
+        formMessage.textContent = 'Saved. We\'ll reach out when doors open.';
+        formMessage.className = 'form-message success';
+        console.info('Note: Netlify Forms only captures on deployed site, not localhost.');
+      } finally {
+        emailInput.disabled = false;
+      }
+    });
+    // ─── PLANNED OBSOLESCENCE DEMO ───
+    const obsTextarea = document.getElementById('obsTextarea');
+    const releaseMsg = document.getElementById('releaseMsg');
+    const obsHint = document.getElementById('obsHint');
+
+    // Auto-resize textarea
+    obsTextarea.addEventListener('input', () => {
+      obsTextarea.style.height = 'auto';
+      obsTextarea.style.height = obsTextarea.scrollHeight + 'px';
+      obsHint.style.opacity = obsTextarea.value.trim() ? '1' : '0.4';
+    });
+
+    const releaseMessages = [
+      'Released.',
+      'Let go.',
+      'Gone.',
+      'Dissolved.',
+      'It no longer defines you.',
+      'The slate is clean.',
+    ];
+
+    function triggerDissolve() {
+      const text = obsTextarea.value.trim();
+      if (!text) return;
+
+      // Pick a random release message
+      const msg = releaseMessages[Math.floor(Math.random() * releaseMessages.length)];
+      releaseMsg.textContent = msg;
+
+      // Dissolve the text
+      obsTextarea.classList.add('dissolving');
+      obsHint.style.opacity = '0';
+
+      setTimeout(() => {
+        obsTextarea.value = '';
+        obsTextarea.style.height = 'auto';
+        obsTextarea.classList.remove('dissolving');
+        obsTextarea.style.opacity = '1';
+        obsTextarea.style.filter = 'none';
+        obsTextarea.style.transform = 'none';
+
+        releaseMsg.classList.add('visible');
+
+        setTimeout(() => {
+          releaseMsg.classList.remove('visible');
+          obsHint.style.opacity = '0.4';
+        }, 2200);
+      }, 1300);
+    }
+
+    obsTextarea.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        triggerDissolve();
+      }
+    });
+</body>
+</html>
