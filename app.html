@@ -1,0 +1,1288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Catatonica — Your Void</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Mono:ital,wght@0,300;0,400;1,300&family=Outfit:wght@200;300;400&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --void: #080808;
+      --deep: #0f0f0f;
+      --surface: #141414;
+      --surface2: #1a1a1a;
+      --border: rgba(255,255,255,0.06);
+      --border-hover: rgba(255,255,255,0.12);
+      --text-primary: #e8e4dc;
+      --text-muted: rgba(232,228,220,0.38);
+      --text-dim: rgba(232,228,220,0.16);
+      --accent: #a89f8c;
+      --accent-cold: #7a9ea8;
+      --accent-glow: rgba(122,158,168,0.1);
+      --gold: #c4a96d;
+      --gold-dim: rgba(196,169,109,0.15);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--void);
+      color: var(--text-primary);
+      font-family: 'Outfit', sans-serif;
+      font-weight: 300;
+      min-height: 100vh;
+      cursor: none;
+      overflow-x: hidden;
+    }
+
+    /* ─── CURSOR ─── */
+    .cursor {
+      position: fixed; width: 5px; height: 5px;
+      background: var(--accent-cold); border-radius: 50%;
+      pointer-events: none; z-index: 9999;
+      transform: translate(-50%,-50%);
+      transition: transform 0.1s ease;
+      opacity: 0.6;
+    }
+    .cursor-ring {
+      position: fixed; width: 28px; height: 28px;
+      border: 1px solid rgba(122,158,168,0.25); border-radius: 50%;
+      pointer-events: none; z-index: 9998;
+      transform: translate(-50%,-50%);
+      transition: width 0.3s ease, height 0.3s ease;
+      opacity: 0.4;
+    }
+
+    /* ─── GRAIN ─── */
+    body::before {
+      content: ''; position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none; z-index: 9997; opacity: 0.3;
+    }
+
+    /* ─── NAV ─── */
+    nav {
+      position: sticky; top: 0;
+      border-bottom: 1px solid var(--border);
+      padding: 1.5rem 3rem;
+      display: flex; justify-content: space-between; align-items: center;
+      background: rgba(8,8,8,0.92);
+      backdrop-filter: blur(12px);
+      z-index: 100;
+    }
+
+    .nav-logo {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1rem; font-weight: 300;
+      letter-spacing: 0.35em; text-transform: uppercase;
+      color: var(--text-primary); text-decoration: none; cursor: none;
+    }
+    .nav-logo span { font-style: italic; color: var(--accent); }
+
+    .nav-right {
+      display: flex; align-items: center; gap: 2rem;
+    }
+
+    .nav-catatons {
+      display: flex; align-items: center; gap: 0.7rem;
+    }
+
+    .cataton-count {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.6rem; font-weight: 300;
+      color: var(--gold);
+      line-height: 1;
+    }
+
+    .cataton-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.55rem; letter-spacing: 0.2em;
+      text-transform: uppercase; color: var(--text-dim);
+      line-height: 1.4;
+    }
+
+    .nav-archive-btn {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.6rem; letter-spacing: 0.2em;
+      text-transform: uppercase; color: var(--text-muted);
+      background: none; border: none; cursor: none;
+      transition: color 0.3s ease;
+      padding: 0;
+    }
+    .nav-archive-btn:hover { color: var(--text-primary); }
+
+    /* ─── MAIN ─── */
+    main {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 4rem 3rem 8rem;
+    }
+
+    /* ─── PAGE HEADER ─── */
+    .page-header {
+      margin-bottom: 4rem;
+      animation: fadeUp 0.8s ease forwards;
+    }
+
+    .page-eyebrow {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.58rem; letter-spacing: 0.3em;
+      text-transform: uppercase; color: var(--accent-cold);
+      margin-bottom: 1rem; opacity: 0.7;
+    }
+
+    .page-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 300; color: var(--text-primary);
+      line-height: 1.1;
+    }
+    .page-title em { font-style: italic; color: var(--accent); }
+
+    /* ─── ADD SITUATION ─── */
+    .add-situation {
+      border: 1px solid var(--border);
+      margin-bottom: 1px;
+      position: relative;
+      transition: border-color 0.3s ease;
+    }
+    .add-situation:hover { border-color: var(--border-hover); }
+
+    .add-situation-inner {
+      padding: 2rem 2.5rem;
+      display: flex; align-items: center; gap: 1.5rem;
+    }
+
+    .add-icon {
+      width: 32px; height: 32px; flex-shrink: 0;
+      border: 1px solid var(--border);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--text-dim);
+      font-size: 1.2rem;
+      font-weight: 200;
+      transition: border-color 0.3s ease, color 0.3s ease;
+    }
+
+    .add-situation:hover .add-icon {
+      border-color: var(--accent-cold);
+      color: var(--accent-cold);
+    }
+
+    .add-input {
+      flex: 1; background: transparent; border: none; outline: none;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.2rem; font-weight: 300;
+      color: var(--text-primary);
+      cursor: none;
+    }
+    .add-input::placeholder { color: var(--text-dim); font-style: italic; }
+
+    .add-confirm {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.6rem; letter-spacing: 0.2em;
+      text-transform: uppercase; color: var(--text-dim);
+      background: none; border: none; cursor: none;
+      transition: color 0.3s ease;
+      opacity: 0;
+      transition: opacity 0.3s ease, color 0.3s ease;
+    }
+    .add-confirm.visible { opacity: 1; }
+    .add-confirm:hover { color: var(--accent-cold); }
+
+    /* ─── FREE TIER NOTICE ─── */
+    .tier-notice {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.58rem; letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      padding: 0.8rem 2.5rem;
+      border: 1px solid var(--border);
+      border-top: none;
+      margin-bottom: 3rem;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+
+    .tier-upgrade {
+      color: var(--accent-cold);
+      background: none; border: none; cursor: none;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.58rem; letter-spacing: 0.15em;
+      text-transform: uppercase;
+      transition: color 0.3s ease;
+    }
+    .tier-upgrade:hover { color: var(--text-primary); }
+
+    /* ─── SECTION LABEL ─── */
+    .section-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.58rem; letter-spacing: 0.28em;
+      text-transform: uppercase; color: var(--text-dim);
+      margin-bottom: 1px;
+    }
+
+    /* ─── SITUATION CARD ─── */
+    .situations-list {
+      display: flex; flex-direction: column; gap: 1px;
+      margin-bottom: 4rem;
+    }
+
+    .situation-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      position: relative; overflow: hidden;
+      transition: border-color 0.4s ease, background 0.4s ease;
+      animation: fadeUp 0.6s ease forwards;
+      opacity: 0;
+    }
+
+    .situation-card:hover {
+      border-color: var(--border-hover);
+      background: var(--surface2);
+    }
+
+    /* Cataton fill bar — bottom accent */
+    .cataton-bar {
+      position: absolute; bottom: 0; left: 0;
+      height: 1px; background: var(--accent-cold);
+      transition: width 0.8s ease;
+      opacity: 0.5;
+    }
+
+    .cataton-bar.threshold-reached {
+      background: var(--gold);
+      opacity: 0.8;
+      height: 2px;
+    }
+
+    .situation-main {
+      padding: 2rem 2.5rem;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 2rem; align-items: center;
+    }
+
+    .situation-left {}
+
+    .situation-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.3rem; font-weight: 300;
+      color: var(--text-primary);
+      margin-bottom: 0.5rem;
+      line-height: 1.2;
+    }
+
+    .situation-meta {
+      display: flex; align-items: center; gap: 1.5rem;
+    }
+
+    .situation-sessions {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.58rem; letter-spacing: 0.12em;
+      text-transform: uppercase; color: var(--text-dim);
+    }
+
+    .situation-threshold {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.58rem; letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 0.25rem 0.6rem;
+      border: 1px solid rgba(196,169,109,0.2);
+      color: var(--gold);
+      opacity: 0;
+      transition: opacity 0.5s ease;
+    }
+    .situation-threshold.visible { opacity: 1; }
+
+    .situation-right {
+      display: flex; align-items: center; gap: 1.2rem;
+    }
+
+    /* Cataton display */
+    .cataton-display {
+      text-align: right;
+    }
+    .cataton-num {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2.2rem; font-weight: 300;
+      color: var(--gold); line-height: 1;
+      display: block;
+    }
+    .cataton-unit {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.5rem; letter-spacing: 0.2em;
+      text-transform: uppercase; color: var(--text-dim);
+    }
+
+    /* Situation actions */
+    .situation-actions {
+      display: flex; flex-direction: column; gap: 0.5rem;
+    }
+
+    .sit-btn {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.58rem; letter-spacing: 0.15em;
+      text-transform: uppercase; cursor: none;
+      background: none; border: none;
+      padding: 0.4rem 0.8rem;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      white-space: nowrap;
+      transition: all 0.3s ease;
+    }
+    .sit-btn:hover { color: var(--text-primary); border-color: var(--border-hover); }
+    .sit-btn.primary {
+      background: var(--text-primary); color: var(--void);
+      border-color: transparent;
+    }
+    .sit-btn.primary:hover { background: var(--accent-cold); }
+    .sit-btn.gold {
+      border-color: rgba(196,169,109,0.3);
+      color: var(--gold);
+    }
+    .sit-btn.gold:hover {
+      background: var(--gold-dim);
+      border-color: rgba(196,169,109,0.5);
+    }
+
+    /* Expanded manifesto area */
+    .situation-manifesto {
+      border-top: 1px solid var(--border);
+      padding: 0 2.5rem;
+      max-height: 0; overflow: hidden;
+      transition: max-height 0.5s ease, padding 0.3s ease;
+    }
+    .situation-manifesto.open {
+      max-height: 300px;
+      padding: 1.5rem 2.5rem;
+    }
+
+    .manifesto-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.55rem; letter-spacing: 0.2em;
+      text-transform: uppercase; color: var(--accent-cold);
+      margin-bottom: 0.8rem; opacity: 0.6;
+    }
+
+    .manifesto-textarea {
+      width: 100%; background: transparent;
+      border: none; border-bottom: 1px solid var(--border);
+      outline: none; resize: none;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1rem; font-style: italic; font-weight: 300;
+      color: var(--text-muted); line-height: 1.8;
+      padding: 0.5rem 0;
+      transition: color 0.3s ease, border-color 0.3s ease;
+      min-height: 60px;
+    }
+    .manifesto-textarea::placeholder { color: var(--text-dim); }
+    .manifesto-textarea:focus {
+      color: var(--text-primary);
+      border-color: rgba(122,158,168,0.2);
+    }
+
+    .manifesto-save {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.55rem; letter-spacing: 0.15em;
+      text-transform: uppercase; color: var(--text-dim);
+      background: none; border: none; cursor: none;
+      margin-top: 0.8rem; padding: 0;
+      transition: color 0.3s ease;
+    }
+    .manifesto-save:hover { color: var(--accent-cold); }
+
+    /* ─── EMPTY STATE ─── */
+    .empty-state {
+      text-align: center; padding: 5rem 2rem;
+      border: 1px solid var(--border);
+    }
+
+    .empty-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.6rem; font-weight: 300; font-style: italic;
+      color: var(--text-muted); margin-bottom: 1rem;
+    }
+    .empty-sub {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.6rem; letter-spacing: 0.15em;
+      text-transform: uppercase; color: var(--text-dim);
+    }
+
+    /* ─── ARCHIVE VIEW ─── */
+    #archiveView {
+      display: none;
+    }
+
+    .archive-list {
+      display: flex; flex-direction: column; gap: 1px;
+    }
+
+    .archive-card {
+      background: var(--deep);
+      border: 1px solid var(--border);
+      padding: 1.5rem 2.5rem;
+      display: grid; grid-template-columns: 1fr auto;
+      gap: 2rem; align-items: center;
+      opacity: 0.6;
+      transition: opacity 0.3s ease;
+    }
+    .archive-card:hover { opacity: 1; }
+
+    .archive-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.1rem; font-weight: 300; font-style: italic;
+      color: var(--text-muted);
+    }
+
+    .archive-meta {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.55rem; letter-spacing: 0.12em;
+      text-transform: uppercase; color: var(--text-dim);
+      margin-top: 0.3rem;
+    }
+
+    .archive-catatons {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.4rem; font-weight: 300;
+      color: var(--gold); opacity: 0.5;
+    }
+
+    /* ─── MODAL OVERLAY ─── */
+    .modal-overlay {
+      position: fixed; inset: 0;
+      background: rgba(8,8,8,0.92);
+      z-index: 1000;
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.4s ease;
+      backdrop-filter: blur(8px);
+    }
+    .modal-overlay.open { opacity: 1; pointer-events: all; }
+
+    .modal {
+      max-width: 520px; width: 90%;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      padding: 3.5rem;
+      position: relative;
+      transform: translateY(20px);
+      transition: transform 0.4s ease;
+    }
+    .modal-overlay.open .modal { transform: translateY(0); }
+
+    .modal-eyebrow {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.58rem; letter-spacing: 0.25em;
+      text-transform: uppercase; color: var(--accent-cold);
+      margin-bottom: 1.5rem; opacity: 0.7;
+    }
+
+    .modal-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2.2rem; font-weight: 300;
+      color: var(--text-primary); margin-bottom: 0.5rem;
+      line-height: 1.1;
+    }
+    .modal-title em { font-style: italic; color: var(--accent); }
+
+    .modal-situation {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1rem; font-style: italic;
+      color: var(--text-muted); margin-bottom: 2.5rem;
+    }
+
+    .modal-textarea {
+      width: 100%; background: var(--void);
+      border: 1px solid var(--border);
+      padding: 1.2rem 1.5rem; outline: none; resize: none;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1rem; font-style: italic; font-weight: 300;
+      color: var(--text-primary); line-height: 1.8; min-height: 120px;
+      transition: border-color 0.3s ease;
+      cursor: none;
+    }
+    .modal-textarea::placeholder { color: var(--text-dim); }
+    .modal-textarea:focus { border-color: rgba(122,158,168,0.2); }
+
+    .modal-textarea.dissolving {
+      opacity: 0; filter: blur(8px);
+      transform: translateY(-4px);
+      transition: opacity 1.4s ease, filter 1.4s ease, transform 1.4s ease;
+    }
+
+    .modal-actions {
+      display: flex; gap: 0.8rem; margin-top: 2rem;
+    }
+
+    .modal-release-msg {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.1rem; font-style: italic;
+      color: var(--accent-cold);
+      margin-top: 1.5rem; min-height: 1.5rem;
+      opacity: 0; transition: opacity 0.6s ease;
+    }
+    .modal-release-msg.visible { opacity: 1; }
+
+    .modal-close {
+      position: absolute; top: 1.5rem; right: 1.5rem;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.6rem; letter-spacing: 0.15em;
+      text-transform: uppercase; color: var(--text-dim);
+      background: none; border: none; cursor: none;
+      transition: color 0.3s ease;
+    }
+    .modal-close:hover { color: var(--text-muted); }
+
+    /* ─── MASTERY MODAL ─── */
+    .mastery-nudge {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 0.95rem; font-style: italic;
+      color: var(--text-muted); line-height: 1.7;
+      margin-bottom: 2rem;
+    }
+    .mastery-nudge em { color: var(--gold); font-style: normal; }
+
+    .cataton-final {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 4rem; font-weight: 300;
+      color: var(--gold); text-align: center;
+      margin: 1.5rem 0;
+      display: block;
+    }
+    .cataton-final-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.58rem; letter-spacing: 0.25em;
+      text-transform: uppercase; color: var(--text-dim);
+      text-align: center; display: block;
+      margin-bottom: 2rem;
+    }
+
+    /* ─── SESSION SELECT MODAL ─── */
+    .session-modes {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 1px; background: var(--border);
+      border: 1px solid var(--border); margin-bottom: 1.5rem;
+    }
+    .sess-mode-btn {
+      background: var(--void); border: none;
+      padding: 1.2rem 1rem; cursor: none; text-align: center;
+      transition: background 0.3s ease;
+    }
+    .sess-mode-btn:hover, .sess-mode-btn.active { background: var(--surface2); }
+    .sess-mode-btn.active { position: relative; }
+    .sess-mode-btn.active::after {
+      content: ''; position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 1px; background: var(--accent-cold);
+    }
+    .sess-mode-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1rem; font-weight: 300;
+      color: var(--text-primary); display: block;
+    }
+    .sess-mode-desc {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.52rem; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--text-dim);
+    }
+
+    .session-durations {
+      display: flex; gap: 1px;
+      background: var(--border); border: 1px solid var(--border);
+      margin-bottom: 2rem;
+    }
+    .sess-dur-btn {
+      flex: 1; background: var(--void);
+      border: none; padding: 0.8rem;
+      cursor: none; text-align: center;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.62rem; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--text-muted);
+      transition: background 0.3s ease, color 0.3s ease;
+    }
+    .sess-dur-btn:hover, .sess-dur-btn.active {
+      background: var(--surface2); color: var(--text-primary);
+    }
+    .sess-dur-btn.active { position: relative; }
+    .sess-dur-btn.active::after {
+      content: ''; position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 1px; background: var(--accent-cold);
+    }
+
+    /* ─── ANIMATIONS ─── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes catatonPop {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.3); color: var(--gold); }
+      100% { transform: scale(1); }
+    }
+    .cataton-pop { animation: catatonPop 0.5s ease; }
+
+    /* ─── RESPONSIVE ─── */
+    @media (max-width: 640px) {
+      nav { padding: 1.2rem 1.5rem; }
+      main { padding: 2.5rem 1.5rem 6rem; }
+      .situation-main { grid-template-columns: 1fr; gap: 1rem; }
+      .situation-right { justify-content: space-between; }
+      .session-modes { grid-template-columns: 1fr; }
+      .modal { padding: 2.5rem 2rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="cursor" id="cursor"></div>
+  <div class="cursor-ring" id="cursorRing"></div>
+
+  <!-- NAV -->
+  <nav>
+    <a href="index.html" class="nav-logo">Cata<span>tonica</span></a>
+    <div class="nav-right">
+      <div class="nav-catatons">
+        <span class="cataton-count" id="totalCatatons">0</span>
+        <span class="cataton-label">Total<br>Catatons</span>
+      </div>
+      <button class="nav-archive-btn" id="archiveToggle">Archive</button>
+    </div>
+  </nav>
+
+  <!-- MAIN -->
+  <main>
+
+    <!-- Active Situations View -->
+    <div id="activeView">
+      <div class="page-header">
+        <p class="page-eyebrow">Your Void</p>
+        <h1 class="page-title">What are you <em>sitting with?</em></h1>
+      </div>
+
+      <!-- Add new situation -->
+      <div class="add-situation" id="addSituationCard">
+        <div class="add-situation-inner">
+          <div class="add-icon">+</div>
+          <input
+            type="text"
+            class="add-input"
+            id="newSituationInput"
+            placeholder="Name a situation, a weight, a transition…"
+            maxlength="120"
+            autocomplete="off"
+          />
+          <button class="add-confirm" id="addConfirmBtn">Enter →</button>
+        </div>
+      </div>
+
+      <div class="tier-notice" id="tierNotice">
+        <span id="tierText">Free tier — 0 of 5 situations used</span>
+        <button class="tier-upgrade">Upgrade to remove limits</button>
+      </div>
+
+      <p class="section-label" id="activeLabel" style="display:none">Active</p>
+      <div class="situations-list" id="situationsList"></div>
+    </div>
+
+    <!-- Archive View -->
+    <div id="archiveView">
+      <div class="page-header">
+        <p class="page-eyebrow">Mastered</p>
+        <h1 class="page-title">What you've <em>released.</em></h1>
+      </div>
+      <div class="archive-list" id="archiveList"></div>
+    </div>
+
+  </main>
+
+  <!-- ─── MODALS ─── -->
+
+  <!-- Session Modal -->
+  <div class="modal-overlay" id="sessionModal">
+    <div class="modal">
+      <button class="modal-close" id="sessionModalClose">✕ Close</button>
+      <p class="modal-eyebrow">Begin Session</p>
+      <h2 class="modal-title">Enter the <em>void.</em></h2>
+      <p class="modal-situation" id="sessionSituationName"></p>
+
+      <div class="session-modes" id="sessionModes">
+        <button class="sess-mode-btn active" data-mode="silence">
+          <span class="sess-mode-name">Silence</span>
+          <span class="sess-mode-desc">Pure void</span>
+        </button>
+        <button class="sess-mode-btn" data-mode="sound">
+          <span class="sess-mode-name">Sound</span>
+          <span class="sess-mode-desc">Ambient tones</span>
+        </button>
+        <button class="sess-mode-btn" data-mode="visual">
+          <span class="sess-mode-name">Breathing</span>
+          <span class="sess-mode-desc">Visual guide</span>
+        </button>
+      </div>
+
+      <div class="session-durations" id="sessionDurations">
+        <button class="sess-dur-btn" data-min="5">5m</button>
+        <button class="sess-dur-btn active" data-min="10">10m</button>
+        <button class="sess-dur-btn" data-min="15">15m</button>
+        <button class="sess-dur-btn" data-min="20">20m</button>
+        <button class="sess-dur-btn" data-min="30">30m</button>
+      </div>
+
+      <div class="modal-actions">
+        <button class="sit-btn primary" id="startSessionBtn" style="flex:1; padding: 1rem;">Begin</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Planned Obsolescence Modal (Manifesto + Completion) -->
+  <div class="modal-overlay" id="obsModal">
+    <div class="modal">
+      <button class="modal-close" id="obsModalClose">✕ Close</button>
+      <p class="modal-eyebrow" id="obsModalEyebrow">Planned Obsolescence</p>
+      <h2 class="modal-title" id="obsModalTitle">Before <em>the void.</em></h2>
+      <p class="modal-situation" id="obsModalSituation"></p>
+
+      <textarea
+        class="modal-textarea"
+        id="obsModalText"
+        placeholder="Write what this situation has meant. What it cost you. What you're ready to leave behind…"
+        rows="5"
+      ></textarea>
+
+      <div class="modal-release-msg" id="obsReleaseMsg"></div>
+
+      <div class="modal-actions" id="obsModalActions">
+        <button class="sit-btn primary" id="obsActionBtn" style="flex:1; padding: 1rem;">Save Intention</button>
+        <button class="sit-btn" id="obsSecondaryBtn" style="padding: 1rem 1.5rem;">Begin Session</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mastery / Completion Modal -->
+  <div class="modal-overlay" id="masteryModal">
+    <div class="modal">
+      <button class="modal-close" id="masteryModalClose">✕ Close</button>
+      <p class="modal-eyebrow">Declare Mastery</p>
+      <h2 class="modal-title">The <em>Genesis.</em></h2>
+
+      <span class="cataton-final" id="masteryCount">0</span>
+      <span class="cataton-final-label">Catatons Accumulated</span>
+
+      <p class="mastery-nudge" id="masteryNudge"></p>
+
+      <textarea
+        class="modal-textarea"
+        id="masteryText"
+        placeholder="What emerged from this silence? What is new? (Optional — write nothing, or write everything)"
+        rows="4"
+      ></textarea>
+
+      <div class="modal-release-msg" id="masteryReleaseMsg"></div>
+
+      <div class="modal-actions" id="masteryActions">
+        <button class="sit-btn gold" id="declareBtn" style="flex:1; padding:1rem;">
+          Declare Mastery — Release
+        </button>
+        <button class="sit-btn" id="masteryNotYetBtn" style="padding:1rem 1.5rem;">
+          Not Yet
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ─── CURSOR ───
+    const cursor = document.getElementById('cursor');
+    const ring = document.getElementById('cursorRing');
+    let mx=0,my=0,rx=0,ry=0;
+    document.addEventListener('mousemove', e => {
+      mx=e.clientX; my=e.clientY;
+      cursor.style.left=mx+'px'; cursor.style.top=my+'px';
+    });
+    (function animRing(){
+      rx+=(mx-rx)*0.12; ry+=(my-ry)*0.12;
+      ring.style.left=rx+'px'; ring.style.top=ry+'px';
+      requestAnimationFrame(animRing);
+    })();
+    document.addEventListener('mouseover', e => {
+      if(e.target.matches('button,a,input,textarea')) {
+        cursor.style.transform='translate(-50%,-50%) scale(2.5)';
+        ring.style.width='44px'; ring.style.height='44px';
+      }
+    });
+    document.addEventListener('mouseout', e => {
+      if(e.target.matches('button,a,input,textarea')) {
+        cursor.style.transform='translate(-50%,-50%) scale(1)';
+        ring.style.width='28px'; ring.style.height='28px';
+      }
+    });
+
+    // ─── STATE & STORAGE ───
+    const FREE_LIMIT = 5;
+    const THRESHOLD_SESSIONS = 7; // suggested mastery threshold
+
+    function loadData() {
+      return {
+        situations: JSON.parse(localStorage.getItem('cat_situations') || '[]'),
+        archive: JSON.parse(localStorage.getItem('cat_archive') || '[]'),
+        totalCatatons: parseInt(localStorage.getItem('cat_total') || '0'),
+        isPremium: localStorage.getItem('cat_premium') === 'true',
+      };
+    }
+
+    function saveData(data) {
+      localStorage.setItem('cat_situations', JSON.stringify(data.situations));
+      localStorage.setItem('cat_archive', JSON.stringify(data.archive));
+      localStorage.setItem('cat_total', data.totalCatatons);
+    }
+
+    let data = loadData();
+    let activeSituationId = null; // which situation current action targets
+    let sessionMode = 'silence';
+    let sessionDuration = 10;
+    let obsMode = 'manifesto'; // 'manifesto' or 'completion'
+
+    // ─── RENDER ───
+    function render() {
+      data = loadData();
+      renderSituations();
+      renderArchive();
+      updateTierNotice();
+      updateTotalCatatons();
+    }
+
+    function updateTotalCatatons() {
+      document.getElementById('totalCatatons').textContent =
+        data.totalCatatons.toLocaleString();
+    }
+
+    function updateTierNotice() {
+      const count = data.situations.length;
+      document.getElementById('tierText').textContent =
+        `Free tier — ${count} of ${FREE_LIMIT} situations used`;
+    }
+
+    function renderSituations() {
+      const list = document.getElementById('situationsList');
+      const label = document.getElementById('activeLabel');
+      list.innerHTML = '';
+
+      if (data.situations.length === 0) {
+        label.style.display = 'none';
+        list.innerHTML = `
+          <div class="empty-state">
+            <p class="empty-title">The void is clear.</p>
+            <p class="empty-sub">Name what you're carrying to begin.</p>
+          </div>`;
+        return;
+      }
+
+      label.style.display = 'block';
+
+      data.situations.forEach((sit, i) => {
+        const progress = Math.min((sit.sessions / THRESHOLD_SESSIONS) * 100, 100);
+        const thresholdReached = sit.sessions >= THRESHOLD_SESSIONS;
+        const delay = i * 80;
+
+        const card = document.createElement('div');
+        card.className = 'situation-card';
+        card.style.animationDelay = delay + 'ms';
+        card.dataset.id = sit.id;
+
+        card.innerHTML = `
+          <div class="cataton-bar ${thresholdReached ? 'threshold-reached' : ''}"
+            style="width: ${progress}%"></div>
+
+          <div class="situation-main">
+            <div class="situation-left">
+              <div class="situation-name">${escHtml(sit.name)}</div>
+              <div class="situation-meta">
+                <span class="situation-sessions">
+                  ${sit.sessions} session${sit.sessions !== 1 ? 's' : ''}
+                </span>
+                <span class="situation-threshold ${thresholdReached ? 'visible' : ''}">
+                  Mastery threshold reached
+                </span>
+              </div>
+            </div>
+            <div class="situation-right">
+              <div class="cataton-display">
+                <span class="cataton-num" id="cnum-${sit.id}">${sit.catatons}</span>
+                <span class="cataton-unit">Catatons</span>
+              </div>
+              <div class="situation-actions">
+                <button class="sit-btn primary" data-action="session" data-id="${sit.id}">
+                  Begin Session
+                </button>
+                <button class="sit-btn" data-action="manifesto" data-id="${sit.id}">
+                  Write Intention
+                </button>
+                ${thresholdReached
+                  ? `<button class="sit-btn gold" data-action="mastery" data-id="${sit.id}">
+                      Declare Mastery
+                    </button>`
+                  : ''}
+              </div>
+            </div>
+          </div>
+
+          <div class="situation-manifesto" id="manifesto-${sit.id}">
+            <div class="manifesto-label">Intention</div>
+            <textarea class="manifesto-textarea"
+              placeholder="What are you bringing into this silence…"
+              data-sit-id="${sit.id}"
+            >${escHtml(sit.manifesto || '')}</textarea>
+            <button class="manifesto-save" data-save="${sit.id}">Save →</button>
+          </div>
+        `;
+
+        list.appendChild(card);
+      });
+
+      // Bind card actions
+      list.querySelectorAll('[data-action]').forEach(btn => {
+        btn.addEventListener('click', e => {
+          const action = btn.dataset.action;
+          const id = btn.dataset.id;
+          if (action === 'session') openSessionModal(id);
+          if (action === 'manifesto') openObsModal(id, 'manifesto');
+          if (action === 'mastery') openMasteryModal(id);
+        });
+      });
+
+      // Inline manifesto save
+      list.querySelectorAll('[data-save]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const id = btn.dataset.save;
+          const ta = list.querySelector(`textarea[data-sit-id="${id}"]`);
+          const sit = data.situations.find(s => s.id === id);
+          if (sit) {
+            sit.manifesto = ta.value;
+            saveData(data);
+            btn.textContent = 'Saved.';
+            setTimeout(() => btn.textContent = 'Save →', 1500);
+          }
+        });
+      });
+    }
+
+    function renderArchive() {
+      const list = document.getElementById('archiveList');
+      list.innerHTML = '';
+
+      if (data.archive.length === 0) {
+        list.innerHTML = `
+          <div class="empty-state">
+            <p class="empty-title">Nothing mastered yet.</p>
+            <p class="empty-sub">Completed situations will appear here.</p>
+          </div>`;
+        return;
+      }
+
+      data.archive.forEach(sit => {
+        const div = document.createElement('div');
+        div.className = 'archive-card';
+        div.innerHTML = `
+          <div>
+            <div class="archive-name">${escHtml(sit.name)}</div>
+            <div class="archive-meta">
+              Mastered ${formatDate(sit.completedAt)} ·
+              ${sit.sessions} sessions
+            </div>
+            ${sit.genesis ? `<div class="archive-meta" style="margin-top:0.5rem;font-style:italic;color:var(--text-muted)">"${escHtml(sit.genesis)}"</div>` : ''}
+          </div>
+          <div class="archive-catatons">${sit.catatons}</div>
+        `;
+        list.appendChild(div);
+      });
+    }
+
+    // ─── ADD SITUATION ───
+    const input = document.getElementById('newSituationInput');
+    const confirmBtn = document.getElementById('addConfirmBtn');
+
+    input.addEventListener('input', () => {
+      confirmBtn.classList.toggle('visible', input.value.trim().length > 0);
+    });
+
+    input.addEventListener('keydown', e => {
+      if (e.key === 'Enter') addSituation();
+    });
+    confirmBtn.addEventListener('click', addSituation);
+
+    function addSituation() {
+      const name = input.value.trim();
+      if (!name) return;
+
+      if (!data.isPremium && data.situations.length >= FREE_LIMIT) {
+        alert('Free tier limit reached. Upgrade for unlimited situations.');
+        return;
+      }
+
+      const sit = {
+        id: Date.now().toString(),
+        name,
+        sessions: 0,
+        catatons: 0,
+        manifesto: '',
+        genesis: '',
+        createdAt: Date.now(),
+      };
+
+      data.situations.push(sit);
+      saveData(data);
+      input.value = '';
+      confirmBtn.classList.remove('visible');
+      render();
+    }
+
+    // ─── SESSION MODAL ───
+    let pendingSessionSitId = null;
+
+    function openSessionModal(id) {
+      pendingSessionSitId = id;
+      const sit = data.situations.find(s => s.id === id);
+      document.getElementById('sessionSituationName').textContent =
+        `"${sit.name}"`;
+      document.getElementById('sessionModal').classList.add('open');
+    }
+
+    // Mode buttons
+    document.getElementById('sessionModes').querySelectorAll('.sess-mode-btn')
+      .forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.getElementById('sessionModes')
+            .querySelectorAll('.sess-mode-btn')
+            .forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          sessionMode = btn.dataset.mode;
+        });
+      });
+
+    // Duration buttons
+    document.getElementById('sessionDurations').querySelectorAll('.sess-dur-btn')
+      .forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.getElementById('sessionDurations')
+            .querySelectorAll('.sess-dur-btn')
+            .forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          sessionDuration = parseInt(btn.dataset.min);
+        });
+      });
+
+    document.getElementById('sessionModalClose').addEventListener('click', () => {
+      document.getElementById('sessionModal').classList.remove('open');
+    });
+
+    document.getElementById('startSessionBtn').addEventListener('click', () => {
+      document.getElementById('sessionModal').classList.remove('open');
+      // Pass situation id, mode, duration to session page via sessionStorage
+      sessionStorage.setItem('cat_session', JSON.stringify({
+        sitId: pendingSessionSitId,
+        mode: sessionMode,
+        duration: sessionDuration,
+      }));
+      window.location.href = 'session.html';
+    });
+
+    // ─── OBS MODAL (MANIFESTO + COMPLETION WRITE) ───
+    function openObsModal(id, mode) {
+      activeSituationId = id;
+      obsMode = mode;
+      const sit = data.situations.find(s => s.id === id);
+
+      document.getElementById('obsModalSituation').textContent = `"${sit.name}"`;
+      document.getElementById('obsModalText').value = sit.manifesto || '';
+      document.getElementById('obsModalText').classList.remove('dissolving');
+      document.getElementById('obsReleaseMsg').classList.remove('visible');
+
+      if (mode === 'manifesto') {
+        document.getElementById('obsModalEyebrow').textContent = 'Planned Obsolescence — Intention';
+        document.getElementById('obsModalTitle').innerHTML = 'Before <em>the void.</em>';
+        document.getElementById('obsModalText').placeholder =
+          'What are you bringing into this silence? What are you hoping to release?…';
+        document.getElementById('obsActionBtn').textContent = 'Save Intention';
+        document.getElementById('obsSecondaryBtn').style.display = '';
+        document.getElementById('obsSecondaryBtn').textContent = 'Begin Session →';
+      } else {
+        document.getElementById('obsModalEyebrow').textContent = 'Planned Obsolescence — Completion';
+        document.getElementById('obsModalTitle').innerHTML = 'The <em>release.</em>';
+        document.getElementById('obsModalText').placeholder =
+          'Write what you are releasing. Name it one final time before it dissolves…';
+        document.getElementById('obsActionBtn').textContent = 'Release It';
+        document.getElementById('obsSecondaryBtn').style.display = 'none';
+      }
+
+      document.getElementById('obsModal').classList.add('open');
+    }
+
+    document.getElementById('obsModalClose').addEventListener('click', () => {
+      document.getElementById('obsModal').classList.remove('open');
+    });
+
+    document.getElementById('obsSecondaryBtn').addEventListener('click', () => {
+      // Save then go to session
+      const sit = data.situations.find(s => s.id === activeSituationId);
+      if (sit) {
+        sit.manifesto = document.getElementById('obsModalText').value;
+        saveData(data);
+      }
+      document.getElementById('obsModal').classList.remove('open');
+      openSessionModal(activeSituationId);
+    });
+
+    document.getElementById('obsActionBtn').addEventListener('click', () => {
+      const sit = data.situations.find(s => s.id === activeSituationId);
+      if (!sit) return;
+
+      if (obsMode === 'manifesto') {
+        sit.manifesto = document.getElementById('obsModalText').value;
+        saveData(data);
+        document.getElementById('obsActionBtn').textContent = 'Saved.';
+        setTimeout(() => {
+          document.getElementById('obsModal').classList.remove('open');
+          document.getElementById('obsActionBtn').textContent = 'Save Intention';
+        }, 1000);
+      } else {
+        // Completion dissolve ritual
+        const ta = document.getElementById('obsModalText');
+        ta.classList.add('dissolving');
+        document.getElementById('obsModalActions').style.opacity = '0';
+        document.getElementById('obsModalActions').style.pointerEvents = 'none';
+
+        const msgs = ['Released.', 'Let go.', 'Gone.', 'It no longer defines you.', 'The slate is clean.'];
+        const msg = msgs[Math.floor(Math.random() * msgs.length)];
+
+        setTimeout(() => {
+          document.getElementById('obsReleaseMsg').textContent = msg;
+          document.getElementById('obsReleaseMsg').classList.add('visible');
+          sit.manifesto = '';
+          saveData(data);
+        }, 1400);
+
+        setTimeout(() => {
+          document.getElementById('obsModal').classList.remove('open');
+          document.getElementById('obsModalActions').style.opacity = '1';
+          document.getElementById('obsModalActions').style.pointerEvents = '';
+          document.getElementById('obsReleaseMsg').classList.remove('visible');
+          ta.classList.remove('dissolving');
+          ta.style.opacity = '1';
+          ta.style.filter = 'none';
+        }, 3500);
+      }
+    });
+
+    // ─── MASTERY MODAL ───
+    function openMasteryModal(id) {
+      activeSituationId = id;
+      const sit = data.situations.find(s => s.id === id);
+
+      document.getElementById('masteryCount').textContent = sit.catatons;
+      document.getElementById('masteryText').value = '';
+      document.getElementById('masteryReleaseMsg').classList.remove('visible');
+      document.getElementById('masteryActions').style.opacity = '1';
+      document.getElementById('masteryActions').style.pointerEvents = '';
+
+      const nudge = sit.sessions >= THRESHOLD_SESSIONS
+        ? `You've completed <em>${sit.sessions} sessions</em> with this situation. The silence has had time to work. You are ready — when you feel it.`
+        : `You've completed ${sit.sessions} sessions. The suggested threshold is ${THRESHOLD_SESSIONS}. You may declare mastery now, or continue accumulating.`;
+
+      document.getElementById('masteryNudge').innerHTML = nudge;
+      document.getElementById('masteryModal').classList.add('open');
+    }
+
+    document.getElementById('masteryModalClose').addEventListener('click', () => {
+      document.getElementById('masteryModal').classList.remove('open');
+    });
+
+    document.getElementById('masteryNotYetBtn').addEventListener('click', () => {
+      document.getElementById('masteryModal').classList.remove('open');
+    });
+
+    document.getElementById('declareBtn').addEventListener('click', () => {
+      const sit = data.situations.find(s => s.id === activeSituationId);
+      if (!sit) return;
+
+      sit.genesis = document.getElementById('masteryText').value.trim();
+
+      // Archive it
+      data.archive.unshift({
+        ...sit,
+        completedAt: Date.now(),
+      });
+
+      // Remove from active
+      data.situations = data.situations.filter(s => s.id !== activeSituationId);
+      saveData(data);
+
+      // Show release
+      document.getElementById('masteryActions').style.opacity = '0';
+      document.getElementById('masteryActions').style.pointerEvents = 'none';
+
+      const msgs = ['Released.', 'Genesis.', 'It is finished.', 'The new world begins.', 'Amen.'];
+      const msg = msgs[Math.floor(Math.random() * msgs.length)];
+      document.getElementById('masteryReleaseMsg').textContent = msg;
+      document.getElementById('masteryReleaseMsg').classList.add('visible');
+
+      setTimeout(() => {
+        document.getElementById('masteryModal').classList.remove('open');
+        render();
+      }, 2500);
+    });
+
+    // ─── ARCHIVE TOGGLE ───
+    let showingArchive = false;
+    document.getElementById('archiveToggle').addEventListener('click', () => {
+      showingArchive = !showingArchive;
+      document.getElementById('activeView').style.display = showingArchive ? 'none' : '';
+      document.getElementById('archiveView').style.display = showingArchive ? '' : 'none';
+      document.getElementById('archiveToggle').textContent =
+        showingArchive ? 'Active' : 'Archive';
+    });
+
+    // ─── SESSION RETURN — add catatons if returning from session ───
+    function checkSessionReturn() {
+      const result = sessionStorage.getItem('cat_session_result');
+      if (!result) return;
+      sessionStorage.removeItem('cat_session_result');
+
+      const { sitId, catatonsEarned } = JSON.parse(result);
+      const sit = data.situations.find(s => s.id === sitId);
+      if (!sit) return;
+
+      sit.sessions++;
+      sit.catatons += catatonsEarned;
+      data.totalCatatons += catatonsEarned;
+      saveData(data);
+
+      // Animate the count
+      setTimeout(() => {
+        const el = document.getElementById(`cnum-${sitId}`);
+        if (el) {
+          el.classList.add('cataton-pop');
+          setTimeout(() => el.classList.remove('cataton-pop'), 500);
+        }
+      }, 400);
+    }
+
+    // ─── HELPERS ───
+    function escHtml(str) {
+      return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    function formatDate(ts) {
+      return new Date(ts).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    }
+
+    // ─── INIT ───
+    checkSessionReturn();
+    render();
+  </script>
+</body>
+</html>
