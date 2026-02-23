@@ -437,6 +437,169 @@
       transform: rotate(-90deg);
     }
 
+    /* ─── PLANNED OBSOLESCENCE SCREEN ─── */
+    #obsolescenceScreen {
+      padding: 3rem;
+      background: var(--void);
+      text-align: left;
+      justify-content: center;
+      align-items: flex-start;
+    }
+
+    .obs-screen-inner {
+      width: 100%;
+      max-width: 600px;
+      margin: 0 auto;
+      animation: fadeUp 1s ease forwards;
+    }
+
+    .obs-screen-eyebrow {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.58rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 2rem;
+      opacity: 0.7;
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+    }
+    .obs-screen-eyebrow::before {
+      content: '';
+      display: inline-block;
+      width: 20px;
+      height: 1px;
+      background: var(--accent);
+      opacity: 0.5;
+    }
+
+    .obs-screen-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(2.5rem, 5vw, 4rem);
+      font-weight: 300;
+      color: var(--text-primary);
+      line-height: 1.1;
+      margin-bottom: 1rem;
+    }
+    .obs-screen-title em {
+      font-style: italic;
+      color: var(--accent-cold);
+    }
+
+    .obs-screen-sub {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      line-height: 1.8;
+      margin-bottom: 3rem;
+      max-width: 440px;
+    }
+
+    .obs-write-area {
+      position: relative;
+      margin-bottom: 1.5rem;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      padding-bottom: 1.5rem;
+    }
+
+    .obs-write-prompt {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1rem;
+      font-style: italic;
+      color: var(--text-muted);
+      margin-bottom: 1rem;
+    }
+
+    .obs-write-input {
+      width: 100%;
+      background: transparent;
+      border: none;
+      outline: none;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(1.3rem, 3vw, 1.8rem);
+      font-weight: 300;
+      color: var(--text-primary);
+      resize: none;
+      line-height: 1.5;
+      min-height: 3rem;
+      overflow: hidden;
+      cursor: text;
+      caret-color: var(--accent-cold);
+      user-select: text;
+    }
+    .obs-write-input::placeholder {
+      color: var(--text-dim);
+      font-style: italic;
+    }
+
+    .obs-char-hint {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.55rem;
+      letter-spacing: 0.15em;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      margin-bottom: 2.5rem;
+      transition: opacity 0.3s ease;
+    }
+
+    .obs-skip {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.6rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      background: none;
+      border: none;
+      cursor: none;
+      margin-left: 1.5rem;
+      transition: color 0.3s ease;
+    }
+    .obs-skip:hover { color: var(--text-muted); }
+
+    /* ─── COMPLETE SCREEN: OBSOLESCENCE ECHO ─── */
+    .complete-obs-echo {
+      margin-bottom: 2.5rem;
+      position: relative;
+    }
+
+    .complete-obs-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.55rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      margin-bottom: 0.8rem;
+    }
+
+    .complete-obs-text {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.2rem;
+      font-style: italic;
+      color: var(--text-muted);
+      line-height: 1.6;
+      max-width: 380px;
+      margin: 0 auto;
+      transition: opacity 2s ease, filter 2s ease, transform 2s ease;
+    }
+
+    .complete-obs-text.dissolving {
+      opacity: 0;
+      filter: blur(10px);
+      transform: translateY(-8px);
+    }
+
+    .complete-obs-released {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 0.85rem;
+      font-style: italic;
+      color: var(--accent-cold);
+      opacity: 0;
+      transition: opacity 0.8s ease;
+      margin-top: 0.5rem;
+      letter-spacing: 0.05em;
+    }
+    .complete-obs-released.visible { opacity: 0.6; }
+
     /* ─── MOBILE ─── */
     @media (max-width: 600px) {
       .mode-grid { grid-template-columns: 1fr; }
@@ -445,6 +608,7 @@
       .timer-display { font-size: clamp(4rem, 20vw, 8rem); }
       .breath-ring-1 { width: 220px; height: 220px; }
       .breath-ring-2 { width: 160px; height: 160px; }
+      #obsolescenceScreen { align-items: center; }
     }
   </style>
 </head>
@@ -453,8 +617,47 @@
   <div class="cursor" id="cursor"></div>
   <div class="cursor-ring" id="cursorRing"></div>
 
+  <!-- ─── PLANNED OBSOLESCENCE SCREEN ─── -->
+  <div class="screen" id="obsolescenceScreen">
+    <div class="setup-nav">
+      <a href="index.html" class="back-link">← Catatonica</a>
+    </div>
+    <div class="setup-logo">Cata<span>tonica</span></div>
+
+    <div class="obs-screen-inner">
+      <div class="obs-screen-eyebrow">Planned Obsolescence</div>
+      <h1 class="obs-screen-title">
+        What are you<br><em>releasing?</em>
+      </h1>
+      <p class="obs-screen-sub">
+        Name the old thing — a habit, a belief, a way of working that no longer fits.
+        Carry it consciously into your silence. What you write here is not saved.
+      </p>
+
+      <div class="obs-write-area">
+        <p class="obs-write-prompt">I am releasing…</p>
+        <textarea
+          class="obs-write-input"
+          id="obsWriteInput"
+          placeholder="Write it here…"
+          rows="2"
+          spellcheck="false"
+        ></textarea>
+      </div>
+
+      <p class="obs-char-hint" id="obsCharHint">Write freely — this exists only for you</p>
+
+      <div style="display:flex; align-items:center; margin-top:0.5rem;">
+        <button class="begin-btn" id="obsBeginBtn" style="flex:1; max-width:260px;">
+          Enter Silence
+        </button>
+        <button class="obs-skip" id="obsSkipBtn">Skip this step →</button>
+      </div>
+    </div>
+  </div>
+
   <!-- ─── SETUP SCREEN ─── -->
-  <div class="screen" id="setupScreen">
+  <div class="screen hidden gone" id="setupScreen">
     <div class="setup-nav">
       <a href="index.html" class="back-link">← Catatonica</a>
     </div>
@@ -566,6 +769,14 @@
       </h2>
       <p class="complete-duration" id="completeDuration"></p>
       <p class="complete-quote" id="completeQuote"></p>
+
+      <!-- Obsolescence echo — only shown if user wrote something -->
+      <div class="complete-obs-echo" id="completeObsEcho" style="display:none;">
+        <p class="complete-obs-label">You released</p>
+        <p class="complete-obs-text" id="completeObsText"></p>
+        <p class="complete-obs-released" id="completeObsReleased">It is gone.</p>
+      </div>
+
       <div class="complete-actions">
         <button class="btn-primary" id="goAgainBtn">Another Session</button>
         <a href="index.html" class="btn-ghost">Return</a>
@@ -577,7 +788,7 @@
     // ─── STATE ───
     const state = {
       mode: 'silence',
-      duration: 10,       // minutes
+      duration: 10,
       secondsLeft: 0,
       totalSeconds: 0,
       timer: null,
@@ -585,7 +796,33 @@
       soundNodes: [],
       breathPhase: 'in',
       breathTimer: null,
+      obsText: '',        // what the user is releasing
     };
+
+    // ─── PLANNED OBSOLESCENCE SCREEN ───
+    const obsInput = document.getElementById('obsWriteInput');
+
+    // Allow user-select on the textarea
+    obsInput.style.userSelect = 'text';
+    obsInput.style.cursor = 'text';
+
+    // Auto-grow textarea
+    obsInput.addEventListener('input', () => {
+      obsInput.style.height = 'auto';
+      obsInput.style.height = obsInput.scrollHeight + 'px';
+    });
+
+    // Enter Silence button
+    document.getElementById('obsBeginBtn').addEventListener('click', () => {
+      state.obsText = obsInput.value.trim();
+      showScreen('setupScreen');
+    });
+
+    // Skip
+    document.getElementById('obsSkipBtn').addEventListener('click', () => {
+      state.obsText = '';
+      showScreen('setupScreen');
+    });
 
     // ─── CURSOR ───
     const cursor = document.getElementById('cursor');
@@ -778,6 +1015,29 @@
         document.getElementById('completeQuote').textContent =
           quotes[Math.floor(Math.random() * quotes.length)];
 
+        // Show obsolescence echo if user wrote something
+        const obsEcho = document.getElementById('completeObsEcho');
+        const obsTextEl = document.getElementById('completeObsText');
+        const obsReleased = document.getElementById('completeObsReleased');
+
+        if (state.obsText) {
+          obsTextEl.textContent = '"' + state.obsText + '"';
+          obsEcho.style.display = 'block';
+
+          // Dissolve it after a moment — one last look, then gone
+          setTimeout(() => {
+            obsTextEl.classList.add('dissolving');
+            setTimeout(() => {
+              obsReleased.classList.add('visible');
+              // After the "It is gone." message fades in, hide the whole block
+              setTimeout(() => {
+                obsEcho.style.transition = 'opacity 1.5s ease';
+                obsEcho.style.opacity = '0';
+              }, 3000);
+            }, 2200);
+          }, 2500);
+        }
+
         showScreen('completeScreen');
       }, early ? 300 : 1200);
     }
@@ -787,7 +1047,17 @@
 
     // ─── GO AGAIN ───
     document.getElementById('goAgainBtn').addEventListener('click', () => {
-      showScreen('setupScreen');
+      // Reset obsolescence state
+      state.obsText = '';
+      obsInput.value = '';
+      obsInput.style.height = 'auto';
+      // Reset echo block
+      const obsEcho = document.getElementById('completeObsEcho');
+      obsEcho.style.display = 'none';
+      obsEcho.style.opacity = '1';
+      document.getElementById('completeObsText').classList.remove('dissolving');
+      document.getElementById('completeObsReleased').classList.remove('visible');
+      showScreen('obsolescenceScreen');
     });
 
     // ─── WEB AUDIO: AMBIENT SOUNDSCAPE ───
