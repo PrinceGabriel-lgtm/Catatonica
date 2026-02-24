@@ -1,0 +1,8 @@
+{
+  "name": "catatonica",
+  "version": "1.0.0",
+  "description": "Catatonica — The Art of Doing Nothing",
+  "dependencies": {
+    "stripe": "^14.0.0"
+  }
+}

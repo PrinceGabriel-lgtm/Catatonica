@@ -892,7 +892,7 @@
           <li class="active">Priority access to new features</li>
           <li class="active">Corporate / Team licenses</li>
         </ul>
-        <a href="#waitlist" class="btn-primary">Join Early Access</a>
+        <a href="#" class="btn-primary upgrade-btn" id="upgradeBtn">Join Early Access</a>
       </div>
     </div>
   </section>
@@ -1174,6 +1174,33 @@
         e.preventDefault();
         triggerDissolve();
       }
+    });
+
+    // ─── STRIPE CHECKOUT ───
+    async function startCheckout() {
+      const btn = document.getElementById('upgradeBtn');
+      if (btn) { btn.textContent = '...'; btn.style.opacity = '0.7'; }
+      try {
+        const res = await fetch('/.netlify/functions/create-checkout', { method: 'POST' });
+        const data = await res.json();
+        if (data.url) {
+          window.location.href = data.url;
+        } else {
+          throw new Error(data.error || 'Unknown error');
+        }
+      } catch (err) {
+        console.error('Checkout error:', err);
+        if (btn) { btn.textContent = 'Join Early Access'; btn.style.opacity = '1'; }
+        alert('Something went wrong. Please try again.');
+      }
+    }
+
+    // Attach to all upgrade buttons
+    document.querySelectorAll('.upgrade-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        startCheckout();
+      });
     });
   </script>
 </body>
