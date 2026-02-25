@@ -10,441 +10,455 @@
 
   <style>
     :root {
-      --void: #080808;
-      --surface: #141414;
-      --border: rgba(255,255,255,0.06);
-      --text-primary: #e8e4dc;
-      --text-muted: rgba(232, 228, 220, 0.38);
-      --text-dim: rgba(232, 228, 220, 0.14);
-      --accent: #a89f8c;
-      --accent-cold: #7a9ea8;
+      --void: #090806;
+      --deep: #0e0c09;
+      --surface: #141210;
+      --border: rgba(255,255,255,0.05);
+      --border-hover: rgba(255,255,255,0.1);
+      --text-primary: #e4dfd6;
+      --text-muted: rgba(228,223,214,0.38);
+      --text-dim: rgba(228,223,214,0.13);
+      --gold: #c9a84c;
+      --gold-dim: rgba(201,168,76,0.1);
+      --teal: #6ba3b0;
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html, body { height: 100%; }
+    html, body { height: 100%; overflow: hidden; }
 
     body {
       background: var(--void);
       color: var(--text-primary);
       font-family: 'Outfit', sans-serif;
       font-weight: 300;
-      overflow: hidden;
       cursor: none;
       user-select: none;
     }
 
-    /* ─── CURSOR ─── */
     .cursor {
-      position: fixed; width: 5px; height: 5px;
-      background: var(--accent-cold); border-radius: 50%;
+      position: fixed; width: 4px; height: 4px;
+      background: var(--teal); border-radius: 50%;
       pointer-events: none; z-index: 9999;
-      transform: translate(-50%, -50%);
+      transform: translate(-50%,-50%);
       transition: transform 0.1s ease, opacity 0.5s ease;
-      opacity: 0.6;
+      opacity: 0.5;
     }
     .cursor-ring {
-      position: fixed; width: 28px; height: 28px;
-      border: 1px solid rgba(122,158,168,0.25); border-radius: 50%;
+      position: fixed; width: 26px; height: 26px;
+      border: 1px solid rgba(107,163,176,0.2); border-radius: 50%;
       pointer-events: none; z-index: 9998;
-      transform: translate(-50%, -50%);
-      transition: width 0.3s ease, height 0.3s ease;
-      opacity: 0.4;
+      transform: translate(-50%,-50%);
+      transition: width 0.4s ease, height 0.4s ease, opacity 0.5s ease;
+      opacity: 0.35;
     }
     body.in-session .cursor,
-    body.in-session .cursor-ring { opacity: 0 !important; }
+    body.in-session .cursor-ring { opacity: 0; }
 
-    /* ─── GRAIN ─── */
     body::before {
       content: '';
       position: fixed; inset: 0;
       background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
-      pointer-events: none; z-index: 9997; opacity: 0.35;
+      pointer-events: none; z-index: 9997; opacity: 0.4;
     }
 
-    /* ─── SCREENS ─── */
     .screen {
       position: fixed; inset: 0;
       display: flex; flex-direction: column;
       justify-content: center; align-items: center;
-      transition: opacity 0.8s ease;
+      transition: opacity 0.9s ease;
     }
     .screen.hidden { opacity: 0; pointer-events: none; }
     .screen.gone { display: none; }
 
-    /* ─── SETUP SCREEN ─── */
-    #setupScreen {
-      padding: 3rem;
-      background: var(--void);
+    .screen-logo {
+      position: absolute; top: 2.5rem; right: 3rem;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 0.9rem; font-weight: 300;
+      letter-spacing: 0.35em; text-transform: uppercase;
+      color: var(--text-dim);
     }
+    .screen-logo em { font-style: italic; color: var(--gold); opacity: 0.55; }
 
-    .setup-nav {
-      position: absolute;
-      top: 2.5rem; left: 3rem;
-      display: flex; align-items: center; gap: 1rem;
-    }
     .back-link {
+      position: absolute; top: 2.5rem; left: 3rem;
       font-family: 'DM Mono', monospace;
-      font-size: 0.62rem; letter-spacing: 0.2em;
+      font-size: 0.6rem; letter-spacing: 0.22em;
       text-transform: uppercase; color: var(--text-dim);
       text-decoration: none; cursor: none;
       transition: color 0.3s ease;
     }
     .back-link:hover { color: var(--text-muted); }
 
-    .setup-logo {
-      position: absolute;
-      top: 2.5rem; right: 3rem;
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 1rem; font-weight: 300;
-      letter-spacing: 0.35em; text-transform: uppercase;
-      color: var(--text-muted); opacity: 0.6;
+    /* ENTRY */
+    #entryScreen { padding: 3rem; }
+
+    .entry-content {
+      width: 100%; max-width: 580px;
+      animation: fadeUp 1s ease forwards;
     }
-    .setup-logo span { font-style: italic; color: var(--accent); }
+
+    .eyebrow {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.58rem; letter-spacing: 0.32em;
+      text-transform: uppercase;
+      margin-bottom: 2rem; opacity: 0.6;
+    }
+    .eyebrow-teal { color: var(--teal); }
+    .eyebrow-gold { color: var(--gold); }
+
+    .big-question {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(2.2rem, 4.5vw, 3.4rem);
+      font-weight: 300; color: var(--text-primary);
+      line-height: 1.15; margin-bottom: 0.8rem;
+    }
+    .big-question em { font-style: italic; color: var(--gold); }
+
+    .sub-text {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 0.95rem; font-style: italic;
+      color: var(--text-muted); margin-bottom: 3rem;
+      line-height: 1.6;
+    }
+
+    .input-wrap { position: relative; margin-bottom: 0.5rem; }
+
+    .void-textarea {
+      width: 100%; background: transparent; border: none;
+      border-bottom: 1px solid var(--border);
+      padding: 1rem 3rem 1rem 0; outline: none; resize: none;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.15rem; font-style: italic; font-weight: 300;
+      color: var(--text-primary); line-height: 1.7;
+      min-height: 80px; cursor: none;
+      transition: border-color 0.4s ease;
+    }
+    .void-textarea::placeholder { color: var(--text-dim); }
+    .void-textarea:focus { border-color: rgba(107,163,176,0.18); }
+
+    .voice-btn {
+      position: absolute; right: 0; top: 1rem;
+      background: none; border: none; cursor: none;
+      color: var(--text-dim); transition: color 0.3s ease; padding: 0.2rem;
+    }
+    .voice-btn:hover { color: var(--teal); }
+    .voice-btn.listening { color: var(--teal); animation: voicePulse 1.2s ease-in-out infinite; }
+    @keyframes voicePulse { 0%,100%{opacity:1}50%{opacity:0.3} }
+
+    .input-hint {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.54rem; letter-spacing: 0.15em;
+      text-transform: uppercase; color: var(--text-dim);
+      margin-bottom: 3rem;
+    }
+
+    .actions { display: flex; gap: 1rem; align-items: center; }
+
+    .btn-primary-dark {
+      background: var(--text-primary); color: var(--void);
+      border: none; padding: 1rem 2.5rem;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.68rem; letter-spacing: 0.22em;
+      text-transform: uppercase; cursor: none;
+      transition: background 0.3s ease;
+    }
+    .btn-enter:hover { background: var(--teal); }
+    .btn-complete-dark:hover { background: var(--gold); }
+
+    .btn-ghost-text {
+      background: none; border: none; cursor: none;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.58rem; letter-spacing: 0.18em;
+      text-transform: uppercase; color: var(--text-dim);
+      transition: color 0.3s ease;
+    }
+    .btn-ghost-text:hover { color: var(--text-muted); }
+
+    /* SETUP */
+    #setupScreen { padding: 3rem; }
 
     .setup-content {
-      width: 100%; max-width: 640px;
+      width: 100%; max-width: 620px;
       animation: fadeUp 0.8s ease forwards;
     }
 
-    .setup-eyebrow {
+    .setup-label {
       font-family: 'DM Mono', monospace;
-      font-size: 0.6rem; letter-spacing: 0.3em;
-      text-transform: uppercase; color: var(--accent-cold);
-      margin-bottom: 1.5rem; opacity: 0.7;
-    }
-
-    .setup-title {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: clamp(2.5rem, 5vw, 4rem);
-      font-weight: 300; color: var(--text-primary);
-      line-height: 1.1; margin-bottom: 3.5rem;
-    }
-    .setup-title em { font-style: italic; color: var(--accent); }
-
-    /* Mode selector */
-    .setup-section-label {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.58rem; letter-spacing: 0.25em;
+      font-size: 0.55rem; letter-spacing: 0.28em;
       text-transform: uppercase; color: var(--text-dim);
-      margin-bottom: 1rem;
+      margin-bottom: 0.8rem;
     }
 
     .mode-grid {
-      display: grid; grid-template-columns: repeat(3, 1fr);
-      gap: 1px; background: var(--border);
-      border: 1px solid var(--border);
-      margin-bottom: 3rem;
+      display: grid; grid-template-columns: repeat(3,1fr);
+      gap: 1px; background: var(--border); border: 1px solid var(--border);
+      margin-bottom: 2.5rem;
     }
 
     .mode-btn {
-      background: var(--void);
-      border: none; padding: 1.6rem 1.4rem;
-      cursor: none; text-align: left;
-      position: relative; overflow: hidden;
-      transition: background 0.3s ease;
+      background: var(--void); border: none;
+      padding: 1.4rem 1.2rem; cursor: none; text-align: left;
+      position: relative; transition: background 0.3s ease;
     }
-    .mode-btn:hover { background: var(--surface); }
-    .mode-btn.active {
-      background: var(--surface);
-    }
+    .mode-btn:hover { background: var(--deep); }
+    .mode-btn.active { background: var(--surface); }
     .mode-btn.active::after {
-      content: '';
-      position: absolute; bottom: 0; left: 0; right: 0;
-      height: 1px;
-      background: var(--accent-cold);
+      content: ''; position: absolute; bottom: 0; left: 0; right: 0;
+      height: 1px; background: var(--teal);
     }
 
-    .mode-icon {
-      width: 28px; height: 28px;
-      margin-bottom: 1rem;
-      display: flex; align-items: center; justify-content: center;
-      opacity: 0.5;
-      transition: opacity 0.3s ease;
-    }
-    .mode-btn.active .mode-icon,
-    .mode-btn:hover .mode-icon { opacity: 1; }
+    .mode-icon { width: 24px; height: 24px; margin-bottom: 0.8rem; opacity: 0.45; transition: opacity 0.3s ease; }
+    .mode-btn.active .mode-icon, .mode-btn:hover .mode-icon { opacity: 0.9; }
 
     .mode-name {
       font-family: 'Cormorant Garamond', serif;
-      font-size: 1.1rem; font-weight: 300;
-      color: var(--text-primary);
-      display: block; margin-bottom: 0.3rem;
+      font-size: 1rem; font-weight: 300;
+      color: var(--text-primary); display: block; margin-bottom: 0.25rem;
     }
-    .mode-desc {
+    .mode-sub {
       font-family: 'DM Mono', monospace;
-      font-size: 0.58rem; letter-spacing: 0.1em;
-      color: var(--text-muted); text-transform: uppercase;
+      font-size: 0.5rem; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--text-muted);
     }
 
-    /* Duration */
     .duration-row {
-      display: flex; gap: 1px;
-      background: var(--border);
-      border: 1px solid var(--border);
-      margin-bottom: 3rem;
+      display: flex; gap: 1px; background: var(--border);
+      border: 1px solid var(--border); margin-bottom: 2.8rem;
     }
-
     .dur-btn {
-      flex: 1; background: var(--void);
-      border: none; padding: 1rem 0.5rem;
-      cursor: none;
-      font-family: 'DM Mono', monospace;
-      font-size: 0.7rem; letter-spacing: 0.1em;
-      color: var(--text-muted); text-transform: uppercase;
-      transition: background 0.3s ease, color 0.3s ease;
-      text-align: center;
+      flex: 1; background: var(--void); border: none;
+      padding: 0.9rem 0.5rem; cursor: none; text-align: center;
+      font-family: 'DM Mono', monospace; font-size: 0.62rem;
+      letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted);
+      transition: background 0.3s ease, color 0.3s ease; position: relative;
     }
-    .dur-btn:hover { background: var(--surface); color: var(--text-primary); }
-    .dur-btn.active {
-      background: var(--surface);
-      color: var(--text-primary);
-      position: relative;
-    }
+    .dur-btn:hover { background: var(--deep); color: var(--text-primary); }
+    .dur-btn.active { background: var(--surface); color: var(--text-primary); }
     .dur-btn.active::after {
-      content: '';
-      position: absolute; bottom: 0; left: 0; right: 0;
-      height: 1px; background: var(--accent-cold);
+      content: ''; position: absolute; bottom: 0; left: 0; right: 0;
+      height: 1px; background: var(--teal);
     }
 
-    /* Begin button */
     .begin-btn {
-      width: 100%;
-      background: var(--text-primary); color: var(--void);
-      border: none; padding: 1.2rem 2rem;
-      font-family: 'DM Mono', monospace;
-      font-size: 0.75rem; letter-spacing: 0.22em;
-      text-transform: uppercase; cursor: none;
-      transition: background 0.3s ease, transform 0.2s ease;
+      width: 100%; background: var(--text-primary); color: var(--void);
+      border: none; padding: 1.15rem 2rem;
+      font-family: 'DM Mono', monospace; font-size: 0.72rem;
+      letter-spacing: 0.24em; text-transform: uppercase; cursor: none;
+      transition: background 0.3s ease;
     }
-    .begin-btn:hover {
-      background: var(--accent-cold);
-      transform: translateY(-1px);
-    }
+    .begin-btn:hover { background: var(--teal); }
 
-    /* ─── SESSION SCREEN ─── */
-    #sessionScreen {
-      background: #050505;
-      cursor: none;
-    }
+    /* SESSION */
+    #sessionScreen { background: var(--void); }
 
-    /* Mode-specific backgrounds */
-    #sessionScreen.mode-sound {
-      background: #060a0d;
-    }
-    #sessionScreen.mode-visual {
-      background: #060606;
-    }
-
-    /* Exit button — appears on mouse move */
     .session-exit {
       position: fixed; top: 2.5rem; right: 3rem;
-      font-family: 'DM Mono', monospace;
-      font-size: 0.58rem; letter-spacing: 0.2em;
-      text-transform: uppercase; color: var(--text-dim);
+      font-family: 'DM Mono', monospace; font-size: 0.55rem;
+      letter-spacing: 0.2em; text-transform: uppercase; color: var(--text-dim);
       background: none; border: none; cursor: none;
-      opacity: 0;
-      transition: opacity 0.5s ease;
-      z-index: 10;
+      opacity: 0; transition: opacity 0.6s ease, color 0.3s ease; z-index: 10;
     }
     .session-exit.visible { opacity: 1; }
     .session-exit:hover { color: var(--text-muted); }
 
-    /* Timer display */
-    .timer-display {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: clamp(5rem, 15vw, 12rem);
-      font-weight: 300;
-      color: var(--text-dim);
-      letter-spacing: -0.02em;
-      line-height: 1;
-      position: relative;
-      z-index: 2;
-      transition: color 1s ease;
-      text-align: center;
-    }
-
-    .session-mode-label {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.58rem; letter-spacing: 0.3em;
-      text-transform: uppercase; color: var(--text-dim);
-      margin-top: 2rem;
-      opacity: 0.5;
-      position: relative; z-index: 2;
-    }
-
-    /* ─── BREATHING VISUAL ─── */
-    .breath-visual {
+    .silence-orb {
       position: absolute; inset: 0;
       display: flex; align-items: center; justify-content: center;
       pointer-events: none;
     }
-
-    .breath-ring {
-      position: absolute; border-radius: 50%;
-      border: 1px solid rgba(168,159,140,0.06);
+    .silence-orb-core {
+      width: 160px; height: 160px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(201,168,76,0.035) 0%, transparent 70%);
+      animation: silencePulse 12s ease-in-out infinite;
     }
-    .breath-ring-1 { width: 300px; height: 300px; animation: breathRing 8s ease-in-out infinite; }
-    .breath-ring-2 { width: 220px; height: 220px; animation: breathRing 8s ease-in-out infinite 0.4s; }
-    .breath-ring-3 { width: 140px; height: 140px; animation: breathRing 8s ease-in-out infinite 0.8s; }
-    .breath-ring-4 {
-      width: 60px; height: 60px;
-      background: radial-gradient(circle, rgba(168,159,140,0.08), transparent 70%);
-      border: none;
-      animation: breathCore 8s ease-in-out infinite;
+    .silence-orb-outer {
+      position: absolute; width: 300px; height: 300px; border-radius: 50%;
+      border: 1px solid rgba(201,168,76,0.02);
+      animation: silencePulse 12s ease-in-out infinite 3s;
     }
-
-    @keyframes breathRing {
-      0%, 100% { transform: scale(0.85); opacity: 0.3; }
-      40% { transform: scale(1.2); opacity: 0.8; }
-      60% { transform: scale(1.2); opacity: 0.8; }
+    @keyframes silencePulse {
+      0%,100% { transform: scale(0.88); opacity: 0.35; }
+      50% { transform: scale(1.1); opacity: 0.7; }
     }
 
-    @keyframes breathCore {
-      0%, 100% { transform: scale(0.7); opacity: 0.4; }
-      40% { transform: scale(1.4); opacity: 1; }
-      60% { transform: scale(1.4); opacity: 1; }
-    }
-
-    .breath-text {
-      position: absolute;
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 0.85rem; font-style: italic;
-      color: var(--text-dim);
-      top: calc(50% + 180px);
-      text-align: center;
-      letter-spacing: 0.05em;
-      animation: breathLabel 8s ease-in-out infinite;
-    }
-
-    @keyframes breathLabel {
-      0%, 15% { content: 'Breathe in'; opacity: 0.6; }
-      35%, 65% { opacity: 0.4; }
-      80%, 100% { opacity: 0.6; }
-    }
-
-    /* ─── SOUND VISUAL ─── */
     .sound-visual {
       position: absolute; inset: 0;
       display: flex; align-items: center; justify-content: center;
       pointer-events: none;
     }
+    .sound-bars { display: flex; gap: 8px; align-items: center; }
+    .sound-bar {
+      width: 2px; border-radius: 2px; background: var(--teal);
+      opacity: 0.15; animation: soundWave 4.5s ease-in-out infinite;
+    }
+    .sound-bar:nth-child(1){height:10px;animation-delay:0s}
+    .sound-bar:nth-child(2){height:22px;animation-delay:0.3s}
+    .sound-bar:nth-child(3){height:38px;animation-delay:0.6s}
+    .sound-bar:nth-child(4){height:52px;animation-delay:0.2s}
+    .sound-bar:nth-child(5){height:38px;animation-delay:0.8s}
+    .sound-bar:nth-child(6){height:22px;animation-delay:0.4s}
+    .sound-bar:nth-child(7){height:10px;animation-delay:0.1s}
+    @keyframes soundWave {
+      0%,100%{transform:scaleY(0.65);opacity:0.1}
+      40%{transform:scaleY(1.35);opacity:0.25}
+      70%{transform:scaleY(0.85);opacity:0.15}
+    }
 
-    .sound-orb {
+    .breath-visual {
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      pointer-events: none;
+    }
+    .breath-container {
+      position: relative; width: 300px; height: 300px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .breath-ring {
       position: absolute; border-radius: 50%;
-      background: radial-gradient(circle, rgba(122,158,168,0.06), transparent 70%);
-      animation: soundOrb 7s ease-in-out infinite;
+      border: 1px solid rgba(201,168,76,0.12);
+      transform: scale(var(--breath-scale, 0.82));
+      opacity: var(--breath-opacity, 0.28);
+      transition: transform var(--breath-dur, 4s) ease-in-out,
+                  opacity var(--breath-dur, 4s) ease-in-out;
     }
-    .sound-orb-1 { width: 400px; height: 400px; animation-duration: 9s; }
-    .sound-orb-2 { width: 280px; height: 280px; animation-duration: 7s; animation-delay: -3s; }
-    .sound-orb-3 {
-      width: 180px; height: 180px;
-      background: radial-gradient(circle, rgba(122,158,168,0.04), transparent 70%);
-      animation-duration: 5s; animation-delay: -1s;
+    .breath-ring-1 { width: 280px; height: 280px; }
+    .breath-ring-2 { width: 200px; height: 200px; border-color: rgba(201,168,76,0.07); }
+    .breath-ring-3 { width: 128px; height: 128px; border-color: rgba(201,168,76,0.05); }
+    .breath-core {
+      width: 48px; height: 48px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(201,168,76,0.1), transparent 70%);
+      transform: scale(var(--breath-scale, 0.82));
+      opacity: var(--breath-opacity, 0.35);
+      transition: transform var(--breath-dur, 4s) ease-in-out,
+                  opacity var(--breath-dur, 4s) ease-in-out;
+    }
+    .breath-phase-text {
+      position: absolute; bottom: -55px; left: 50%; transform: translateX(-50%);
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 0.85rem; font-style: italic; color: var(--text-dim);
+      letter-spacing: 0.06em; white-space: nowrap;
+      transition: opacity 0.8s ease;
     }
 
-    @keyframes soundOrb {
-      0%, 100% { transform: scale(0.9) translate(0,0); opacity: 0.6; }
-      33% { transform: scale(1.1) translate(15px, -20px); opacity: 1; }
-      66% { transform: scale(0.95) translate(-10px, 10px); opacity: 0.7; }
+    .timer-display {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(5rem, 14vw, 11rem);
+      font-weight: 300; line-height: 1;
+      color: rgba(228,223,214,0.18); letter-spacing: -0.02em;
+      position: relative; z-index: 2; text-align: center;
+      transition: color 2s ease;
+    }
+    .session-mode-label {
+      font-family: 'DM Mono', monospace; font-size: 0.55rem;
+      letter-spacing: 0.3em; text-transform: uppercase; color: var(--text-dim);
+      margin-top: 1.8rem; opacity: 0.4; position: relative; z-index: 2;
     }
 
-    /* ─── COMPLETE SCREEN ─── */
-    #completeScreen {
-      background: var(--void);
-      text-align: center; padding: 3rem;
+    .progress-ring {
+      position: fixed; bottom: 2.5rem; left: 50%;
+      transform: translateX(-50%); z-index: 5; opacity: 0.28;
+    }
+    .progress-ring circle {
+      transform-origin: center; transform: rotate(-90deg);
+      transition: stroke-dashoffset 1s linear;
     }
 
+    /* EXIT */
+    #exitScreen { padding: 3rem; }
+    .exit-content {
+      width: 100%; max-width: 540px;
+      animation: fadeUp 1.2s ease forwards;
+    }
+    .exit-textarea {
+      width: 100%; background: transparent; border: none;
+      border-bottom: 1px solid var(--border);
+      padding: 1rem 0; outline: none; resize: none;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.15rem; font-style: italic; font-weight: 300;
+      color: var(--text-primary); line-height: 1.7;
+      min-height: 80px; cursor: none;
+      transition: border-color 0.4s ease; margin-bottom: 2.5rem;
+    }
+    .exit-textarea::placeholder { color: var(--text-dim); }
+    .exit-textarea:focus { border-color: rgba(201,168,76,0.15); }
+
+    /* COMPLETE */
+    #completeScreen { padding: 3rem; }
     .complete-content {
-      max-width: 480px;
-      animation: fadeUp 1s ease forwards;
-      opacity: 0;
+      max-width: 480px; text-align: center;
+      animation: fadeUp 1s ease forwards; opacity: 0;
     }
-
-    .complete-icon {
-      width: 48px; height: 1px;
-      background: var(--accent);
-      margin: 0 auto 3rem;
-      opacity: 0.5;
+    .complete-line {
+      width: 36px; height: 1px; background: var(--gold);
+      opacity: 0.35; margin: 0 auto 3.5rem;
     }
-
+    .cataton-earned {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 5rem; font-weight: 300; color: var(--gold);
+      line-height: 1; display: block; margin-bottom: 0.3rem;
+    }
+    .cataton-label-sm {
+      font-family: 'DM Mono', monospace; font-size: 0.55rem;
+      letter-spacing: 0.28em; text-transform: uppercase;
+      color: var(--text-dim); margin-bottom: 3.5rem; display: block;
+    }
     .complete-title {
       font-family: 'Cormorant Garamond', serif;
-      font-size: clamp(2.5rem, 5vw, 4rem);
-      font-weight: 300; color: var(--text-primary);
-      line-height: 1.1; margin-bottom: 1.5rem;
+      font-size: clamp(2rem, 4vw, 3rem); font-weight: 300;
+      color: var(--text-primary); line-height: 1.15; margin-bottom: 0.8rem;
     }
-    .complete-title em { font-style: italic; color: var(--accent); }
-
-    .complete-duration {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.65rem; letter-spacing: 0.25em;
-      text-transform: uppercase; color: var(--text-muted);
-      margin-bottom: 3.5rem;
+    .complete-title em { font-style: italic; color: var(--text-muted); }
+    .complete-meta {
+      font-family: 'DM Mono', monospace; font-size: 0.6rem;
+      letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--text-dim); margin-bottom: 2.5rem;
     }
-
-    .complete-quote {
+    .echo-block {
+      border-left: 1px solid rgba(201,168,76,0.18);
+      padding: 0.7rem 1.4rem; margin-bottom: 1rem; text-align: left;
+    }
+    .echo-block.shift { border-left-color: rgba(107,163,176,0.18); }
+    .echo-label {
+      font-family: 'DM Mono', monospace; font-size: 0.5rem;
+      letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--teal); opacity: 0.55; margin-bottom: 0.4rem; display: block;
+    }
+    .echo-text {
       font-family: 'Cormorant Garamond', serif;
-      font-size: 1rem; font-style: italic;
-      color: var(--text-muted); line-height: 1.8;
-      margin-bottom: 3.5rem;
-      max-width: 360px; margin-left: auto; margin-right: auto;
+      font-size: 0.95rem; font-style: italic; color: var(--text-muted);
+      line-height: 1.6;
     }
-
     .complete-actions {
       display: flex; gap: 1rem; justify-content: center;
-      flex-wrap: wrap;
+      flex-wrap: wrap; margin-top: 3rem;
     }
-
-    .btn-primary {
-      background: var(--text-primary); color: var(--void);
-      border: none; padding: 1rem 2.2rem;
-      font-family: 'DM Mono', monospace;
-      font-size: 0.7rem; letter-spacing: 0.18em;
-      text-transform: uppercase; cursor: none;
-      transition: background 0.3s ease;
-      text-decoration: none; display: inline-block;
+    .btn-go-again {
+      background: var(--text-primary); color: var(--void); border: none;
+      padding: 1rem 2.2rem; font-family: 'DM Mono', monospace;
+      font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase;
+      cursor: none; transition: background 0.3s ease; text-decoration: none; display: inline-block;
     }
-    .btn-primary:hover { background: var(--accent-cold); }
-
-    .btn-ghost {
+    .btn-go-again:hover { background: var(--teal); }
+    .btn-exit-link {
       background: transparent; color: var(--text-muted);
       border: 1px solid var(--border); padding: 1rem 1.8rem;
-      font-family: 'DM Mono', monospace;
-      font-size: 0.7rem; letter-spacing: 0.18em;
-      text-transform: uppercase; cursor: none;
-      transition: color 0.3s ease, border-color 0.3s ease;
+      font-family: 'DM Mono', monospace; font-size: 0.65rem;
+      letter-spacing: 0.2em; text-transform: uppercase;
+      cursor: none; transition: color 0.3s ease, border-color 0.3s ease;
       text-decoration: none; display: inline-block;
     }
-    .btn-ghost:hover { color: var(--text-primary); border-color: rgba(255,255,255,0.2); }
+    .btn-exit-link:hover { color: var(--text-primary); border-color: var(--border-hover); }
 
-    /* ─── ANIMATIONS ─── */
     @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(20px); }
+      from { opacity: 0; transform: translateY(18px); }
       to { opacity: 1; transform: translateY(0); }
     }
 
-    /* ─── PROGRESS ARC ─── */
-    .progress-ring {
-      position: fixed;
-      bottom: 3rem; left: 50%;
-      transform: translateX(-50%);
-      z-index: 5;
-      opacity: 0.4;
-    }
-    .progress-ring circle {
-      transition: stroke-dashoffset 1s linear;
-      transform-origin: center;
-      transform: rotate(-90deg);
-    }
-
-    /* ─── MOBILE ─── */
     @media (max-width: 600px) {
+      .screen-logo, .back-link { font-size: 0.5rem; }
       .mode-grid { grid-template-columns: 1fr; }
-      .setup-content { max-width: 100%; }
-      .setup-logo { display: none; }
       .timer-display { font-size: clamp(4rem, 20vw, 8rem); }
-      .breath-ring-1 { width: 220px; height: 220px; }
-      .breath-ring-2 { width: 160px; height: 160px; }
+      .cataton-earned { font-size: 4rem; }
     }
   </style>
 </head>
@@ -453,63 +467,90 @@
   <div class="cursor" id="cursor"></div>
   <div class="cursor-ring" id="cursorRing"></div>
 
-  <!-- ─── SETUP SCREEN ─── -->
-  <div class="screen" id="setupScreen">
-    <div class="setup-nav">
-      <a href="index.html" class="back-link">← Catatonica</a>
+  <!-- ENTRY SCREEN -->
+  <div class="screen" id="entryScreen">
+    <a href="app.html" class="back-link">← Your void</a>
+    <div class="screen-logo">Cata<em>tonica</em></div>
+
+    <div class="entry-content">
+      <p class="eyebrow eyebrow-teal">Before the void</p>
+      <h1 class="big-question">
+        What's <em>actually</em><br>going on right now?
+      </h1>
+      <p class="sub-text">Name it. Speak it. Then let it wait.</p>
+
+      <div class="input-wrap">
+        <textarea
+          class="void-textarea"
+          id="entryText"
+          placeholder="A pressure, a decision, a person you can't stop circling…"
+          rows="3"
+        ></textarea>
+        <button class="voice-btn" id="voiceBtn" title="Speak instead">
+          <svg width="16" height="20" viewBox="0 0 16 20" fill="none">
+            <rect x="5" y="1" width="6" height="11" rx="3" stroke="currentColor" stroke-width="1.2"/>
+            <path d="M1 10c0 3.866 3.134 7 7 7s7-3.134 7-7" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+            <line x1="8" y1="17" x2="8" y2="19" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </div>
+      <p class="input-hint">Optional — or skip and go straight in</p>
+
+      <div class="actions">
+        <button class="btn-primary-dark btn-enter" id="entryNextBtn">Enter the void →</button>
+        <button class="btn-ghost-text" id="entrySkipBtn">Skip</button>
+      </div>
     </div>
-    <div class="setup-logo">Cata<span>tonica</span></div>
+  </div>
+
+  <!-- SETUP SCREEN -->
+  <div class="screen hidden gone" id="setupScreen">
+    <div class="screen-logo">Cata<em>tonica</em></div>
 
     <div class="setup-content">
-      <p class="setup-eyebrow">New Session</p>
-      <h1 class="setup-title">
-        Choose your<br><em>silence.</em>
-      </h1>
+      <p class="eyebrow eyebrow-teal">Configure your silence</p>
+      <h1 class="big-question">Choose your <em>mode.</em></h1>
 
-      <!-- Mode -->
-      <p class="setup-section-label">Mode</p>
+      <p class="setup-label">Mode</p>
       <div class="mode-grid">
         <button class="mode-btn active" data-mode="silence">
           <div class="mode-icon">
-            <!-- Silence icon: just a dot -->
-            <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-              <circle cx="9" cy="9" r="2" fill="var(--accent)"/>
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <circle cx="10" cy="10" r="2" fill="var(--gold)" opacity="0.7"/>
+              <circle cx="10" cy="10" r="6" stroke="var(--gold)" stroke-width="0.6" opacity="0.2"/>
             </svg>
           </div>
           <span class="mode-name">Silence</span>
-          <span class="mode-desc">Pure void</span>
+          <span class="mode-sub">Pure void</span>
         </button>
         <button class="mode-btn" data-mode="sound">
           <div class="mode-icon">
-            <!-- Soundwave icon -->
-            <svg width="24" height="18" viewBox="0 0 24 18" fill="none">
-              <rect x="0" y="7" width="2" height="4" rx="1" fill="var(--accent-cold)" opacity="0.8"/>
-              <rect x="4" y="4" width="2" height="10" rx="1" fill="var(--accent-cold)"/>
-              <rect x="8" y="1" width="2" height="16" rx="1" fill="var(--accent-cold)" opacity="0.7"/>
-              <rect x="12" y="4" width="2" height="10" rx="1" fill="var(--accent-cold)"/>
-              <rect x="16" y="6" width="2" height="6" rx="1" fill="var(--accent-cold)" opacity="0.6"/>
-              <rect x="20" y="8" width="2" height="2" rx="1" fill="var(--accent-cold)" opacity="0.4"/>
+            <svg width="22" height="16" viewBox="0 0 22 16" fill="none">
+              <rect x="0" y="6" width="2" height="4" rx="1" fill="var(--teal)" opacity="0.7"/>
+              <rect x="4" y="3" width="2" height="10" rx="1" fill="var(--teal)"/>
+              <rect x="8" y="0" width="2" height="16" rx="1" fill="var(--teal)" opacity="0.8"/>
+              <rect x="12" y="3" width="2" height="10" rx="1" fill="var(--teal)"/>
+              <rect x="16" y="5" width="2" height="6" rx="1" fill="var(--teal)" opacity="0.6"/>
+              <rect x="20" y="7" width="2" height="2" rx="1" fill="var(--teal)" opacity="0.4"/>
             </svg>
           </div>
           <span class="mode-name">Soundscape</span>
-          <span class="mode-desc">Ambient tones</span>
+          <span class="mode-sub">Ambient tones</span>
         </button>
         <button class="mode-btn" data-mode="visual">
           <div class="mode-icon">
-            <!-- Breath circle icon -->
             <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
-              <circle cx="11" cy="11" r="9" stroke="var(--accent)" stroke-width="0.8" opacity="0.6"/>
-              <circle cx="11" cy="11" r="5" stroke="var(--accent)" stroke-width="0.8" opacity="0.4"/>
-              <circle cx="11" cy="11" r="1.5" fill="var(--accent)" opacity="0.8"/>
+              <circle cx="11" cy="11" r="9" stroke="var(--gold)" stroke-width="0.7" opacity="0.5"/>
+              <circle cx="11" cy="11" r="5" stroke="var(--gold)" stroke-width="0.7" opacity="0.3"/>
+              <circle cx="11" cy="11" r="1.5" fill="var(--gold)" opacity="0.7"/>
             </svg>
           </div>
           <span class="mode-name">Breathing</span>
-          <span class="mode-desc">Visual guide</span>
+          <span class="mode-sub">Visual guide</span>
         </button>
       </div>
 
-      <!-- Duration -->
-      <p class="setup-section-label">Duration</p>
+      <p class="setup-label">Duration</p>
       <div class="duration-row">
         <button class="dur-btn" data-min="5">5 min</button>
         <button class="dur-btn active" data-min="10">10 min</button>
@@ -518,487 +559,354 @@
         <button class="dur-btn" data-min="30">30 min</button>
       </div>
 
-      <button class="begin-btn" id="beginBtn">Begin Session</button>
+      <button class="begin-btn" id="beginBtn">Begin</button>
     </div>
   </div>
 
-  <!-- ─── SESSION SCREEN ─── -->
+  <!-- SESSION SCREEN -->
   <div class="screen hidden gone" id="sessionScreen">
-
     <button class="session-exit" id="exitBtn">End Early</button>
 
-    <!-- Breathing visual (shown in visual mode) -->
-    <div class="breath-visual" id="breathVisual" style="display:none">
-      <div class="breath-ring breath-ring-1"></div>
-      <div class="breath-ring breath-ring-2"></div>
-      <div class="breath-ring breath-ring-3"></div>
-      <div class="breath-ring breath-ring-4"></div>
-      <div class="breath-text" id="breathText">Breathe in</div>
+    <div class="silence-orb" id="silenceVisual">
+      <div class="silence-orb-outer"></div>
+      <div class="silence-orb-core"></div>
     </div>
 
-    <!-- Sound visual (shown in sound mode) -->
     <div class="sound-visual" id="soundVisual" style="display:none">
-      <div class="sound-orb sound-orb-1"></div>
-      <div class="sound-orb sound-orb-2"></div>
-      <div class="sound-orb sound-orb-3"></div>
+      <div class="sound-bars">
+        <div class="sound-bar"></div>
+        <div class="sound-bar"></div>
+        <div class="sound-bar"></div>
+        <div class="sound-bar"></div>
+        <div class="sound-bar"></div>
+        <div class="sound-bar"></div>
+        <div class="sound-bar"></div>
+      </div>
     </div>
 
-    <!-- Timer -->
+    <div class="breath-visual" id="breathVisual" style="display:none">
+      <div class="breath-container" id="breathContainer">
+        <div class="breath-ring breath-ring-1"></div>
+        <div class="breath-ring breath-ring-2"></div>
+        <div class="breath-ring breath-ring-3"></div>
+        <div class="breath-core"></div>
+        <div class="breath-phase-text" id="breathPhaseText">Breathe in</div>
+      </div>
+    </div>
+
     <div class="timer-display" id="timerDisplay">00:00</div>
     <div class="session-mode-label" id="sessionModeLabel"></div>
 
-    <!-- Progress ring at bottom -->
-    <svg class="progress-ring" width="48" height="48" viewBox="0 0 48 48">
-      <circle cx="24" cy="24" r="20" fill="none" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
-      <circle id="progressCircle" cx="24" cy="24" r="20" fill="none"
-        stroke="var(--accent-cold)" stroke-width="1"
-        stroke-dasharray="125.6" stroke-dashoffset="125.6"
+    <svg class="progress-ring" width="44" height="44" viewBox="0 0 44 44">
+      <circle cx="22" cy="22" r="18" fill="none" stroke="rgba(255,255,255,0.03)" stroke-width="1"/>
+      <circle id="progressCircle" cx="22" cy="22" r="18" fill="none"
+        stroke="var(--teal)" stroke-width="1"
+        stroke-dasharray="113.1" stroke-dashoffset="113.1"
         stroke-linecap="round"/>
     </svg>
   </div>
 
-  <!-- ─── COMPLETE SCREEN ─── -->
+  <!-- EXIT SCREEN -->
+  <div class="screen hidden gone" id="exitScreen">
+    <div class="screen-logo">Cata<em>tonica</em></div>
+
+    <div class="exit-content">
+      <p class="eyebrow eyebrow-gold">Surface</p>
+      <h2 class="big-question">What <em>shifted?</em></h2>
+      <p class="sub-text">Even one word. Or nothing at all.</p>
+
+      <textarea
+        class="exit-textarea"
+        id="exitText"
+        placeholder="Something you see differently. Something quieter. Something that can wait…"
+        rows="3"
+      ></textarea>
+
+      <div class="actions">
+        <button class="btn-primary-dark btn-complete-dark" id="exitCompleteBtn">Complete Session</button>
+        <button class="btn-ghost-text" id="exitNothingBtn">Nothing yet</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- COMPLETE SCREEN -->
   <div class="screen hidden gone" id="completeScreen">
     <div class="complete-content">
-      <div class="complete-icon"></div>
-      <h2 class="complete-title">
-        Well<br><em>done.</em>
-      </h2>
-      <p class="complete-duration" id="completeDuration"></p>
-      <p class="complete-quote" id="completeQuote"></p>
+      <div class="complete-line"></div>
+
+      <span class="cataton-earned" id="catatonsDisplay">0</span>
+      <span class="cataton-label-sm">Catatons earned</span>
+
+      <h2 class="complete-title" id="completeTitleEl">You <em>showed up.</em></h2>
+      <p class="complete-meta" id="completeDuration"></p>
+
+      <div class="echo-block" id="echoIn" style="display:none">
+        <span class="echo-label">Carried in</span>
+        <p class="echo-text" id="echoInText"></p>
+      </div>
+
+      <div class="echo-block shift" id="echoOut" style="display:none">
+        <span class="echo-label">What shifted</span>
+        <p class="echo-text" id="echoOutText"></p>
+      </div>
+
       <div class="complete-actions">
-        <button class="btn-primary" id="goAgainBtn">Another Session</button>
-        <a href="index.html" class="btn-ghost">Return</a>
+        <button class="btn-go-again" id="goAgainBtn">Return to void</button>
+        <a href="index.html" class="btn-exit-link">Exit</a>
       </div>
     </div>
   </div>
 
   <script>
-    // ─── SESSION CONTEXT (from app.html) ───
-    const sessionCtx = JSON.parse(sessionStorage.getItem('cat_session') || 'null');
+    const cursor = document.getElementById('cursor');
+    const ring = document.getElementById('cursorRing');
+    let mx=0,my=0,rx=0,ry=0;
+    document.addEventListener('mousemove', e => { mx=e.clientX; my=e.clientY; cursor.style.left=mx+'px'; cursor.style.top=my+'px'; });
+    (function animRing(){ rx+=(mx-rx)*0.1; ry+=(my-ry)*0.1; ring.style.left=rx+'px'; ring.style.top=ry+'px'; requestAnimationFrame(animRing); })();
 
-    // ─── STATE ───
+    const sessionCtx = JSON.parse(sessionStorage.getItem('cat_session') || 'null');
     const state = {
       mode: sessionCtx?.mode || 'silence',
       duration: sessionCtx?.duration || 10,
       sitId: sessionCtx?.sitId || null,
-      secondsLeft: 0,
-      totalSeconds: 0,
-      timer: null,
-      audioCtx: null,
-      soundNodes: [],
-      breathPhase: 'in',
-      breathTimer: null,
+      secondsLeft: 0, totalSeconds: 0,
+      timer: null, audioCtx: null, soundNodes: [],
+      breathTimer: null, breathPhaseIndex: 0,
+      entryText: '', exitText: '',
+      catatonsEarned: 0, elapsedSeconds: 0, completedFull: false,
     };
 
-    // Pre-select mode and duration from context
     if (sessionCtx) {
-      document.querySelectorAll('.mode-btn').forEach(b => {
-        b.classList.toggle('active', b.dataset.mode === state.mode);
-      });
-      document.querySelectorAll('.dur-btn').forEach(b => {
-        b.classList.toggle('active', parseInt(b.dataset.min) === state.duration);
-      });
+      document.querySelectorAll('.mode-btn').forEach(b => b.classList.toggle('active', b.dataset.mode === state.mode));
+      document.querySelectorAll('.dur-btn').forEach(b => b.classList.toggle('active', parseInt(b.dataset.min) === state.duration));
     }
 
-    // ─── CURSOR ───
-    const cursor = document.getElementById('cursor');
-    const ring = document.getElementById('cursorRing');
-    let mx = 0, my = 0, rx = 0, ry = 0;
+    function showScreen(id) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
+      const target = document.getElementById(id);
+      target.classList.remove('gone');
+      requestAnimationFrame(() => requestAnimationFrame(() => target.classList.remove('hidden')));
+      document.querySelectorAll('.screen').forEach(s => { if (s.id !== id) setTimeout(() => s.classList.add('gone'), 950); });
+    }
 
-    document.addEventListener('mousemove', e => {
-      mx = e.clientX; my = e.clientY;
-      cursor.style.left = mx + 'px';
-      cursor.style.top = my + 'px';
+    const entryTextEl = document.getElementById('entryText');
+
+    document.getElementById('entryNextBtn').addEventListener('click', () => {
+      state.entryText = entryTextEl.value.trim();
+      showScreen('setupScreen');
+    });
+    document.getElementById('entrySkipBtn').addEventListener('click', () => {
+      state.entryText = '';
+      showScreen('setupScreen');
+    });
+    entryTextEl.addEventListener('keydown', e => {
+      if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); state.entryText = entryTextEl.value.trim(); showScreen('setupScreen'); }
     });
 
-    (function animateRing() {
-      rx += (mx - rx) * 0.12; ry += (my - ry) * 0.12;
-      ring.style.left = rx + 'px'; ring.style.top = ry + 'px';
-      requestAnimationFrame(animateRing);
-    })();
-
-    document.querySelectorAll('button, a').forEach(el => {
-      el.addEventListener('mouseenter', () => {
-        cursor.style.transform = 'translate(-50%,-50%) scale(2.5)';
-        ring.style.width = '44px'; ring.style.height = '44px';
+    const voiceBtn = document.getElementById('voiceBtn');
+    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+      const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+      const recognition = new SR();
+      recognition.continuous = false; recognition.interimResults = true; recognition.lang = 'en-US';
+      recognition.onresult = e => { let t=''; for(let i=0;i<e.results.length;i++) t+=e.results[i][0].transcript; entryTextEl.value=t; };
+      recognition.onend = () => voiceBtn.classList.remove('listening');
+      voiceBtn.addEventListener('click', () => {
+        if (voiceBtn.classList.contains('listening')) { recognition.stop(); voiceBtn.classList.remove('listening'); }
+        else { recognition.start(); voiceBtn.classList.add('listening'); }
       });
-      el.addEventListener('mouseleave', () => {
-        cursor.style.transform = 'translate(-50%,-50%) scale(1)';
-        ring.style.width = '28px'; ring.style.height = '28px';
-      });
-    });
+    } else { voiceBtn.style.display = 'none'; }
 
-    // ─── SETUP: MODE BUTTONS ───
     document.querySelectorAll('.mode-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        state.mode = btn.dataset.mode;
+        btn.classList.add('active'); state.mode = btn.dataset.mode;
       });
     });
-
-    // ─── SETUP: DURATION BUTTONS ───
     document.querySelectorAll('.dur-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         document.querySelectorAll('.dur-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        state.duration = parseInt(btn.dataset.min);
+        btn.classList.add('active'); state.duration = parseInt(btn.dataset.min);
       });
     });
-
-    // ─── SCREEN TRANSITIONS ───
-    function showScreen(id) {
-      document.querySelectorAll('.screen').forEach(s => {
-        s.classList.add('hidden');
-        setTimeout(() => {
-          if (!s.classList.contains('hidden') || s.id !== id) return;
-        }, 800);
-      });
-
-      const target = document.getElementById(id);
-      target.classList.remove('gone');
-
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => target.classList.remove('hidden'));
-      });
-
-      // Hide others after fade
-      document.querySelectorAll('.screen').forEach(s => {
-        if (s.id !== id) {
-          setTimeout(() => s.classList.add('gone'), 900);
-        }
-      });
-    }
-
-    // ─── BEGIN SESSION ───
     document.getElementById('beginBtn').addEventListener('click', startSession);
 
     function startSession() {
-      state.secondsLeft = state.duration * 60;
       state.totalSeconds = state.duration * 60;
+      state.secondsLeft = state.totalSeconds;
+
+      document.getElementById('silenceVisual').style.display = state.mode === 'silence' ? 'flex' : 'none';
+      document.getElementById('soundVisual').style.display   = state.mode === 'sound'   ? 'flex' : 'none';
+      document.getElementById('breathVisual').style.display  = state.mode === 'visual'  ? 'flex' : 'none';
+
+      document.getElementById('sessionModeLabel').textContent =
+        state.mode==='silence' ? 'Pure void' : state.mode==='sound' ? 'Soundscape' : 'Breathing guide';
 
       showScreen('sessionScreen');
-
-      // Set mode class and visuals
-      const ss = document.getElementById('sessionScreen');
-      ss.className = 'screen';
-      ss.classList.add(`mode-${state.mode}`);
-
-      const modeLabels = {
-        silence: 'Pure Silence',
-        sound: 'Soundscape',
-        visual: 'Breathing Visual'
-      };
-      document.getElementById('sessionModeLabel').textContent = modeLabels[state.mode];
-
-      // Show/hide mode visuals
-      document.getElementById('breathVisual').style.display = state.mode === 'visual' ? 'flex' : 'none';
-      document.getElementById('soundVisual').style.display = state.mode === 'sound' ? 'flex' : 'none';
-
-      // Hide timer in visual mode (timer is peripheral)
-      const timerEl = document.getElementById('timerDisplay');
-      timerEl.style.opacity = state.mode === 'visual' ? '0.15' : '1';
-
-      // Start audio if sound mode
-      if (state.mode === 'sound') startAmbientSound();
-
-      // Start breath cycle if visual mode
-      if (state.mode === 'visual') startBreathCycle();
-
-      // Hide cursor in session
       document.body.classList.add('in-session');
 
-      // Show exit button on mouse move (debounced)
-      let moveTimeout;
-      const exitBtn = document.getElementById('exitBtn');
-      const sessionMouseHandler = () => {
-        exitBtn.classList.add('visible');
-        document.body.classList.remove('in-session');
-        clearTimeout(moveTimeout);
-        moveTimeout = setTimeout(() => {
-          exitBtn.classList.remove('visible');
-          document.body.classList.add('in-session');
-        }, 2500);
-      };
-      document.addEventListener('mousemove', sessionMouseHandler);
-      state._sessionMouseHandler = sessionMouseHandler;
+      if (state.mode === 'sound')  startAmbientSound();
+      if (state.mode === 'visual') startBreathCycle();
 
-      // Tick
-      updateTimer();
+      updateTimerDisplay();
       state.timer = setInterval(tick, 1000);
+
+      let hideTimer;
+      state._mouseHandler = () => {
+        document.getElementById('exitBtn').classList.add('visible');
+        clearTimeout(hideTimer);
+        hideTimer = setTimeout(() => document.getElementById('exitBtn').classList.remove('visible'), 2500);
+      };
+      document.addEventListener('mousemove', state._mouseHandler);
     }
 
-    // ─── TIMER ───
-    function tick() {
-      state.secondsLeft--;
-      if (state.secondsLeft <= 0) {
-        clearInterval(state.timer);
-        endSession();
-      } else {
-        updateTimer();
-      }
-    }
+    function tick() { state.secondsLeft--; updateTimerDisplay(); if (state.secondsLeft <= 0) endSession(false); }
 
-    function updateTimer() {
-      const m = Math.floor(state.secondsLeft / 60);
-      const s = state.secondsLeft % 60;
-      document.getElementById('timerDisplay').textContent =
-        String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
-
-      // Progress ring
-      const progress = 1 - (state.secondsLeft / state.totalSeconds);
-      const circumference = 125.6;
-      const offset = circumference - (progress * circumference);
-      document.getElementById('progressCircle').style.strokeDashoffset = offset;
-
-      // Dim timer slightly as session progresses (going into the void)
+    function updateTimerDisplay() {
+      const m = Math.floor(state.secondsLeft/60);
+      const s = state.secondsLeft%60;
+      document.getElementById('timerDisplay').textContent = String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
+      const elapsed = state.totalSeconds - state.secondsLeft;
+      document.getElementById('progressCircle').style.strokeDashoffset = 113.1 * (1 - elapsed/state.totalSeconds);
       if (state.mode === 'silence') {
-        const opacity = 0.18 + (0.5 * (state.secondsLeft / state.totalSeconds));
-        document.getElementById('timerDisplay').style.color = `rgba(232,228,220,${opacity})`;
+        const opacity = Math.max(0.08, 0.2 - 0.08 * (elapsed/state.totalSeconds));
+        document.getElementById('timerDisplay').style.color = `rgba(228,223,214,${opacity})`;
       }
     }
 
-    // ─── END SESSION ───
+    const breathPhases = [
+      { label: 'Breathe in',  duration: 4000, scale: 1.25, opacity: 0.85, dur: '4s' },
+      { label: 'Hold',        duration: 4000, scale: 1.25, opacity: 0.6,  dur: '1s' },
+      { label: 'Breathe out', duration: 5000, scale: 0.78, opacity: 0.22, dur: '5s' },
+      { label: '',            duration: 2000, scale: 0.78, opacity: 0.18, dur: '2s' },
+    ];
+
+    function startBreathCycle() { state.breathPhaseIndex = 0; runBreathPhase(); }
+
+    function runBreathPhase() {
+      const phase = breathPhases[state.breathPhaseIndex];
+      const textEl = document.getElementById('breathPhaseText');
+      const container = document.getElementById('breathContainer');
+      if (textEl) { textEl.style.opacity = phase.label ? '0.5' : '0'; textEl.textContent = phase.label; }
+      if (container) {
+        container.style.setProperty('--breath-scale', phase.scale);
+        container.style.setProperty('--breath-opacity', phase.opacity);
+        container.style.setProperty('--breath-dur', phase.dur);
+      }
+      state.breathTimer = setTimeout(() => {
+        state.breathPhaseIndex = (state.breathPhaseIndex + 1) % breathPhases.length;
+        runBreathPhase();
+      }, phase.duration);
+    }
+
+    function stopBreathCycle() { clearTimeout(state.breathTimer); }
+
     function endSession(early = false) {
       clearInterval(state.timer);
-      stopAmbientSound();
-      stopBreathCycle();
-      document.removeEventListener('mousemove', state._sessionMouseHandler);
+      stopAmbientSound(); stopBreathCycle();
+      document.removeEventListener('mousemove', state._mouseHandler);
       document.body.classList.remove('in-session');
-
-      // Play completion bell
       playBell();
-
-      // Catatons earned — based on % of session completed
       const elapsed = state.totalSeconds - state.secondsLeft;
-      const completion = elapsed / state.totalSeconds;
-      const catatonsEarned = Math.max(1, Math.round(state.duration * completion));
-
-      // Return result to app.html via sessionStorage
+      state.catatonsEarned = Math.max(1, Math.round(state.duration * (elapsed/state.totalSeconds)));
+      state.elapsedSeconds = elapsed;
+      state.completedFull = !early;
       if (state.sitId) {
         sessionStorage.setItem('cat_session_result', JSON.stringify({
-          sitId: state.sitId,
-          catatonsEarned,
-          completed: !early,
+          sitId: state.sitId, catatonsEarned: state.catatonsEarned, completed: !early,
         }));
       }
-
-      // Show complete screen after brief pause
-      setTimeout(() => {
-        const elapsedMin = Math.floor(elapsed / 60);
-        const elapsedSec = elapsed % 60;
-
-        const durText = early
-          ? `${elapsedMin}m ${elapsedSec}s completed`
-          : `${state.duration} minutes of silence`;
-
-        document.getElementById('completeDuration').textContent =
-          durText + ` · +${catatonsEarned} Catatons`;
-
-        const quotes = [
-          'The mind that rests, decides better.',
-          'You gave yourself permission to stop. That takes more courage than you think.',
-          'What surfaces in silence is more honest than anything the noise told you.',
-          'The gaps you protect are where the next version of you is built.',
-          'Stillness is not the absence of thought — it is the condition for better ones.',
-        ];
-        document.getElementById('completeQuote').textContent =
-          quotes[Math.floor(Math.random() * quotes.length)];
-
-        showScreen('completeScreen');
-      }, early ? 300 : 1200);
+      setTimeout(() => showScreen('exitScreen'), early ? 400 : 1400);
     }
 
-    // Exit early
     document.getElementById('exitBtn').addEventListener('click', () => endSession(true));
 
-    // ─── GO AGAIN ───
-    document.getElementById('goAgainBtn').addEventListener('click', () => {
-      if (state.sitId) {
-        window.location.href = 'app.html';
-      } else {
-        showScreen('setupScreen');
-      }
+    function goToComplete() {
+      state.exitText = document.getElementById('exitText').value.trim();
+      document.getElementById('catatonsDisplay').textContent = state.catatonsEarned;
+      const elMin = Math.floor(state.elapsedSeconds/60);
+      const elSec = state.elapsedSeconds%60;
+      document.getElementById('completeDuration').textContent = state.completedFull
+        ? `${state.duration} minutes · +${state.catatonsEarned} catatons`
+        : `${elMin}m ${elSec}s · +${state.catatonsEarned} catatons`;
+      const titles = state.completedFull
+        ? ['You <em>held it.</em>','You <em>showed up.</em>','Well <em>done.</em>','You <em>stayed.</em>']
+        : ['You <em>tried.</em>','A start <em>is a start.</em>'];
+      document.getElementById('completeTitleEl').innerHTML = titles[Math.floor(Math.random()*titles.length)];
+      if (state.entryText) { document.getElementById('echoInText').textContent = state.entryText; document.getElementById('echoIn').style.display = 'block'; }
+      if (state.exitText)  { document.getElementById('echoOutText').textContent = state.exitText;  document.getElementById('echoOut').style.display = 'block'; }
+      showScreen('completeScreen');
+    }
+
+    document.getElementById('exitCompleteBtn').addEventListener('click', goToComplete);
+    document.getElementById('exitNothingBtn').addEventListener('click', () => { state.exitText=''; goToComplete(); });
+    document.getElementById('exitText').addEventListener('keydown', e => {
+      if (e.key==='Enter' && !e.shiftKey) { e.preventDefault(); goToComplete(); }
     });
 
-    // ─── WEB AUDIO: AMBIENT SOUNDSCAPE ───
+    document.getElementById('goAgainBtn').addEventListener('click', () => {
+      window.location.href = state.sitId ? 'app.html' : 'catatonica-session.html';
+    });
+
     function startAmbientSound() {
       try {
         state.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         const ctx = state.audioCtx;
         const master = ctx.createGain();
         master.gain.setValueAtTime(0, ctx.currentTime);
-        master.gain.linearRampToValueAtTime(0.18, ctx.currentTime + 4);
-        master.connect(ctx.destination);
-        state.soundNodes.push(master);
-
-        // Deep brown noise base
-        createNoiseLayer(ctx, master, 'brown', 0.4);
-
-        // Soft low tone ~60hz
-        createTone(ctx, master, 60, 'sine', 0.08);
-
-        // Higher shimmer ~432hz
-        createTone(ctx, master, 432, 'sine', 0.025);
-
-        // Subtle flutter ~8hz binaural-adjacent
-        createTone(ctx, master, 200, 'sine', 0.015);
-        createTone(ctx, master, 208, 'sine', 0.015);
-
-      } catch(e) {
-        console.info('Web Audio not available:', e);
-      }
+        master.gain.linearRampToValueAtTime(0.16, ctx.currentTime+5);
+        master.connect(ctx.destination); state.soundNodes.push(master);
+        createNoiseLayer(ctx, master, 0.38);
+        createTone(ctx, master, 55, 0.07); createTone(ctx, master, 432, 0.022);
+        createTone(ctx, master, 198, 0.012); createTone(ctx, master, 205, 0.012);
+      } catch(e) {}
     }
 
-    function createNoiseLayer(ctx, destination, type, gain) {
-      const bufferSize = ctx.sampleRate * 4;
-      const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
-      const data = buffer.getChannelData(0);
-
-      // Generate brown noise
-      let lastOut = 0;
-      for (let i = 0; i < bufferSize; i++) {
-        const white = Math.random() * 2 - 1;
-        if (type === 'brown') {
-          data[i] = (lastOut + (0.02 * white)) / 1.02;
-          lastOut = data[i];
-          data[i] *= 3.5;
-        } else {
-          data[i] = white;
-        }
-      }
-
-      const source = ctx.createBufferSource();
-      source.buffer = buffer;
-      source.loop = true;
-
-      const gainNode = ctx.createGain();
-      gainNode.gain.value = gain;
-
-      // Low-pass filter to keep it soft
-      const filter = ctx.createBiquadFilter();
-      filter.type = 'lowpass';
-      filter.frequency.value = 400;
-
-      source.connect(filter);
-      filter.connect(gainNode);
-      gainNode.connect(destination);
-      source.start();
-
-      state.soundNodes.push(source, gainNode, filter);
+    function createNoiseLayer(ctx, dest, gain) {
+      const buf = ctx.createBuffer(1, ctx.sampleRate*4, ctx.sampleRate);
+      const d = buf.getChannelData(0); let last=0;
+      for(let i=0;i<d.length;i++){ const w=Math.random()*2-1; d[i]=(last+0.02*w)/1.02; last=d[i]; d[i]*=3.5; }
+      const src=ctx.createBufferSource(); src.buffer=buf; src.loop=true;
+      const g=ctx.createGain(); g.gain.value=gain;
+      const f=ctx.createBiquadFilter(); f.type='lowpass'; f.frequency.value=350;
+      src.connect(f); f.connect(g); g.connect(dest); src.start();
+      state.soundNodes.push(src,g,f);
     }
 
-    function createTone(ctx, destination, freq, type, gain) {
-      const osc = ctx.createOscillator();
-      const gainNode = ctx.createGain();
-
-      osc.type = type;
-      osc.frequency.value = freq;
-      gainNode.gain.value = gain;
-
-      // Add very slow frequency drift for organic feel
-      const lfo = ctx.createOscillator();
-      const lfoGain = ctx.createGain();
-      lfo.frequency.value = 0.04;
-      lfoGain.gain.value = freq * 0.003;
-      lfo.connect(lfoGain);
-      lfoGain.connect(osc.frequency);
-      lfo.start();
-
-      osc.connect(gainNode);
-      gainNode.connect(destination);
-      osc.start();
-
-      state.soundNodes.push(osc, gainNode, lfo, lfoGain);
+    function createTone(ctx, dest, freq, gain) {
+      const osc=ctx.createOscillator(); const g=ctx.createGain();
+      osc.frequency.value=freq; g.gain.value=gain;
+      const lfo=ctx.createOscillator(); const lg=ctx.createGain();
+      lfo.frequency.value=0.035; lg.gain.value=freq*0.003;
+      lfo.connect(lg); lg.connect(osc.frequency); lfo.start();
+      osc.connect(g); g.connect(dest); osc.start();
+      state.soundNodes.push(osc,g,lfo,lg);
     }
 
     function stopAmbientSound() {
       if (!state.audioCtx) return;
       try {
-        // Fade out
-        const master = state.soundNodes[0];
-        if (master && master.gain) {
-          master.gain.linearRampToValueAtTime(0, state.audioCtx.currentTime + 1.5);
-        }
-        setTimeout(() => {
-          state.soundNodes.forEach(n => {
-            try { if (n.stop) n.stop(); } catch(e) {}
-          });
-          state.audioCtx.close();
-          state.audioCtx = null;
-          state.soundNodes = [];
-        }, 1600);
+        const m=state.soundNodes[0];
+        if(m?.gain) m.gain.linearRampToValueAtTime(0, state.audioCtx.currentTime+1.5);
+        setTimeout(()=>{ state.soundNodes.forEach(n=>{try{if(n.stop)n.stop();}catch(e){}}); state.audioCtx.close(); state.audioCtx=null; state.soundNodes=[]; }, 1600);
       } catch(e) {}
     }
 
-    // ─── BELL ───
     function playBell() {
       try {
-        const ctx = new (window.AudioContext || window.webkitAudioContext)();
-        const frequencies = [528, 1056, 1584]; // gentle harmonic series
-
-        frequencies.forEach((freq, i) => {
-          const osc = ctx.createOscillator();
-          const gain = ctx.createGain();
-          const t = ctx.currentTime + (i * 0.02);
-
-          osc.type = 'sine';
-          osc.frequency.value = freq;
-
-          gain.gain.setValueAtTime(0, t);
-          gain.gain.linearRampToValueAtTime(0.12 / (i + 1), t + 0.01);
-          gain.gain.exponentialRampToValueAtTime(0.001, t + 4);
-
-          osc.connect(gain);
-          gain.connect(ctx.destination);
-          osc.start(t);
-          osc.stop(t + 4);
+        const ctx=new(window.AudioContext||window.webkitAudioContext)();
+        [528,1056,1584].forEach((freq,i)=>{
+          const osc=ctx.createOscillator(); const g=ctx.createGain();
+          const t=ctx.currentTime+i*0.025; osc.frequency.value=freq;
+          g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(0.1/(i+1),t+0.01); g.gain.exponentialRampToValueAtTime(0.001,t+4);
+          osc.connect(g); g.connect(ctx.destination); osc.start(t); osc.stop(t+4);
         });
-
-        setTimeout(() => ctx.close(), 5000);
+        setTimeout(()=>ctx.close(),5000);
       } catch(e) {}
     }
 
-    // ─── BREATH CYCLE ───
-    const breathPhases = [
-      { label: 'Breathe in', duration: 4000 },
-      { label: 'Hold', duration: 4000 },
-      { label: 'Breathe out', duration: 4000 },
-      { label: '', duration: 2000 },
-    ];
-    let breathIndex = 0;
-
-    function startBreathCycle() {
-      runBreathPhase();
-    }
-
-    function runBreathPhase() {
-      const phase = breathPhases[breathIndex];
-      const textEl = document.getElementById('breathText');
-      if (textEl) textEl.textContent = phase.label;
-
-      state.breathTimer = setTimeout(() => {
-        breathIndex = (breathIndex + 1) % breathPhases.length;
-        runBreathPhase();
-      }, phase.duration);
-    }
-
-    function stopBreathCycle() {
-      clearTimeout(state.breathTimer);
-    }
-
-    // ─── KEYBOARD SHORTCUTS ───
     document.addEventListener('keydown', e => {
-      // Escape to end session early
-      if (e.key === 'Escape' && !document.getElementById('sessionScreen').classList.contains('gone')) {
-        endSession(true);
-      }
-      // Space or Enter to begin from setup
-      if ((e.key === ' ' || e.key === 'Enter') && !document.getElementById('setupScreen').classList.contains('gone')) {
-        e.preventDefault();
-        startSession();
-      }
+      if (e.key==='Escape' && !document.getElementById('sessionScreen').classList.contains('gone')) endSession(true);
+      if ((e.key===' '||e.key==='Enter') && !e.shiftKey && !document.getElementById('setupScreen').classList.contains('gone')) { e.preventDefault(); startSession(); }
     });
   </script>
 </body>
