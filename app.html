@@ -844,7 +844,7 @@
 
     // ─── STATE & STORAGE ───
     const FREE_LIMIT = 5;
-    const THRESHOLD_SESSIONS = 7; // suggested mastery threshold
+    const THRESHOLD_SESSIONS = 3; // minimum sessions before mastery suggested
 
     function loadData() {
       return {
@@ -869,10 +869,10 @@
 
     // ── STAGE SYSTEM ──
     const APP_STAGES = [
-      { name: 'Acknowledgement', label: 'Stage 1 of 4', min: 0,   max: 49,  modesUnlocked: ['silence'] },
-      { name: 'Acceptance',      label: 'Stage 2 of 4', min: 50,  max: 149, modesUnlocked: ['silence','sound'] },
-      { name: 'Receiving',       label: 'Stage 3 of 4', min: 150, max: 349, modesUnlocked: ['silence','sound','visual'] },
-      { name: 'The Threshold',   label: 'Stage 4 of 4', min: 350, max: Infinity, modesUnlocked: ['silence','sound','visual'] },
+      { name: 'Acknowledgement', label: 'Stage 1 of 4', min: 0,  max: 9,        modesUnlocked: ['silence'] },
+      { name: 'Acceptance',      label: 'Stage 2 of 4', min: 10, max: 29,       modesUnlocked: ['silence','sound'] },
+      { name: 'Receiving',       label: 'Stage 3 of 4', min: 30, max: 69,       modesUnlocked: ['silence','sound','visual'] },
+      { name: 'The Threshold',   label: 'Stage 4 of 4', min: 70, max: Infinity, modesUnlocked: ['silence','sound','visual'] },
     ];
     function getAppStage(total) {
       return APP_STAGES.find(s => total >= s.min && total <= s.max) || APP_STAGES[0];
@@ -888,13 +888,13 @@
         const locked = !stage.modesUnlocked.includes('sound');
         threshBtn.style.opacity = locked ? '0.3' : '1';
         threshBtn.style.pointerEvents = locked ? 'none' : 'auto';
-        threshBtn.querySelector('.sess-mode-desc').textContent = locked ? 'Unlocks at 50 catatons' : 'Pressurized void';
+        threshBtn.querySelector('.sess-mode-desc').textContent = locked ? 'Unlocks at 10 catatons' : 'Pressurized void';
       }
       if (ignBtn) {
         const locked = !stage.modesUnlocked.includes('visual');
         ignBtn.style.opacity = locked ? '0.3' : '1';
         ignBtn.style.pointerEvents = locked ? 'none' : 'auto';
-        ignBtn.querySelector('.sess-mode-desc').textContent = locked ? 'Unlocks at 150 catatons' : 'Critical state';
+        ignBtn.querySelector('.sess-mode-desc').textContent = locked ? 'Unlocks at 30 catatons' : 'Critical state';
       }
     }
 
@@ -1242,8 +1242,8 @@
       document.getElementById('masteryActions').style.pointerEvents = '';
 
       const nudge = sit.sessions >= THRESHOLD_SESSIONS
-        ? `You've completed <em>${sit.sessions} sessions</em> with this situation. The silence has had time to work. You are ready — when you feel it.`
-        : `You've completed ${sit.sessions} sessions. The suggested threshold is ${THRESHOLD_SESSIONS}. You may declare mastery now, or continue accumulating.`;
+        ? `This storm has given you <em>${sit.catatons} catatons.</em> When you declare mastery, they crystallize permanently into your total — and this situation enters the archive. The storm is complete. The void did its work.`
+        : `You've entered this void ${sit.sessions} time${sit.sessions !== 1 ? 's' : ''}. You may declare mastery now — or return again. There is no wrong answer. The still voice will wait.`;
 
       document.getElementById('masteryNudge').innerHTML = nudge;
       document.getElementById('masteryModal').classList.add('open');
@@ -1263,7 +1263,8 @@
 
       sit.genesis = document.getElementById('masteryText').value.trim();
 
-      // Archive it
+      // Crystallize — catatons are already in the lifetime total from sessions.
+      // Archive the situation with its full record.
       data.archive.unshift({
         ...sit,
         completedAt: Date.now(),
@@ -1273,19 +1274,32 @@
       data.situations = data.situations.filter(s => s.id !== activeSituationId);
       saveData(data);
 
-      // Show release
+      // Crystallize moment
       document.getElementById('masteryActions').style.opacity = '0';
       document.getElementById('masteryActions').style.pointerEvents = 'none';
 
-      const msgs = ['Released.', 'Genesis.', 'It is finished.', 'The new world begins.', 'Amen.'];
-      const msg = msgs[Math.floor(Math.random() * msgs.length)];
-      document.getElementById('masteryReleaseMsg').textContent = msg;
-      document.getElementById('masteryReleaseMsg').classList.add('visible');
+      const crystallizeEl = document.getElementById('masteryReleaseMsg');
+      crystallizeEl.style.color = 'var(--gold)';
+      crystallizeEl.textContent = `${sit.catatons} catatons crystallized.`;
+      crystallizeEl.classList.add('visible');
+
+      setTimeout(() => {
+        crystallizeEl.style.transition = 'opacity 0.8s ease';
+        crystallizeEl.style.opacity = '0.4';
+        setTimeout(() => {
+          const msgs = ['The genesis has begun.', 'It is finished.', 'The new world begins.', 'A new universe opens.', 'Amen.'];
+          crystallizeEl.textContent = msgs[Math.floor(Math.random() * msgs.length)];
+          crystallizeEl.style.color = '';
+          crystallizeEl.style.opacity = '1';
+        }, 800);
+      }, 1200);
 
       setTimeout(() => {
         document.getElementById('masteryModal').classList.remove('open');
+        crystallizeEl.classList.remove('visible');
+        crystallizeEl.style.opacity = '';
         render();
-      }, 2500);
+      }, 3200);
     });
 
     // ─── ARCHIVE TOGGLE ───

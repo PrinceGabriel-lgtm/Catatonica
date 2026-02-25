@@ -605,7 +605,7 @@
           </div>
           <span class="mode-name">The Threshold</span>
           <span class="mode-sub">Pressurized void</span>
-          <span class="lock-label">50 catatons</span>
+          <span class="lock-label">10 catatons</span>
         </button>
         <button class="mode-btn" data-mode="visual" id="modeIgnition">
           <div class="mode-icon">
@@ -617,7 +617,7 @@
           </div>
           <span class="mode-name">The Ignition</span>
           <span class="mode-sub">Critical state</span>
-          <span class="lock-label">150 catatons</span>
+          <span class="lock-label">30 catatons</span>
         </button>
       </div>
 
@@ -746,8 +746,7 @@
     const STAGES = [
       {
         name: 'Acknowledgement',
-        min: 0, max: 49,
-        // first-ever session (0 total AND 0 sessions ever)
+        min: 0, max: 9,
         firstPrompt:    { eyebrow: 'Before the void', question: 'What <em>brought</em><br>you here today?', sub: 'There is no wrong answer. The void only listens.' },
         prompt:         { eyebrow: 'Name the cataclysm', question: 'What <em>broke</em><br>the silence?', sub: 'Speak it. Name it. Then leave it here.' },
         exitQuestion:   'What <em>shifted?</em>',
@@ -757,7 +756,7 @@
       },
       {
         name: 'Acceptance',
-        min: 50, max: 149,
+        min: 10, max: 29,
         prompt:         { eyebrow: 'What you carry', question: 'What are you<br><em>carrying in?</em>', sub: 'The void holds what you bring. Set it down.' },
         exitQuestion:   'What are you <em>leaving here?</em>',
         completeTitles: ['The void <em>received you.</em>', 'You <em>accepted the stillness.</em>', 'Something <em>settled.</em>'],
@@ -766,7 +765,7 @@
       },
       {
         name: 'Receiving',
-        min: 150, max: 349,
+        min: 30, max: 69,
         prompt:         { eyebrow: 'The still voice', question: 'What is the<br><em>Still Voice showing you?</em>', sub: 'Not what you think. What you hear beneath it.' },
         exitQuestion:   'What did the <em>void reveal?</em>',
         completeTitles: ['You are <em>learning to listen.</em>', 'The Still Voice <em>spoke.</em>', 'You <em>received.</em>'],
@@ -775,7 +774,7 @@
       },
       {
         name: 'The Threshold',
-        min: 350, max: Infinity,
+        min: 70, max: Infinity,
         prompt:         { eyebrow: 'The threshold', question: 'What brought you<br>to the <em>threshold?</em>', sub: 'This is your story. The void is ready for it.' },
         exitQuestion:   'What <em>new world</em> is forming?',
         completeTitles: ['A new beginning <em>is already underway.</em>', 'The genesis <em>has begun.</em>', 'You have <em>crossed over.</em>'],
