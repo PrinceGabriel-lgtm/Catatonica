@@ -86,6 +86,22 @@
       display: flex; align-items: center; gap: 2rem;
     }
 
+    .nav-stage {
+      display: flex; flex-direction: column; align-items: flex-end;
+      gap: 0.15rem; padding-right: 1.5rem;
+      border-right: 1px solid var(--border);
+    }
+    .stage-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 0.85rem; font-weight: 300; font-style: italic;
+      color: rgba(160,138,110,0.75); letter-spacing: 0.04em;
+    }
+    .stage-sub {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.46rem; letter-spacing: 0.22em;
+      text-transform: uppercase; color: var(--text-dim);
+    }
+
     .nav-catatons {
       display: flex; align-items: center; gap: 0.7rem;
     }
@@ -646,6 +662,10 @@
   <nav>
     <a href="index.html" class="nav-logo">Cata<span>tonica</span></a>
     <div class="nav-right">
+      <div class="nav-stage" id="navStage" title="Your current stage in the Order">
+        <span class="stage-name" id="stageName">Acknowledgement</span>
+        <span class="stage-sub" id="stageSub">Stage 1 of 4</span>
+      </div>
       <div class="nav-catatons">
         <span class="cataton-count" id="totalCatatons">0</span>
         <span class="cataton-label">Total<br>Catatons</span>
@@ -712,16 +732,16 @@
 
       <div class="session-modes" id="sessionModes">
         <button class="sess-mode-btn active" data-mode="silence">
-          <span class="sess-mode-name">Silence</span>
-          <span class="sess-mode-desc">Pure void</span>
+          <span class="sess-mode-name">The Void</span>
+          <span class="sess-mode-desc">Sub-zero stillness</span>
         </button>
-        <button class="sess-mode-btn" data-mode="sound">
-          <span class="sess-mode-name">Sound</span>
-          <span class="sess-mode-desc">Ambient tones</span>
+        <button class="sess-mode-btn" data-mode="sound" id="dashModeThreshold">
+          <span class="sess-mode-name">The Threshold</span>
+          <span class="sess-mode-desc">Pressurized void</span>
         </button>
-        <button class="sess-mode-btn" data-mode="visual">
-          <span class="sess-mode-name">Breathing</span>
-          <span class="sess-mode-desc">Visual guide</span>
+        <button class="sess-mode-btn" data-mode="visual" id="dashModeIgnition">
+          <span class="sess-mode-name">The Ignition</span>
+          <span class="sess-mode-desc">Critical state</span>
         </button>
       </div>
 
@@ -842,10 +862,41 @@
     }
 
     let data = loadData();
-    let activeSituationId = null; // which situation current action targets
+    let activeSituationId = null;
     let sessionMode = 'silence';
     let sessionDuration = 10;
-    let obsMode = 'manifesto'; // 'manifesto' or 'completion'
+    let obsMode = 'manifesto';
+
+    // ── STAGE SYSTEM ──
+    const APP_STAGES = [
+      { name: 'Acknowledgement', label: 'Stage 1 of 4', min: 0,   max: 49,  modesUnlocked: ['silence'] },
+      { name: 'Acceptance',      label: 'Stage 2 of 4', min: 50,  max: 149, modesUnlocked: ['silence','sound'] },
+      { name: 'Receiving',       label: 'Stage 3 of 4', min: 150, max: 349, modesUnlocked: ['silence','sound','visual'] },
+      { name: 'The Threshold',   label: 'Stage 4 of 4', min: 350, max: Infinity, modesUnlocked: ['silence','sound','visual'] },
+    ];
+    function getAppStage(total) {
+      return APP_STAGES.find(s => total >= s.min && total <= s.max) || APP_STAGES[0];
+    }
+    function applyAppStage() {
+      const stage = getAppStage(data.totalCatatons);
+      document.getElementById('stageName').textContent = stage.name;
+      document.getElementById('stageSub').textContent = stage.label;
+      // Lock modes in session modal
+      const threshBtn = document.getElementById('dashModeThreshold');
+      const ignBtn = document.getElementById('dashModeIgnition');
+      if (threshBtn) {
+        const locked = !stage.modesUnlocked.includes('sound');
+        threshBtn.style.opacity = locked ? '0.3' : '1';
+        threshBtn.style.pointerEvents = locked ? 'none' : 'auto';
+        threshBtn.querySelector('.sess-mode-desc').textContent = locked ? 'Unlocks at 50 catatons' : 'Pressurized void';
+      }
+      if (ignBtn) {
+        const locked = !stage.modesUnlocked.includes('visual');
+        ignBtn.style.opacity = locked ? '0.3' : '1';
+        ignBtn.style.pointerEvents = locked ? 'none' : 'auto';
+        ignBtn.querySelector('.sess-mode-desc').textContent = locked ? 'Unlocks at 150 catatons' : 'Critical state';
+      }
+    }
 
     // ─── RENDER ───
     function render() {
@@ -854,6 +905,7 @@
       renderArchive();
       updateTierNotice();
       updateTotalCatatons();
+      applyAppStage();
     }
 
     function updateTotalCatatons() {

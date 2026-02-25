@@ -7,7 +7,6 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Mono:ital,wght@0,300;0,400;1,300&family=Outfit:wght@200;300;400&display=swap" rel="stylesheet" />
-
   <style>
     :root {
       --void: #090806;
@@ -19,8 +18,10 @@
       --text-muted: rgba(228,223,214,0.38);
       --text-dim: rgba(228,223,214,0.13);
       --gold: #c9a84c;
-      --gold-dim: rgba(201,168,76,0.1);
+      --gold-dim: rgba(201,168,76,0.08);
       --teal: #6ba3b0;
+      --ash: #2e2820;
+      --ash-accent: rgba(160,138,110,0.22);
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -89,7 +90,18 @@
     }
     .back-link:hover { color: var(--text-muted); }
 
-    /* ENTRY */
+    /* stage badge top center */
+    .stage-badge {
+      position: absolute; top: 2.5rem; left: 50%; transform: translateX(-50%);
+      font-family: 'DM Mono', monospace;
+      font-size: 0.52rem; letter-spacing: 0.28em;
+      text-transform: uppercase; color: var(--ash-accent);
+      border: 1px solid var(--ash-accent);
+      padding: 0.3rem 0.8rem;
+      white-space: nowrap;
+    }
+
+    /* ── ENTRY ── */
     #entryScreen { padding: 3rem; }
 
     .entry-content {
@@ -105,6 +117,7 @@
     }
     .eyebrow-teal { color: var(--teal); }
     .eyebrow-gold { color: var(--gold); }
+    .eyebrow-ash { color: rgba(160,138,110,0.7); }
 
     .big-question {
       font-family: 'Cormorant Garamond', serif;
@@ -174,7 +187,7 @@
     }
     .btn-ghost-text:hover { color: var(--text-muted); }
 
-    /* SETUP */
+    /* ── SETUP ── */
     #setupScreen { padding: 3rem; }
 
     .setup-content {
@@ -200,15 +213,27 @@
       padding: 1.4rem 1.2rem; cursor: none; text-align: left;
       position: relative; transition: background 0.3s ease;
     }
-    .mode-btn:hover { background: var(--deep); }
+    .mode-btn:hover:not(.locked) { background: var(--deep); }
     .mode-btn.active { background: var(--surface); }
     .mode-btn.active::after {
       content: ''; position: absolute; bottom: 0; left: 0; right: 0;
       height: 1px; background: var(--teal);
     }
+    .mode-btn.locked {
+      opacity: 0.3; cursor: not-allowed;
+      position: relative;
+    }
+    .lock-label {
+      display: none;
+      position: absolute; bottom: 0.6rem; right: 0.8rem;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.44rem; letter-spacing: 0.12em;
+      text-transform: uppercase; color: var(--ash-accent);
+    }
+    .mode-btn.locked .lock-label { display: block; }
 
     .mode-icon { width: 24px; height: 24px; margin-bottom: 0.8rem; opacity: 0.45; transition: opacity 0.3s ease; }
-    .mode-btn.active .mode-icon, .mode-btn:hover .mode-icon { opacity: 0.9; }
+    .mode-btn.active .mode-icon, .mode-btn:hover:not(.locked) .mode-icon { opacity: 0.9; }
 
     .mode-name {
       font-family: 'Cormorant Garamond', serif;
@@ -248,7 +273,7 @@
     }
     .begin-btn:hover { background: var(--teal); }
 
-    /* SESSION */
+    /* ── SESSION ── */
     #sessionScreen { background: var(--void); }
 
     .session-exit {
@@ -261,6 +286,7 @@
     .session-exit.visible { opacity: 1; }
     .session-exit:hover { color: var(--text-muted); }
 
+    /* Silence orb */
     .silence-orb {
       position: absolute; inset: 0;
       display: flex; align-items: center; justify-content: center;
@@ -276,11 +302,18 @@
       border: 1px solid rgba(201,168,76,0.02);
       animation: silencePulse 12s ease-in-out infinite 3s;
     }
+    /* ash ring — the rubble beneath the gold */
+    .silence-orb-ash {
+      position: absolute; width: 420px; height: 420px; border-radius: 50%;
+      border: 1px solid rgba(160,138,110,0.04);
+      animation: silencePulse 18s ease-in-out infinite 6s;
+    }
     @keyframes silencePulse {
       0%,100% { transform: scale(0.88); opacity: 0.35; }
       50% { transform: scale(1.1); opacity: 0.7; }
     }
 
+    /* Sound bars */
     .sound-visual {
       position: absolute; inset: 0;
       display: flex; align-items: center; justify-content: center;
@@ -288,8 +321,8 @@
     }
     .sound-bars { display: flex; gap: 8px; align-items: center; }
     .sound-bar {
-      width: 2px; border-radius: 2px; background: var(--teal);
-      opacity: 0.15; animation: soundWave 4.5s ease-in-out infinite;
+      width: 2px; border-radius: 2px; background: var(--ash-accent);
+      opacity: 0.2; animation: soundWave 4.5s ease-in-out infinite;
     }
     .sound-bar:nth-child(1){height:10px;animation-delay:0s}
     .sound-bar:nth-child(2){height:22px;animation-delay:0.3s}
@@ -299,11 +332,12 @@
     .sound-bar:nth-child(6){height:22px;animation-delay:0.4s}
     .sound-bar:nth-child(7){height:10px;animation-delay:0.1s}
     @keyframes soundWave {
-      0%,100%{transform:scaleY(0.65);opacity:0.1}
-      40%{transform:scaleY(1.35);opacity:0.25}
-      70%{transform:scaleY(0.85);opacity:0.15}
+      0%,100%{transform:scaleY(0.65);opacity:0.12}
+      40%{transform:scaleY(1.35);opacity:0.3}
+      70%{transform:scaleY(0.85);opacity:0.18}
     }
 
+    /* Breathing rings */
     .breath-visual {
       position: absolute; inset: 0;
       display: flex; align-items: center; justify-content: center;
@@ -340,30 +374,52 @@
       transition: opacity 0.8s ease;
     }
 
-    .timer-display {
+    /* Cataton counter — the main session display */
+    .cataton-live {
+      position: relative; z-index: 2; text-align: center;
+    }
+    .cataton-live-num {
       font-family: 'Cormorant Garamond', serif;
       font-size: clamp(5rem, 14vw, 11rem);
       font-weight: 300; line-height: 1;
-      color: rgba(228,223,214,0.18); letter-spacing: -0.02em;
-      position: relative; z-index: 2; text-align: center;
+      color: rgba(201,168,76,0.12);
+      letter-spacing: -0.02em;
+      display: block;
+      transition: color 3s ease;
+    }
+    .cataton-live-num.earned {
+      color: rgba(201,168,76,0.45);
+    }
+    .cataton-live-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.52rem; letter-spacing: 0.32em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      display: block; margin-top: 0.4rem;
+    }
+    .session-elapsed {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.58rem; letter-spacing: 0.2em;
+      color: rgba(228,223,214,0.06);
+      margin-top: 1.2rem; display: block;
       transition: color 2s ease;
     }
     .session-mode-label {
-      font-family: 'DM Mono', monospace; font-size: 0.55rem;
+      font-family: 'DM Mono', monospace; font-size: 0.52rem;
       letter-spacing: 0.3em; text-transform: uppercase; color: var(--text-dim);
-      margin-top: 1.8rem; opacity: 0.4; position: relative; z-index: 2;
+      margin-top: 0.6rem; opacity: 0.35; position: relative; z-index: 2; display: block;
     }
 
     .progress-ring {
       position: fixed; bottom: 2.5rem; left: 50%;
-      transform: translateX(-50%); z-index: 5; opacity: 0.28;
+      transform: translateX(-50%); z-index: 5; opacity: 0.22;
     }
     .progress-ring circle {
       transform-origin: center; transform: rotate(-90deg);
       transition: stroke-dashoffset 1s linear;
     }
 
-    /* EXIT */
+    /* ── EXIT ── */
     #exitScreen { padding: 3rem; }
     .exit-content {
       width: 100%; max-width: 540px;
@@ -382,7 +438,7 @@
     .exit-textarea::placeholder { color: var(--text-dim); }
     .exit-textarea:focus { border-color: rgba(201,168,76,0.15); }
 
-    /* COMPLETE */
+    /* ── COMPLETE ── */
     #completeScreen { padding: 3rem; }
     .complete-content {
       max-width: 480px; text-align: center;
@@ -400,7 +456,12 @@
     .cataton-label-sm {
       font-family: 'DM Mono', monospace; font-size: 0.55rem;
       letter-spacing: 0.28em; text-transform: uppercase;
-      color: var(--text-dim); margin-bottom: 3.5rem; display: block;
+      color: var(--text-dim); margin-bottom: 1rem; display: block;
+    }
+    .cataton-total-sm {
+      font-family: 'DM Mono', monospace; font-size: 0.5rem;
+      letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--ash-accent); margin-bottom: 3rem; display: block;
     }
     .complete-title {
       font-family: 'Cormorant Garamond', serif;
@@ -417,11 +478,11 @@
       border-left: 1px solid rgba(201,168,76,0.18);
       padding: 0.7rem 1.4rem; margin-bottom: 1rem; text-align: left;
     }
-    .echo-block.shift { border-left-color: rgba(107,163,176,0.18); }
+    .echo-block.shift { border-left-color: rgba(160,138,110,0.25); }
     .echo-label {
       font-family: 'DM Mono', monospace; font-size: 0.5rem;
       letter-spacing: 0.2em; text-transform: uppercase;
-      color: var(--teal); opacity: 0.55; margin-bottom: 0.4rem; display: block;
+      color: var(--ash-accent); opacity: 0.8; margin-bottom: 0.4rem; display: block;
     }
     .echo-text {
       font-family: 'Cormorant Garamond', serif;
@@ -453,11 +514,16 @@
       from { opacity: 0; transform: translateY(18px); }
       to { opacity: 1; transform: translateY(0); }
     }
+    @keyframes catatonPulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
 
     @media (max-width: 600px) {
       .screen-logo, .back-link { font-size: 0.5rem; }
       .mode-grid { grid-template-columns: 1fr; }
-      .timer-display { font-size: clamp(4rem, 20vw, 8rem); }
+      .cataton-live-num { font-size: clamp(4rem, 20vw, 8rem); }
       .cataton-earned { font-size: 4rem; }
     }
   </style>
@@ -469,21 +535,22 @@
 
   <!-- ENTRY SCREEN -->
   <div class="screen" id="entryScreen">
-    <a href="app.html" class="back-link">← Your void</a>
+    <a href="app.html" class="back-link">← Return</a>
     <div class="screen-logo">Cata<em>tonica</em></div>
+    <div class="stage-badge" id="entryStageBadge">Acknowledgement</div>
 
     <div class="entry-content">
-      <p class="eyebrow eyebrow-teal">Before the void</p>
-      <h1 class="big-question">
-        What's <em>actually</em><br>going on right now?
+      <p class="eyebrow eyebrow-ash" id="entryEyebrow">Before the void</p>
+      <h1 class="big-question" id="entryQuestion">
+        What <em>brought</em><br>you here today?
       </h1>
-      <p class="sub-text">Name it. Speak it. Then let it wait.</p>
+      <p class="sub-text" id="entrySubtext">There is no wrong answer. The void only listens.</p>
 
       <div class="input-wrap">
         <textarea
           class="void-textarea"
           id="entryText"
-          placeholder="A pressure, a decision, a person you can't stop circling…"
+          placeholder="Speak it or leave it here…"
           rows="3"
         ></textarea>
         <button class="voice-btn" id="voiceBtn" title="Speak instead">
@@ -494,10 +561,10 @@
           </svg>
         </button>
       </div>
-      <p class="input-hint">Optional — or skip and go straight in</p>
+      <p class="input-hint">Optional — or skip and enter directly</p>
 
       <div class="actions">
-        <button class="btn-primary-dark btn-enter" id="entryNextBtn">Enter the void →</button>
+        <button class="btn-primary-dark btn-enter" id="entryNextBtn">Enter →</button>
         <button class="btn-ghost-text" id="entrySkipBtn">Skip</button>
       </div>
     </div>
@@ -506,38 +573,41 @@
   <!-- SETUP SCREEN -->
   <div class="screen hidden gone" id="setupScreen">
     <div class="screen-logo">Cata<em>tonica</em></div>
+    <div class="stage-badge" id="setupStageBadge">Acknowledgement</div>
 
     <div class="setup-content">
-      <p class="eyebrow eyebrow-teal">Configure your silence</p>
-      <h1 class="big-question">Choose your <em>mode.</em></h1>
+      <p class="eyebrow eyebrow-ash">Configure your silence</p>
+      <h1 class="big-question">Choose your <em>state.</em></h1>
 
       <p class="setup-label">Mode</p>
       <div class="mode-grid">
-        <button class="mode-btn active" data-mode="silence">
+        <button class="mode-btn active" data-mode="silence" id="modeVoid">
           <div class="mode-icon">
             <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
               <circle cx="10" cy="10" r="2" fill="var(--gold)" opacity="0.7"/>
               <circle cx="10" cy="10" r="6" stroke="var(--gold)" stroke-width="0.6" opacity="0.2"/>
+              <circle cx="10" cy="10" r="9" stroke="rgba(160,138,110,0.15)" stroke-width="0.4"/>
             </svg>
           </div>
-          <span class="mode-name">Silence</span>
-          <span class="mode-sub">Pure void</span>
+          <span class="mode-name">The Void</span>
+          <span class="mode-sub">Sub-zero stillness</span>
         </button>
-        <button class="mode-btn" data-mode="sound">
+        <button class="mode-btn" data-mode="sound" id="modeThreshold">
           <div class="mode-icon">
             <svg width="22" height="16" viewBox="0 0 22 16" fill="none">
-              <rect x="0" y="6" width="2" height="4" rx="1" fill="var(--teal)" opacity="0.7"/>
-              <rect x="4" y="3" width="2" height="10" rx="1" fill="var(--teal)"/>
-              <rect x="8" y="0" width="2" height="16" rx="1" fill="var(--teal)" opacity="0.8"/>
-              <rect x="12" y="3" width="2" height="10" rx="1" fill="var(--teal)"/>
-              <rect x="16" y="5" width="2" height="6" rx="1" fill="var(--teal)" opacity="0.6"/>
-              <rect x="20" y="7" width="2" height="2" rx="1" fill="var(--teal)" opacity="0.4"/>
+              <rect x="0" y="6" width="2" height="4" rx="1" fill="rgba(160,138,110,0.7)"/>
+              <rect x="4" y="3" width="2" height="10" rx="1" fill="rgba(160,138,110,0.85)"/>
+              <rect x="8" y="0" width="2" height="16" rx="1" fill="rgba(160,138,110,0.9)"/>
+              <rect x="12" y="3" width="2" height="10" rx="1" fill="rgba(160,138,110,0.85)"/>
+              <rect x="16" y="5" width="2" height="6" rx="1" fill="rgba(160,138,110,0.6)"/>
+              <rect x="20" y="7" width="2" height="2" rx="1" fill="rgba(160,138,110,0.4)"/>
             </svg>
           </div>
-          <span class="mode-name">Soundscape</span>
-          <span class="mode-sub">Ambient tones</span>
+          <span class="mode-name">The Threshold</span>
+          <span class="mode-sub">Pressurized void</span>
+          <span class="lock-label">50 catatons</span>
         </button>
-        <button class="mode-btn" data-mode="visual">
+        <button class="mode-btn" data-mode="visual" id="modeIgnition">
           <div class="mode-icon">
             <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
               <circle cx="11" cy="11" r="9" stroke="var(--gold)" stroke-width="0.7" opacity="0.5"/>
@@ -545,8 +615,9 @@
               <circle cx="11" cy="11" r="1.5" fill="var(--gold)" opacity="0.7"/>
             </svg>
           </div>
-          <span class="mode-name">Breathing</span>
-          <span class="mode-sub">Visual guide</span>
+          <span class="mode-name">The Ignition</span>
+          <span class="mode-sub">Critical state</span>
+          <span class="lock-label">150 catatons</span>
         </button>
       </div>
 
@@ -559,15 +630,16 @@
         <button class="dur-btn" data-min="30">30 min</button>
       </div>
 
-      <button class="begin-btn" id="beginBtn">Begin</button>
+      <button class="begin-btn" id="beginBtn">Enter the stillness</button>
     </div>
   </div>
 
   <!-- SESSION SCREEN -->
   <div class="screen hidden gone" id="sessionScreen">
-    <button class="session-exit" id="exitBtn">End Early</button>
+    <button class="session-exit" id="exitBtn">Surface Early</button>
 
     <div class="silence-orb" id="silenceVisual">
+      <div class="silence-orb-ash"></div>
       <div class="silence-orb-outer"></div>
       <div class="silence-orb-core"></div>
     </div>
@@ -594,13 +666,17 @@
       </div>
     </div>
 
-    <div class="timer-display" id="timerDisplay">00:00</div>
-    <div class="session-mode-label" id="sessionModeLabel"></div>
+    <div class="cataton-live">
+      <span class="cataton-live-num" id="catatonLiveNum">0</span>
+      <span class="cataton-live-label">catatons forming</span>
+      <span class="session-elapsed" id="sessionElapsed">00:00</span>
+      <span class="session-mode-label" id="sessionModeLabel"></span>
+    </div>
 
     <svg class="progress-ring" width="44" height="44" viewBox="0 0 44 44">
       <circle cx="22" cy="22" r="18" fill="none" stroke="rgba(255,255,255,0.03)" stroke-width="1"/>
       <circle id="progressCircle" cx="22" cy="22" r="18" fill="none"
-        stroke="var(--teal)" stroke-width="1"
+        stroke="rgba(160,138,110,0.4)" stroke-width="1"
         stroke-dasharray="113.1" stroke-dashoffset="113.1"
         stroke-linecap="round"/>
     </svg>
@@ -612,18 +688,18 @@
 
     <div class="exit-content">
       <p class="eyebrow eyebrow-gold">Surface</p>
-      <h2 class="big-question">What <em>shifted?</em></h2>
+      <h2 class="big-question" id="exitQuestion">What <em>shifted?</em></h2>
       <p class="sub-text">Even one word. Or nothing at all.</p>
 
       <textarea
         class="exit-textarea"
         id="exitText"
-        placeholder="Something you see differently. Something quieter. Something that can wait…"
+        placeholder="Something quieter. Something that can wait. Something new…"
         rows="3"
       ></textarea>
 
       <div class="actions">
-        <button class="btn-primary-dark btn-complete-dark" id="exitCompleteBtn">Complete Session</button>
+        <button class="btn-primary-dark btn-complete-dark" id="exitCompleteBtn">Complete</button>
         <button class="btn-ghost-text" id="exitNothingBtn">Nothing yet</button>
       </div>
     </div>
@@ -636,8 +712,9 @@
 
       <span class="cataton-earned" id="catatonsDisplay">0</span>
       <span class="cataton-label-sm">Catatons earned</span>
+      <span class="cataton-total-sm" id="catatonTotalSm"></span>
 
-      <h2 class="complete-title" id="completeTitleEl">You <em>showed up.</em></h2>
+      <h2 class="complete-title" id="completeTitleEl">You <em>stayed.</em></h2>
       <p class="complete-meta" id="completeDuration"></p>
 
       <div class="echo-block" id="echoIn" style="display:none">
@@ -652,35 +729,115 @@
 
       <div class="complete-actions">
         <button class="btn-go-again" id="goAgainBtn">Return to void</button>
-        <a href="index.html" class="btn-exit-link">Exit</a>
+        <a href="app.html" class="btn-exit-link">Your void</a>
       </div>
     </div>
   </div>
 
   <script>
+    // ── CURSOR ──
     const cursor = document.getElementById('cursor');
     const ring = document.getElementById('cursorRing');
     let mx=0,my=0,rx=0,ry=0;
     document.addEventListener('mousemove', e => { mx=e.clientX; my=e.clientY; cursor.style.left=mx+'px'; cursor.style.top=my+'px'; });
     (function animRing(){ rx+=(mx-rx)*0.1; ry+=(my-ry)*0.1; ring.style.left=rx+'px'; ring.style.top=ry+'px'; requestAnimationFrame(animRing); })();
 
+    // ── STAGE SYSTEM ──
+    const STAGES = [
+      {
+        name: 'Acknowledgement',
+        min: 0, max: 49,
+        // first-ever session (0 total AND 0 sessions ever)
+        firstPrompt:    { eyebrow: 'Before the void', question: 'What <em>brought</em><br>you here today?', sub: 'There is no wrong answer. The void only listens.' },
+        prompt:         { eyebrow: 'Name the cataclysm', question: 'What <em>broke</em><br>the silence?', sub: 'Speak it. Name it. Then leave it here.' },
+        exitQuestion:   'What <em>shifted?</em>',
+        completeTitles: ['You <em>stayed still.</em>', 'That was <em>enough.</em>', 'The void <em>received you.</em>'],
+        completeEarly:  ['You <em>came.</em>', 'A single step <em>is still movement.</em>'],
+        modesUnlocked:  ['silence'],
+      },
+      {
+        name: 'Acceptance',
+        min: 50, max: 149,
+        prompt:         { eyebrow: 'What you carry', question: 'What are you<br><em>carrying in?</em>', sub: 'The void holds what you bring. Set it down.' },
+        exitQuestion:   'What are you <em>leaving here?</em>',
+        completeTitles: ['The void <em>received you.</em>', 'You <em>accepted the stillness.</em>', 'Something <em>settled.</em>'],
+        completeEarly:  ['You <em>entered.</em>', 'Partial stillness <em>is still stillness.</em>'],
+        modesUnlocked:  ['silence', 'sound'],
+      },
+      {
+        name: 'Receiving',
+        min: 150, max: 349,
+        prompt:         { eyebrow: 'The still voice', question: 'What is the<br><em>Still Voice showing you?</em>', sub: 'Not what you think. What you hear beneath it.' },
+        exitQuestion:   'What did the <em>void reveal?</em>',
+        completeTitles: ['You are <em>learning to listen.</em>', 'The Still Voice <em>spoke.</em>', 'You <em>received.</em>'],
+        completeEarly:  ['You <em>listened.</em>', 'Even partial silence <em>teaches.</em>'],
+        modesUnlocked:  ['silence', 'sound', 'visual'],
+      },
+      {
+        name: 'The Threshold',
+        min: 350, max: Infinity,
+        prompt:         { eyebrow: 'The threshold', question: 'What brought you<br>to the <em>threshold?</em>', sub: 'This is your story. The void is ready for it.' },
+        exitQuestion:   'What <em>new world</em> is forming?',
+        completeTitles: ['A new beginning <em>is already underway.</em>', 'The genesis <em>has begun.</em>', 'You have <em>crossed over.</em>'],
+        completeEarly:  ['Even threshold-walkers <em>rest.</em>', 'The voice <em>will wait.</em>'],
+        modesUnlocked:  ['silence', 'sound', 'visual'],
+      },
+    ];
+
+    function getStage(totalCatatons) {
+      return STAGES.find(s => totalCatatons >= s.min && totalCatatons <= s.max) || STAGES[0];
+    }
+
+    // ── STATE ──
     const sessionCtx = JSON.parse(sessionStorage.getItem('cat_session') || 'null');
+    const totalCatatonsCurrent = parseInt(localStorage.getItem('cat_total') || '0');
+    const sessionCount = parseInt(localStorage.getItem('cat_session_count') || '0');
+    const isFirstEver = (totalCatatonsCurrent === 0 && sessionCount === 0);
+    const currentStage = getStage(totalCatatonsCurrent);
+
     const state = {
       mode: sessionCtx?.mode || 'silence',
       duration: sessionCtx?.duration || 10,
       sitId: sessionCtx?.sitId || null,
-      secondsLeft: 0, totalSeconds: 0,
+      totalSeconds: 0, elapsedSeconds: 0,
       timer: null, audioCtx: null, soundNodes: [],
       breathTimer: null, breathPhaseIndex: 0,
       entryText: '', exitText: '',
-      catatonsEarned: 0, elapsedSeconds: 0, completedFull: false,
+      catatonsEarned: 0, completedFull: false,
     };
 
-    if (sessionCtx) {
-      document.querySelectorAll('.mode-btn').forEach(b => b.classList.toggle('active', b.dataset.mode === state.mode));
-      document.querySelectorAll('.dur-btn').forEach(b => b.classList.toggle('active', parseInt(b.dataset.min) === state.duration));
+    // Apply stage content to entry screen
+    function applyStageContent() {
+      const stage = currentStage;
+      const p = isFirstEver ? stage.firstPrompt : stage.prompt;
+
+      document.getElementById('entryStageBadge').textContent = stage.name;
+      document.getElementById('setupStageBadge').textContent = stage.name;
+      document.getElementById('entryEyebrow').textContent = p.eyebrow;
+      document.getElementById('entryQuestion').innerHTML = p.question;
+      document.getElementById('entrySubtext').textContent = p.sub;
+      document.getElementById('exitQuestion').innerHTML = stage.exitQuestion;
+
+      // Lock/unlock modes
+      const unlocked = stage.modesUnlocked;
+      document.getElementById('modeThreshold').classList.toggle('locked', !unlocked.includes('sound'));
+      document.getElementById('modeIgnition').classList.toggle('locked', !unlocked.includes('visual'));
+
+      // If current mode is locked, fall back to silence
+      if (!unlocked.includes(state.mode)) state.mode = 'silence';
+
+      // Pre-select from sessionCtx
+      if (sessionCtx) {
+        const modeToUse = unlocked.includes(sessionCtx.mode) ? sessionCtx.mode : 'silence';
+        state.mode = modeToUse;
+        document.querySelectorAll('.mode-btn').forEach(b => b.classList.toggle('active', b.dataset.mode === modeToUse));
+        document.querySelectorAll('.dur-btn').forEach(b => b.classList.toggle('active', parseInt(b.dataset.min) === state.duration));
+      }
     }
 
+    applyStageContent();
+
+    // ── SCREEN MANAGER ──
     function showScreen(id) {
       document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
       const target = document.getElementById(id);
@@ -689,6 +846,7 @@
       document.querySelectorAll('.screen').forEach(s => { if (s.id !== id) setTimeout(() => s.classList.add('gone'), 950); });
     }
 
+    // ── ENTRY SCREEN ──
     const entryTextEl = document.getElementById('entryText');
 
     document.getElementById('entryNextBtn').addEventListener('click', () => {
@@ -703,6 +861,7 @@
       if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); state.entryText = entryTextEl.value.trim(); showScreen('setupScreen'); }
     });
 
+    // Voice input
     const voiceBtn = document.getElementById('voiceBtn');
     if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
       const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -716,8 +875,10 @@
       });
     } else { voiceBtn.style.display = 'none'; }
 
+    // ── SETUP SCREEN ──
     document.querySelectorAll('.mode-btn').forEach(btn => {
       btn.addEventListener('click', () => {
+        if (btn.classList.contains('locked')) return;
         document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active'); state.mode = btn.dataset.mode;
       });
@@ -730,16 +891,17 @@
     });
     document.getElementById('beginBtn').addEventListener('click', startSession);
 
+    // ── SESSION ──
     function startSession() {
       state.totalSeconds = state.duration * 60;
-      state.secondsLeft = state.totalSeconds;
+      state.elapsedSeconds = 0;
 
       document.getElementById('silenceVisual').style.display = state.mode === 'silence' ? 'flex' : 'none';
       document.getElementById('soundVisual').style.display   = state.mode === 'sound'   ? 'flex' : 'none';
       document.getElementById('breathVisual').style.display  = state.mode === 'visual'  ? 'flex' : 'none';
 
-      document.getElementById('sessionModeLabel').textContent =
-        state.mode==='silence' ? 'Pure void' : state.mode==='sound' ? 'Soundscape' : 'Breathing guide';
+      const modeLabels = { silence: 'The Void', sound: 'The Threshold', visual: 'The Ignition' };
+      document.getElementById('sessionModeLabel').textContent = modeLabels[state.mode] || '';
 
       showScreen('sessionScreen');
       document.body.classList.add('in-session');
@@ -747,7 +909,7 @@
       if (state.mode === 'sound')  startAmbientSound();
       if (state.mode === 'visual') startBreathCycle();
 
-      updateTimerDisplay();
+      updateSessionDisplay();
       state.timer = setInterval(tick, 1000);
 
       let hideTimer;
@@ -759,20 +921,39 @@
       document.addEventListener('mousemove', state._mouseHandler);
     }
 
-    function tick() { state.secondsLeft--; updateTimerDisplay(); if (state.secondsLeft <= 0) endSession(false); }
-
-    function updateTimerDisplay() {
-      const m = Math.floor(state.secondsLeft/60);
-      const s = state.secondsLeft%60;
-      document.getElementById('timerDisplay').textContent = String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
-      const elapsed = state.totalSeconds - state.secondsLeft;
-      document.getElementById('progressCircle').style.strokeDashoffset = 113.1 * (1 - elapsed/state.totalSeconds);
-      if (state.mode === 'silence') {
-        const opacity = Math.max(0.08, 0.2 - 0.08 * (elapsed/state.totalSeconds));
-        document.getElementById('timerDisplay').style.color = `rgba(228,223,214,${opacity})`;
-      }
+    function tick() {
+      state.elapsedSeconds++;
+      updateSessionDisplay();
+      if (state.elapsedSeconds >= state.totalSeconds) endSession(false);
     }
 
+    function updateSessionDisplay() {
+      const elapsed = state.elapsedSeconds;
+      const catatonsNow = Math.floor(elapsed / 60);
+      const numEl = document.getElementById('catatonLiveNum');
+
+      const prevNum = parseInt(numEl.textContent) || 0;
+      numEl.textContent = catatonsNow;
+
+      // pulse and brighten when a new cataton earns
+      if (catatonsNow > prevNum && catatonsNow > 0) {
+        numEl.classList.add('earned');
+        numEl.style.animation = 'catatonPulse 0.6s ease';
+        setTimeout(() => { numEl.style.animation = ''; }, 650);
+      }
+      if (catatonsNow > 0) numEl.classList.add('earned');
+
+      // elapsed time small dim
+      const m = Math.floor(elapsed/60);
+      const s = elapsed%60;
+      document.getElementById('sessionElapsed').textContent = String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
+
+      // progress arc
+      const pct = elapsed / state.totalSeconds;
+      document.getElementById('progressCircle').style.strokeDashoffset = 113.1 * (1 - pct);
+    }
+
+    // ── BREATHING ──
     const breathPhases = [
       { label: 'Breathe in',  duration: 4000, scale: 1.25, opacity: 0.85, dur: '4s' },
       { label: 'Hold',        duration: 4000, scale: 1.25, opacity: 0.6,  dur: '1s' },
@@ -800,40 +981,65 @@
 
     function stopBreathCycle() { clearTimeout(state.breathTimer); }
 
+    // ── END SESSION ──
     function endSession(early = false) {
       clearInterval(state.timer);
       stopAmbientSound(); stopBreathCycle();
       document.removeEventListener('mousemove', state._mouseHandler);
       document.body.classList.remove('in-session');
       playBell();
-      const elapsed = state.totalSeconds - state.secondsLeft;
-      state.catatonsEarned = Math.max(1, Math.round(state.duration * (elapsed/state.totalSeconds)));
-      state.elapsedSeconds = elapsed;
+
+      const elapsed = state.elapsedSeconds;
+      state.catatonsEarned = Math.max(1, Math.floor(elapsed / 60));
       state.completedFull = !early;
+
+      // Save to localStorage
+      const prevTotal = parseInt(localStorage.getItem('cat_total') || '0');
+      const newTotal = prevTotal + state.catatonsEarned;
+      const prevCount = parseInt(localStorage.getItem('cat_session_count') || '0');
+      localStorage.setItem('cat_total', newTotal);
+      localStorage.setItem('cat_session_count', prevCount + 1);
+
+      // Update situation catatons in app data if sitId present
       if (state.sitId) {
-        sessionStorage.setItem('cat_session_result', JSON.stringify({
-          sitId: state.sitId, catatonsEarned: state.catatonsEarned, completed: !early,
-        }));
+        try {
+          const situations = JSON.parse(localStorage.getItem('cat_situations') || '[]');
+          const sit = situations.find(s => s.id === state.sitId);
+          if (sit) {
+            sit.catatons = (sit.catatons || 0) + state.catatonsEarned;
+            sit.sessions = (sit.sessions || 0) + 1;
+            localStorage.setItem('cat_situations', JSON.stringify(situations));
+          }
+        } catch(e) {}
       }
+
       setTimeout(() => showScreen('exitScreen'), early ? 400 : 1400);
     }
 
     document.getElementById('exitBtn').addEventListener('click', () => endSession(true));
 
+    // ── EXIT SCREEN ──
     function goToComplete() {
       state.exitText = document.getElementById('exitText').value.trim();
+
+      const newTotal = parseInt(localStorage.getItem('cat_total') || '0');
       document.getElementById('catatonsDisplay').textContent = state.catatonsEarned;
+      document.getElementById('catatonTotalSm').textContent = newTotal.toLocaleString() + ' total catatons';
+
       const elMin = Math.floor(state.elapsedSeconds/60);
       const elSec = state.elapsedSeconds%60;
       document.getElementById('completeDuration').textContent = state.completedFull
-        ? `${state.duration} minutes · +${state.catatonsEarned} catatons`
+        ? `${state.duration} min · +${state.catatonsEarned} catatons`
         : `${elMin}m ${elSec}s · +${state.catatonsEarned} catatons`;
-      const titles = state.completedFull
-        ? ['You <em>held it.</em>','You <em>showed up.</em>','Well <em>done.</em>','You <em>stayed.</em>']
-        : ['You <em>tried.</em>','A start <em>is a start.</em>'];
-      document.getElementById('completeTitleEl').innerHTML = titles[Math.floor(Math.random()*titles.length)];
+
+      // Stage-aware complete title
+      const newStage = getStage(newTotal);
+      const pool = state.completedFull ? newStage.completeTitles : newStage.completeEarly;
+      document.getElementById('completeTitleEl').innerHTML = pool[Math.floor(Math.random()*pool.length)];
+
       if (state.entryText) { document.getElementById('echoInText').textContent = state.entryText; document.getElementById('echoIn').style.display = 'block'; }
       if (state.exitText)  { document.getElementById('echoOutText').textContent = state.exitText;  document.getElementById('echoOut').style.display = 'block'; }
+
       showScreen('completeScreen');
     }
 
@@ -847,17 +1053,20 @@
       window.location.href = state.sitId ? 'app.html' : 'catatonica-session.html';
     });
 
+    // ── WEB AUDIO ──
     function startAmbientSound() {
       try {
         state.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         const ctx = state.audioCtx;
         const master = ctx.createGain();
         master.gain.setValueAtTime(0, ctx.currentTime);
-        master.gain.linearRampToValueAtTime(0.16, ctx.currentTime+5);
+        master.gain.linearRampToValueAtTime(0.14, ctx.currentTime+5);
         master.connect(ctx.destination); state.soundNodes.push(master);
         createNoiseLayer(ctx, master, 0.38);
-        createTone(ctx, master, 55, 0.07); createTone(ctx, master, 432, 0.022);
-        createTone(ctx, master, 198, 0.012); createTone(ctx, master, 205, 0.012);
+        createTone(ctx, master, 55, 0.07);
+        createTone(ctx, master, 432, 0.02);
+        createTone(ctx, master, 198, 0.01);
+        createTone(ctx, master, 205, 0.01);
       } catch(e) {}
     }
 
@@ -867,7 +1076,7 @@
       for(let i=0;i<d.length;i++){ const w=Math.random()*2-1; d[i]=(last+0.02*w)/1.02; last=d[i]; d[i]*=3.5; }
       const src=ctx.createBufferSource(); src.buffer=buf; src.loop=true;
       const g=ctx.createGain(); g.gain.value=gain;
-      const f=ctx.createBiquadFilter(); f.type='lowpass'; f.frequency.value=350;
+      const f=ctx.createBiquadFilter(); f.type='lowpass'; f.frequency.value=320;
       src.connect(f); f.connect(g); g.connect(dest); src.start();
       state.soundNodes.push(src,g,f);
     }
