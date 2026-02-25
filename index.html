@@ -1084,37 +1084,31 @@
       formMessage.className = 'form-message';
 
       try {
-        // Netlify Forms expects a standard POST with form-encoded body
-        const response = await fetch('/', {
+        const response = await fetch('/.netlify/functions/subscribe', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-          body: new URLSearchParams({
-            'form-name': 'waitlist',
-            'email': email
-          }).toString()
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email }),
         });
 
-        if (response.ok) {
-          // Success
+        const data = await response.json();
+
+        if (data.success) {
           submitBtn.textContent = 'Done.';
           submitBtn.style.background = 'var(--accent)';
           emailInput.value = '';
           emailInput.placeholder = "You're on the list.";
-          formMessage.textContent = 'We\'ll be in touch when doors open.';
+          formMessage.textContent = "We'll be in touch when doors open.";
           formMessage.className = 'form-message success';
         } else {
-          throw new Error('Network response was not ok');
+          throw new Error(data.error || 'Something went wrong');
         }
       } catch (err) {
-        // Fallback — happens in local dev (no Netlify runtime)
-        // On production this won't trigger
-        submitBtn.textContent = 'Done.';
-        submitBtn.style.background = 'var(--accent)';
-        emailInput.value = '';
-        emailInput.placeholder = "You're on the list.";
-        formMessage.textContent = 'Saved. We\'ll reach out when doors open.';
-        formMessage.className = 'form-message success';
-        console.info('Note: Netlify Forms only captures on deployed site, not localhost.');
+        submitBtn.textContent = 'Try again';
+        submitBtn.disabled = false;
+        submitBtn.style.opacity = '1';
+        formMessage.textContent = 'Something went wrong. Please try again.';
+        formMessage.className = 'form-message error';
+        console.error('Subscribe error:', err);
       } finally {
         emailInput.disabled = false;
       }
