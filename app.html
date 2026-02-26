@@ -370,6 +370,33 @@
       display: block; margin-top: 0.3rem;
     }
 
+    /* ─── CHRONICLE CHAPTERS ─── */
+    .chr-chapter { margin-bottom: 3rem; }
+    .chr-chapter-header {
+      display: flex; justify-content: space-between; align-items: baseline;
+      padding: 0.8rem 0; border-bottom: 1px solid var(--border);
+      margin-bottom: 1px; cursor: none;
+    }
+    .chr-chapter-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.15rem; font-weight: 300; font-style: italic;
+      color: var(--text-primary);
+    }
+    .chr-chapter-stats {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.46rem; letter-spacing: 0.15em;
+      text-transform: uppercase; color: var(--text-dim);
+      display: flex; gap: 1.5rem;
+    }
+    .chr-chapter-stats em { color: rgba(201,168,76,0.55); font-style: normal; }
+    .chr-unsituated-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.5rem; letter-spacing: 0.22em;
+      text-transform: uppercase; color: var(--text-dim);
+      padding: 0.8rem 0; border-bottom: 1px solid var(--border);
+      margin-bottom: 1px;
+    }
+
     /* ─── MAIN ─── */
     main {
       max-width: 900px;
@@ -947,11 +974,6 @@
         </div>
       </div>
 
-      <div class="tier-notice" id="tierNotice">
-        <span id="tierText">Free tier — 0 of 5 situations used</span>
-        <button class="tier-upgrade">Upgrade to remove limits</button>
-      </div>
-
       <p class="section-label" id="activeLabel" style="display:none">Active</p>
       <div class="situations-list" id="situationsList"></div>
     </div>
@@ -1224,7 +1246,6 @@
       data = loadData();
       renderSituations();
       renderArchive();
-      updateTierNotice();
       updateTotalCatatons();
       applyAppStage();
     }
@@ -1232,12 +1253,6 @@
     function updateTotalCatatons() {
       document.getElementById('totalCatatons').textContent =
         data.totalCatatons.toLocaleString();
-    }
-
-    function updateTierNotice() {
-      const count = data.situations.length;
-      document.getElementById('tierText').textContent =
-        `Free tier — ${count} of ${FREE_LIMIT} situations used`;
     }
 
     function renderSituations() {
@@ -1391,11 +1406,6 @@
     function addSituation() {
       const name = input.value.trim();
       if (!name) return;
-
-      if (!data.isPremium && data.situations.length >= FREE_LIMIT) {
-        alert('Free tier limit reached. Upgrade for unlimited situations.');
-        return;
-      }
 
       const sit = {
         id: Date.now().toString(),
@@ -1666,7 +1676,7 @@
       });
     });
 
-    // ─── CHRONICLE RENDER ───
+    // ─── CHRONICLE RENDER — grouped by situation ───
     function renderChronicle() {
       const chronicle = JSON.parse(localStorage.getItem('cat_chronicle') || '[]');
       const totalCat  = parseInt(localStorage.getItem('cat_total') || '0');
@@ -1679,7 +1689,6 @@
       document.getElementById('chrStatMinutes').textContent   = totalMin.toLocaleString();
       document.getElementById('chrStatCompleted').textContent = totalComp.toLocaleString();
 
-      // Sync filter button states
       document.querySelectorAll('.chr-filter-btn').forEach(b =>
         b.classList.toggle('active', b.dataset.mode === chrFilter)
       );
@@ -1693,35 +1702,44 @@
 
       if (filtered.length === 0) {
         list.innerHTML = chronicle.length === 0
-          ? `<div class="empty-state">
-               <p class="empty-title">The chronicle is empty.</p>
-               <p class="empty-sub">Complete your first session to begin the record.</p>
-             </div>`
-          : `<div class="empty-state">
-               <p class="empty-title">No sessions in this mode yet.</p>
-               <p class="empty-sub">Return to the void to begin.</p>
-             </div>`;
+          ? `<div class="empty-state"><p class="empty-title">The chronicle is empty.</p><p class="empty-sub">Complete your first session to begin the record.</p></div>`
+          : `<div class="empty-state"><p class="empty-title">No sessions in this mode yet.</p></div>`;
         return;
       }
 
-      const modePill = { silence: 'void-pill', sound: 'thresh-pill', visual: 'ignition-pill' };
+      // Group by situation id — unsituated sessions go under null
+      const chapters = {};
+      const chapterOrder = [];
+      filtered.forEach(rec => {
+        const key = rec.sitId || '__free__';
+        if (!chapters[key]) { chapters[key] = []; chapterOrder.push(key); }
+        chapters[key].push(rec);
+      });
+
+      const modePill  = { silence: 'void-pill', sound: 'thresh-pill', visual: 'ignition-pill' };
       const modeLabel = { silence: 'The Void', sound: 'The Threshold', visual: 'The Ignition' };
 
-      filtered.forEach((rec, i) => {
-        const card = document.createElement('div');
-        card.className = 'chr-entry';
-        card.dataset.mode = rec.mode || 'silence';
-        card.style.animationDelay = (i * 35) + 'ms';
+      // Resolve situation name — check active and archive
+      function getSitName(sitId) {
+        if (!sitId || sitId === '__free__') return null;
+        const active  = data.situations.find(s => s.id === sitId);
+        const archived = (data.archive || []).find(s => s.id === sitId);
+        return (active || archived)?.name || 'Unnamed storm';
+      }
 
+      function buildEntry(rec, i) {
         const d = new Date(rec.date);
         const dateStr = d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
         const m = Math.floor((rec.elapsed || 0) / 60);
         const s = (rec.elapsed || 0) % 60;
-        const durationStr = m > 0 ? `${m}m ${s}s` : `${s}s`;
-
+        const dur = m > 0 ? `${m}m ${s}s` : `${s}s`;
         const hasEntry = rec.entryText && rec.entryText.trim();
         const hasExit  = rec.exitText  && rec.exitText.trim();
 
+        const card = document.createElement('div');
+        card.className = 'chr-entry';
+        card.dataset.mode = rec.mode || 'silence';
+        card.style.animationDelay = (i * 30) + 'ms';
         card.innerHTML = `
           <div class="chr-entry-inner">
             <div>
@@ -1737,11 +1755,40 @@
             <div class="chr-right">
               <span class="chr-catatons-label">Catatons</span>
               <span class="chr-catatons">+${rec.catatons}</span>
-              <span class="chr-duration">${durationStr}</span>
+              <span class="chr-duration">${dur}</span>
               ${!rec.completed ? '<span class="chr-early-tag">surfaced early</span>' : ''}
             </div>
           </div>`;
-        list.appendChild(card);
+        return card;
+      }
+
+      chapterOrder.forEach(key => {
+        const recs = chapters[key];
+        const sitName = getSitName(key);
+        const chapterCatatons = recs.reduce((a, r) => a + (r.catatons || 0), 0);
+
+        const chapter = document.createElement('div');
+        chapter.className = 'chr-chapter';
+
+        if (sitName) {
+          const header = document.createElement('div');
+          header.className = 'chr-chapter-header';
+          header.innerHTML = `
+            <span class="chr-chapter-name">${escHtml(sitName)}</span>
+            <span class="chr-chapter-stats">
+              <span>${recs.length} session${recs.length !== 1 ? 's' : ''}</span>
+              <span><em>${chapterCatatons}</em> catatons</span>
+            </span>`;
+          chapter.appendChild(header);
+        } else {
+          const label = document.createElement('div');
+          label.className = 'chr-unsituated-label';
+          label.textContent = 'Free sessions';
+          chapter.appendChild(label);
+        }
+
+        recs.forEach((rec, i) => chapter.appendChild(buildEntry(rec, i)));
+        list.appendChild(chapter);
       });
     }
 
