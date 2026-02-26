@@ -999,6 +999,24 @@
       localStorage.setItem('cat_total', newTotal);
       localStorage.setItem('cat_session_count', prevCount + 1);
 
+      // Chronicle record
+      const modeLabels = { silence: 'The Void', sound: 'The Threshold', visual: 'The Ignition' };
+      const record = {
+        id: Date.now(),
+        date: Date.now(),
+        mode: state.mode,
+        modeLabel: modeLabels[state.mode] || 'The Void',
+        duration: state.duration,
+        elapsed: state.elapsedSeconds,
+        catatons: state.catatonsEarned,
+        stage: currentStage.name,
+        entryText: state.entryText,
+        exitText: '',   // filled after exit screen
+        completed: !early,
+        sitId: state.sitId || null,
+      };
+      state._pendingRecord = record;
+
       // Update situation catatons in app data if sitId present
       if (state.sitId) {
         try {
@@ -1020,6 +1038,14 @@
     // ── EXIT SCREEN ──
     function goToComplete() {
       state.exitText = document.getElementById('exitText').value.trim();
+
+      // Finalize chronicle record
+      if (state._pendingRecord) {
+        state._pendingRecord.exitText = state.exitText;
+        const chronicle = JSON.parse(localStorage.getItem('cat_chronicle') || '[]');
+        chronicle.unshift(state._pendingRecord);
+        localStorage.setItem('cat_chronicle', JSON.stringify(chronicle));
+      }
 
       const newTotal = parseInt(localStorage.getItem('cat_total') || '0');
       document.getElementById('catatonsDisplay').textContent = state.catatonsEarned;

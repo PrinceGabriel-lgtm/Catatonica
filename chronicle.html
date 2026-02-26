@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Catatonica — The Chronicle</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Mono:ital,wght@0,300;0,400;1,300&family=Outfit:wght@200;300;400&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --void: #090806;
+      --deep: #0e0c09;
+      --surface: #141210;
+      --border: rgba(255,255,255,0.05);
+      --border-hover: rgba(255,255,255,0.1);
+      --text-primary: #e4dfd6;
+      --text-muted: rgba(228,223,214,0.38);
+      --text-dim: rgba(228,223,214,0.13);
+      --gold: #c9a84c;
+      --gold-dim: rgba(201,168,76,0.08);
+      --teal: #6ba3b0;
+      --ash: rgba(160,138,110,0.22);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--void);
+      color: var(--text-primary);
+      font-family: 'Outfit', sans-serif;
+      font-weight: 300;
+      min-height: 100vh;
+      cursor: none;
+      overflow-x: hidden;
+    }
+
+    .cursor {
+      position: fixed; width: 4px; height: 4px;
+      background: var(--teal); border-radius: 50%;
+      pointer-events: none; z-index: 9999;
+      transform: translate(-50%,-50%);
+      opacity: 0.5;
+    }
+    .cursor-ring {
+      position: fixed; width: 26px; height: 26px;
+      border: 1px solid rgba(107,163,176,0.2); border-radius: 50%;
+      pointer-events: none; z-index: 9998;
+      transform: translate(-50%,-50%);
+      transition: width 0.4s ease, height 0.4s ease;
+      opacity: 0.35;
+    }
+
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none; z-index: 9997; opacity: 0.4;
+    }
+
+    /* NAV */
+    nav {
+      position: sticky; top: 0;
+      border-bottom: 1px solid var(--border);
+      padding: 1.5rem 3rem;
+      display: flex; justify-content: space-between; align-items: center;
+      background: rgba(9,8,6,0.94);
+      backdrop-filter: blur(12px);
+      z-index: 100;
+    }
+    .nav-logo {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1rem; font-weight: 300;
+      letter-spacing: 0.35em; text-transform: uppercase;
+      color: var(--text-primary); text-decoration: none; cursor: none;
+    }
+    .nav-logo em { font-style: italic; color: var(--gold); }
+
+    .nav-right {
+      display: flex; align-items: center; gap: 2rem;
+    }
+    .nav-total {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.4rem; font-weight: 300;
+      color: var(--gold); line-height: 1;
+    }
+    .nav-total-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.5rem; letter-spacing: 0.2em;
+      text-transform: uppercase; color: var(--text-dim);
+    }
+    .nav-back {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.58rem; letter-spacing: 0.2em;
+      text-transform: uppercase; color: var(--text-dim);
+      text-decoration: none; cursor: none;
+      transition: color 0.3s ease;
+    }
+    .nav-back:hover { color: var(--text-muted); }
+
+    /* MAIN */
+    main {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 4rem 3rem 8rem;
+    }
+
+    /* HEADER */
+    .page-header {
+      margin-bottom: 5rem;
+      animation: fadeUp 0.8s ease forwards;
+    }
+    .page-eyebrow {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.58rem; letter-spacing: 0.32em;
+      text-transform: uppercase; color: var(--ash);
+      margin-bottom: 1rem;
+    }
+    .page-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(2.5rem, 5vw, 4rem);
+      font-weight: 300; color: var(--text-primary);
+      line-height: 1.05;
+    }
+    .page-title em { font-style: italic; color: var(--gold); }
+    .page-sub {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 0.95rem; font-style: italic;
+      color: var(--text-muted); margin-top: 1rem;
+      line-height: 1.7; max-width: 480px;
+    }
+
+    /* STATS ROW */
+    .stats-row {
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      gap: 1px; background: var(--border);
+      border: 1px solid var(--border);
+      margin-bottom: 4rem;
+    }
+    .stat-cell {
+      background: var(--void);
+      padding: 1.8rem 1.5rem;
+    }
+    .stat-num {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2.2rem; font-weight: 300;
+      color: var(--gold); line-height: 1;
+      display: block; margin-bottom: 0.3rem;
+    }
+    .stat-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.5rem; letter-spacing: 0.2em;
+      text-transform: uppercase; color: var(--text-dim);
+    }
+
+    /* STAGE PROGRESS */
+    .stage-progress {
+      border: 1px solid var(--border);
+      padding: 2rem 2.5rem;
+      margin-bottom: 4rem;
+      position: relative; overflow: hidden;
+    }
+    .stage-progress-bar {
+      position: absolute; bottom: 0; left: 0;
+      height: 1px; background: var(--gold);
+      opacity: 0.5; transition: width 1s ease;
+    }
+    .stage-progress-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.52rem; letter-spacing: 0.25em;
+      text-transform: uppercase; color: var(--ash);
+      margin-bottom: 0.6rem;
+    }
+    .stage-name-large {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.6rem; font-weight: 300; font-style: italic;
+      color: var(--text-primary); margin-bottom: 0.4rem;
+    }
+    .stage-next {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.5rem; letter-spacing: 0.15em;
+      text-transform: uppercase; color: var(--text-dim);
+    }
+    .stage-next em { color: var(--gold); font-style: normal; }
+
+    /* FILTER */
+    .filter-row {
+      display: flex; gap: 1px; background: var(--border);
+      border: 1px solid var(--border); margin-bottom: 2rem;
+    }
+    .filter-btn {
+      flex: 1; background: var(--void);
+      border: none; padding: 0.8rem;
+      cursor: none; text-align: center;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.55rem; letter-spacing: 0.12em;
+      text-transform: uppercase; color: var(--text-dim);
+      transition: background 0.3s ease, color 0.3s ease;
+      position: relative;
+    }
+    .filter-btn:hover { background: var(--deep); color: var(--text-muted); }
+    .filter-btn.active { background: var(--surface); color: var(--text-primary); }
+    .filter-btn.active::after {
+      content: ''; position: absolute; bottom: 0; left: 0; right: 0;
+      height: 1px; background: var(--gold);
+    }
+
+    /* CHRONICLE LIST */
+    .chronicle-list {
+      display: flex; flex-direction: column; gap: 1px;
+    }
+
+    .entry-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      position: relative; overflow: hidden;
+      animation: fadeUp 0.5s ease forwards; opacity: 0;
+      transition: border-color 0.3s ease;
+    }
+    .entry-card:hover { border-color: var(--border-hover); }
+
+    /* mode accent line */
+    .entry-card::before {
+      content: ''; position: absolute;
+      top: 0; left: 0; bottom: 0; width: 1px;
+    }
+    .entry-card[data-mode="silence"]::before  { background: rgba(201,168,76,0.35); }
+    .entry-card[data-mode="sound"]::before    { background: rgba(160,138,110,0.35); }
+    .entry-card[data-mode="visual"]::before   { background: rgba(107,163,176,0.35); }
+
+    .entry-main {
+      padding: 1.8rem 2rem 1.8rem 2.5rem;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 2rem; align-items: start;
+    }
+
+    .entry-top {
+      display: flex; align-items: center; gap: 1.2rem;
+      margin-bottom: 1rem;
+    }
+    .entry-date {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.52rem; letter-spacing: 0.18em;
+      text-transform: uppercase; color: var(--text-dim);
+    }
+    .entry-mode-tag {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.48rem; letter-spacing: 0.15em;
+      text-transform: uppercase;
+      padding: 0.2rem 0.55rem;
+      border: 1px solid var(--border);
+      color: var(--text-dim);
+    }
+    .entry-mode-tag.void-tag     { border-color: rgba(201,168,76,0.2); color: rgba(201,168,76,0.5); }
+    .entry-mode-tag.threshold-tag{ border-color: rgba(160,138,110,0.2); color: rgba(160,138,110,0.5); }
+    .entry-mode-tag.ignition-tag { border-color: rgba(107,163,176,0.2); color: rgba(107,163,176,0.5); }
+
+    .entry-stage-tag {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.45rem; letter-spacing: 0.12em;
+      text-transform: uppercase; color: var(--ash);
+    }
+
+    .entry-texts { }
+    .entry-echo {
+      display: flex; gap: 0.5rem; align-items: baseline;
+      margin-bottom: 0.5rem;
+    }
+    .echo-key {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.46rem; letter-spacing: 0.15em;
+      text-transform: uppercase; color: var(--text-dim);
+      flex-shrink: 0; width: 72px;
+    }
+    .echo-val {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 0.92rem; font-style: italic;
+      color: var(--text-muted); line-height: 1.5;
+    }
+
+    .entry-right {
+      text-align: right; flex-shrink: 0;
+    }
+    .entry-catatons {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2.4rem; font-weight: 300;
+      color: var(--gold); line-height: 1;
+      display: block;
+    }
+    .entry-catatons-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.48rem; letter-spacing: 0.18em;
+      text-transform: uppercase; color: var(--text-dim);
+      display: block; margin-bottom: 0.6rem;
+    }
+    .entry-duration {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.5rem; letter-spacing: 0.12em;
+      text-transform: uppercase; color: var(--text-dim);
+    }
+    .entry-incomplete {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.44rem; letter-spacing: 0.12em;
+      text-transform: uppercase; color: rgba(107,163,176,0.4);
+      display: block; margin-top: 0.3rem;
+    }
+
+    /* EMPTY STATE */
+    .empty-state {
+      text-align: center; padding: 6rem 2rem;
+      border: 1px solid var(--border);
+    }
+    .empty-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.8rem; font-weight: 300; font-style: italic;
+      color: var(--text-muted); margin-bottom: 1rem;
+    }
+    .empty-sub {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.58rem; letter-spacing: 0.15em;
+      text-transform: uppercase; color: var(--text-dim);
+      margin-bottom: 2.5rem;
+    }
+    .empty-cta {
+      background: var(--text-primary); color: var(--void);
+      border: none; padding: 1rem 2.5rem;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.65rem; letter-spacing: 0.2em;
+      text-transform: uppercase; cursor: none;
+      text-decoration: none; display: inline-block;
+      transition: background 0.3s ease;
+    }
+    .empty-cta:hover { background: var(--teal); }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 640px) {
+      nav { padding: 1.2rem 1.5rem; }
+      main { padding: 2.5rem 1.5rem 6rem; }
+      .stats-row { grid-template-columns: repeat(2, 1fr); }
+      .entry-main { grid-template-columns: 1fr; gap: 1rem; }
+      .entry-right { text-align: left; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="cursor" id="cursor"></div>
+  <div class="cursor-ring" id="cursorRing"></div>
+
+  <nav>
+    <a href="app.html" class="nav-logo">Cata<em>tonica</em></a>
+    <div class="nav-right">
+      <div>
+        <span class="nav-total" id="navTotal">0</span>
+        <span class="nav-total-label"> Catatons</span>
+      </div>
+      <a href="app.html" class="nav-back">← Your void</a>
+    </div>
+  </nav>
+
+  <main>
+    <div class="page-header">
+      <p class="page-eyebrow">The Order of the Still Voice</p>
+      <h1 class="page-title">The <em>Chronicle</em></h1>
+      <p class="page-sub">Every session. Every storm you entered. Every cataton earned. The record of your stillness.</p>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-row">
+      <div class="stat-cell">
+        <span class="stat-num" id="statTotal">0</span>
+        <span class="stat-label">Total Catatons</span>
+      </div>
+      <div class="stat-cell">
+        <span class="stat-num" id="statSessions">0</span>
+        <span class="stat-label">Sessions</span>
+      </div>
+      <div class="stat-cell">
+        <span class="stat-num" id="statMinutes">0</span>
+        <span class="stat-label">Minutes in Stillness</span>
+      </div>
+      <div class="stat-cell">
+        <span class="stat-num" id="statCompleted">0</span>
+        <span class="stat-label">Completed</span>
+      </div>
+    </div>
+
+    <!-- Stage progress -->
+    <div class="stage-progress">
+      <div class="stage-progress-bar" id="stageBar" style="width:0%"></div>
+      <p class="stage-progress-label">Current Stage</p>
+      <p class="stage-name-large" id="stageNameLarge">Acknowledgement</p>
+      <p class="stage-next" id="stageNext"></p>
+    </div>
+
+    <!-- Filter -->
+    <div class="filter-row">
+      <button class="filter-btn active" data-filter="all">All</button>
+      <button class="filter-btn" data-filter="silence">The Void</button>
+      <button class="filter-btn" data-filter="sound">The Threshold</button>
+      <button class="filter-btn" data-filter="visual">The Ignition</button>
+    </div>
+
+    <!-- Entries -->
+    <div class="chronicle-list" id="chronicleList"></div>
+
+  </main>
+
+  <script>
+    // CURSOR
+    const cursor = document.getElementById('cursor');
+    const ring = document.getElementById('cursorRing');
+    let mx=0,my=0,rx=0,ry=0;
+    document.addEventListener('mousemove', e => { mx=e.clientX; my=e.clientY; cursor.style.left=mx+'px'; cursor.style.top=my+'px'; });
+    (function animRing(){ rx+=(mx-rx)*0.1; ry+=(my-ry)*0.1; ring.style.left=rx+'px'; ring.style.top=ry+'px'; requestAnimationFrame(animRing); })();
+
+    // STAGE SYSTEM
+    const STAGES = [
+      { name: 'Acknowledgement', label: 'Stage 1', min: 0,  max: 9,        next: 'Acceptance at 10 catatons' },
+      { name: 'Acceptance',      label: 'Stage 2', min: 10, max: 29,       next: 'Receiving at 30 catatons' },
+      { name: 'Receiving',       label: 'Stage 3', min: 30, max: 69,       next: 'The Threshold at 70 catatons' },
+      { name: 'The Threshold',   label: 'Stage 4', min: 70, max: Infinity, next: 'You have reached The Threshold.' },
+    ];
+    function getStage(n) { return STAGES.find(s => n >= s.min && n <= s.max) || STAGES[0]; }
+
+    // DATA
+    const chronicle = JSON.parse(localStorage.getItem('cat_chronicle') || '[]');
+    const totalCatatons = parseInt(localStorage.getItem('cat_total') || '0');
+    const totalSessions = parseInt(localStorage.getItem('cat_session_count') || '0');
+
+    document.getElementById('navTotal').textContent = totalCatatons;
+
+    // Stats
+    const totalMinutes = Math.round(chronicle.reduce((a, r) => a + (r.elapsed || 0), 0) / 60);
+    const totalCompleted = chronicle.filter(r => r.completed).length;
+
+    document.getElementById('statTotal').textContent    = totalCatatons.toLocaleString();
+    document.getElementById('statSessions').textContent = totalSessions.toLocaleString();
+    document.getElementById('statMinutes').textContent  = totalMinutes.toLocaleString();
+    document.getElementById('statCompleted').textContent= totalCompleted.toLocaleString();
+
+    // Stage progress
+    const stage = getStage(totalCatatons);
+    document.getElementById('stageNameLarge').textContent = stage.name;
+    document.getElementById('stageNext').innerHTML = stage.max === Infinity
+      ? 'You have arrived.'
+      : `Next — <em>${stage.next}</em>`;
+
+    const pct = stage.max === Infinity ? 100
+      : Math.round(((totalCatatons - stage.min) / (stage.max - stage.min + 1)) * 100);
+    document.getElementById('stageBar').style.width = pct + '%';
+
+    // Filter
+    let activeFilter = 'all';
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        activeFilter = btn.dataset.filter;
+        renderList();
+      });
+    });
+
+    function formatDate(ts) {
+      const d = new Date(ts);
+      return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+    }
+    function formatElapsed(sec) {
+      const m = Math.floor(sec / 60);
+      const s = sec % 60;
+      return m > 0 ? `${m}m ${s}s` : `${s}s`;
+    }
+    function modeTagClass(mode) {
+      if (mode === 'silence') return 'void-tag';
+      if (mode === 'sound')   return 'threshold-tag';
+      return 'ignition-tag';
+    }
+
+    function renderList() {
+      const list = document.getElementById('chronicleList');
+      list.innerHTML = '';
+
+      const filtered = activeFilter === 'all'
+        ? chronicle
+        : chronicle.filter(r => r.mode === activeFilter);
+
+      if (filtered.length === 0) {
+        list.innerHTML = chronicle.length === 0
+          ? `<div class="empty-state">
+               <p class="empty-title">The chronicle is empty.</p>
+               <p class="empty-sub">Complete your first session to begin the record.</p>
+               <a href="catatonica-session.html" class="empty-cta">Enter the void →</a>
+             </div>`
+          : `<div class="empty-state">
+               <p class="empty-title">No sessions in this mode yet.</p>
+               <p class="empty-sub">Try a different filter.</p>
+             </div>`;
+        return;
+      }
+
+      filtered.forEach((record, i) => {
+        const card = document.createElement('div');
+        card.className = 'entry-card';
+        card.dataset.mode = record.mode;
+        card.style.animationDelay = (i * 40) + 'ms';
+
+        const hasEntry = record.entryText && record.entryText.trim();
+        const hasExit  = record.exitText  && record.exitText.trim();
+
+        card.innerHTML = `
+          <div class="entry-main">
+            <div class="entry-left">
+              <div class="entry-top">
+                <span class="entry-date">${formatDate(record.date)}</span>
+                <span class="entry-mode-tag ${modeTagClass(record.mode)}">${record.modeLabel || 'The Void'}</span>
+                <span class="entry-stage-tag">${record.stage || 'Acknowledgement'}</span>
+              </div>
+              <div class="entry-texts">
+                ${hasEntry ? `
+                  <div class="entry-echo">
+                    <span class="echo-key">Carried in</span>
+                    <span class="echo-val">${escHtml(record.entryText)}</span>
+                  </div>` : ''}
+                ${hasExit ? `
+                  <div class="entry-echo">
+                    <span class="echo-key">What shifted</span>
+                    <span class="echo-val">${escHtml(record.exitText)}</span>
+                  </div>` : ''}
+                ${(!hasEntry && !hasExit) ? `
+                  <div class="entry-echo">
+                    <span class="echo-key">—</span>
+                    <span class="echo-val" style="color:var(--text-dim)">Silent entry. No words.</span>
+                  </div>` : ''}
+              </div>
+            </div>
+            <div class="entry-right">
+              <span class="entry-catatons-label">Catatons</span>
+              <span class="entry-catatons">+${record.catatons}</span>
+              <span class="entry-duration">${formatElapsed(record.elapsed || 0)}</span>
+              ${!record.completed ? '<span class="entry-incomplete">surfaced early</span>' : ''}
+            </div>
+          </div>
+        `;
+        list.appendChild(card);
+      });
+    }
+
+    function escHtml(str) {
+      return String(str)
+        .replace(/&/g,'&amp;')
+        .replace(/</g,'&lt;')
+        .replace(/>/g,'&gt;')
+        .replace(/"/g,'&quot;');
+    }
+
+    renderList();
+  </script>
+</body>
+</html>

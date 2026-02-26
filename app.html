@@ -120,15 +120,156 @@
       line-height: 1.4;
     }
 
-    .nav-archive-btn {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.6rem; letter-spacing: 0.2em;
-      text-transform: uppercase; color: var(--text-muted);
-      background: none; border: none; cursor: none;
-      transition: color 0.3s ease;
-      padding: 0;
+    .nav-tabs {
+      display: flex; gap: 1px; background: var(--border);
+      border: 1px solid var(--border);
     }
-    .nav-archive-btn:hover { color: var(--text-primary); }
+    .nav-tab {
+      background: var(--void); border: none; cursor: none;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.58rem; letter-spacing: 0.18em;
+      text-transform: uppercase; color: var(--text-dim);
+      padding: 0.55rem 1.1rem;
+      transition: background 0.25s ease, color 0.25s ease;
+      position: relative;
+    }
+    .nav-tab:hover { color: var(--text-muted); background: var(--deep); }
+    .nav-tab.active { color: var(--text-primary); background: var(--surface); }
+    .nav-tab.active::after {
+      content: ''; position: absolute; bottom: 0; left: 0; right: 0;
+      height: 1px; background: var(--gold);
+    }
+
+    /* ─── CHRONICLE VIEW ─── */
+    #chronicleView { display: none; }
+
+    .chronicle-stats {
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      gap: 1px; background: var(--border);
+      border: 1px solid var(--border); margin-bottom: 3rem;
+    }
+    .chr-stat {
+      background: var(--void); padding: 1.5rem 1.8rem;
+    }
+    .chr-stat-num {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2rem; font-weight: 300;
+      color: var(--gold); line-height: 1; display: block; margin-bottom: 0.25rem;
+    }
+    .chr-stat-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.48rem; letter-spacing: 0.18em;
+      text-transform: uppercase; color: var(--text-dim);
+    }
+
+    .chr-filter {
+      display: flex; gap: 1px; background: var(--border);
+      border: 1px solid var(--border); margin-bottom: 2rem;
+    }
+    .chr-filter-btn {
+      flex: 1; background: var(--void); border: none;
+      padding: 0.75rem 0.5rem; cursor: none; text-align: center;
+      font-family: 'DM Mono', monospace; font-size: 0.52rem;
+      letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-dim);
+      transition: background 0.25s ease, color 0.25s ease; position: relative;
+    }
+    .chr-filter-btn:hover { background: var(--deep); color: var(--text-muted); }
+    .chr-filter-btn.active { background: var(--surface); color: var(--text-primary); }
+    .chr-filter-btn.active::after {
+      content: ''; position: absolute; bottom: 0; left: 0; right: 0;
+      height: 1px; background: var(--gold);
+    }
+
+    .chronicle-list {
+      display: flex; flex-direction: column; gap: 1px;
+    }
+
+    .chr-entry {
+      background: var(--surface); border: 1px solid var(--border);
+      position: relative; overflow: hidden;
+      transition: border-color 0.3s ease;
+      animation: fadeUp 0.5s ease forwards; opacity: 0;
+    }
+    .chr-entry:hover { border-color: var(--border-hover); }
+
+    /* mode accent — left edge */
+    .chr-entry::before {
+      content: ''; position: absolute;
+      top: 0; left: 0; bottom: 0; width: 1px;
+    }
+    .chr-entry[data-mode="silence"]::before  { background: rgba(201,168,76,0.4); }
+    .chr-entry[data-mode="sound"]::before    { background: rgba(160,138,110,0.4); }
+    .chr-entry[data-mode="visual"]::before   { background: rgba(107,163,176,0.4); }
+
+    .chr-entry-inner {
+      padding: 1.6rem 2rem 1.6rem 2.4rem;
+      display: grid; grid-template-columns: 1fr auto;
+      gap: 1.5rem; align-items: start;
+    }
+
+    .chr-meta-row {
+      display: flex; align-items: center; gap: 1rem;
+      margin-bottom: 0.9rem; flex-wrap: wrap;
+    }
+    .chr-date {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.5rem; letter-spacing: 0.18em;
+      text-transform: uppercase; color: var(--text-dim);
+    }
+    .chr-mode-pill {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.45rem; letter-spacing: 0.14em;
+      text-transform: uppercase; padding: 0.18rem 0.5rem;
+      border: 1px solid var(--border);
+    }
+    .chr-mode-pill.void-pill     { border-color: rgba(201,168,76,0.2);  color: rgba(201,168,76,0.55); }
+    .chr-mode-pill.thresh-pill   { border-color: rgba(160,138,110,0.2); color: rgba(160,138,110,0.55); }
+    .chr-mode-pill.ignition-pill { border-color: rgba(107,163,176,0.2); color: rgba(107,163,176,0.55); }
+    .chr-stage-pill {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.43rem; letter-spacing: 0.12em;
+      text-transform: uppercase; color: rgba(160,138,110,0.45);
+    }
+
+    .chr-echo-row {
+      display: flex; gap: 0.6rem; align-items: baseline;
+      margin-bottom: 0.45rem;
+    }
+    .chr-echo-key {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.44rem; letter-spacing: 0.14em;
+      text-transform: uppercase; color: var(--text-dim);
+      flex-shrink: 0; width: 68px;
+    }
+    .chr-echo-val {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 0.9rem; font-style: italic;
+      color: var(--text-muted); line-height: 1.5;
+    }
+
+    .chr-right { text-align: right; flex-shrink: 0; }
+    .chr-catatons {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2.2rem; font-weight: 300;
+      color: var(--gold); line-height: 1; display: block;
+    }
+    .chr-catatons-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.44rem; letter-spacing: 0.16em;
+      text-transform: uppercase; color: var(--text-dim);
+      display: block; margin-bottom: 0.4rem;
+    }
+    .chr-duration {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.48rem; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--text-dim);
+    }
+    .chr-early-tag {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.42rem; letter-spacing: 0.1em;
+      text-transform: uppercase; color: rgba(107,163,176,0.35);
+      display: block; margin-top: 0.3rem;
+    }
 
     /* ─── MAIN ─── */
     main {
@@ -670,7 +811,11 @@
         <span class="cataton-count" id="totalCatatons">0</span>
         <span class="cataton-label">Total<br>Catatons</span>
       </div>
-      <button class="nav-archive-btn" id="archiveToggle">Archive</button>
+      <div class="nav-tabs">
+        <button class="nav-tab active" data-view="active">Void</button>
+        <button class="nav-tab" data-view="archive">Archive</button>
+        <button class="nav-tab" data-view="chronicle">Chronicle</button>
+      </div>
     </div>
   </nav>
 
@@ -710,12 +855,49 @@
     </div>
 
     <!-- Archive View -->
-    <div id="archiveView">
+    <div id="archiveView" style="display:none">
       <div class="page-header">
         <p class="page-eyebrow">Mastered</p>
         <h1 class="page-title">What you've <em>released.</em></h1>
       </div>
       <div class="archive-list" id="archiveList"></div>
+    </div>
+
+    <!-- Chronicle View -->
+    <div id="chronicleView" style="display:none">
+      <div class="page-header">
+        <p class="page-eyebrow">The Order of the Still Voice</p>
+        <h1 class="page-title">The <em>Chronicle.</em></h1>
+        <p style="font-family:'Cormorant Garamond',serif;font-size:0.95rem;font-style:italic;color:var(--text-muted);margin-top:0.8rem;line-height:1.7">Every session. Every storm you entered. Every cataton earned.</p>
+      </div>
+
+      <div class="chronicle-stats">
+        <div class="chr-stat">
+          <span class="chr-stat-num" id="chrStatTotal">0</span>
+          <span class="chr-stat-label">Total Catatons</span>
+        </div>
+        <div class="chr-stat">
+          <span class="chr-stat-num" id="chrStatSessions">0</span>
+          <span class="chr-stat-label">Sessions</span>
+        </div>
+        <div class="chr-stat">
+          <span class="chr-stat-num" id="chrStatMinutes">0</span>
+          <span class="chr-stat-label">Minutes in Stillness</span>
+        </div>
+        <div class="chr-stat">
+          <span class="chr-stat-num" id="chrStatCompleted">0</span>
+          <span class="chr-stat-label">Completed</span>
+        </div>
+      </div>
+
+      <div class="chr-filter">
+        <button class="chr-filter-btn active" data-mode="all">All</button>
+        <button class="chr-filter-btn" data-mode="silence">The Void</button>
+        <button class="chr-filter-btn" data-mode="sound">The Threshold</button>
+        <button class="chr-filter-btn" data-mode="visual">The Ignition</button>
+      </div>
+
+      <div class="chronicle-list" id="chronicleListEl"></div>
     </div>
 
   </main>
@@ -1302,15 +1484,108 @@
       }, 3200);
     });
 
-    // ─── ARCHIVE TOGGLE ───
-    let showingArchive = false;
-    document.getElementById('archiveToggle').addEventListener('click', () => {
-      showingArchive = !showingArchive;
-      document.getElementById('activeView').style.display = showingArchive ? 'none' : '';
-      document.getElementById('archiveView').style.display = showingArchive ? '' : 'none';
-      document.getElementById('archiveToggle').textContent =
-        showingArchive ? 'Active' : 'Archive';
+    // ─── THREE-VIEW TAB SYSTEM ───
+    let activeView = 'active';
+
+    function switchView(view) {
+      activeView = view;
+      document.getElementById('activeView').style.display    = view === 'active'    ? '' : 'none';
+      document.getElementById('archiveView').style.display   = view === 'archive'   ? '' : 'none';
+      document.getElementById('chronicleView').style.display = view === 'chronicle' ? '' : 'none';
+      document.querySelectorAll('.nav-tab').forEach(t =>
+        t.classList.toggle('active', t.dataset.view === view)
+      );
+      if (view === 'chronicle') renderChronicle();
+    }
+
+    document.querySelectorAll('.nav-tab').forEach(btn => {
+      btn.addEventListener('click', () => switchView(btn.dataset.view));
     });
+
+    // ─── CHRONICLE RENDER ───
+    let chrFilter = 'all';
+
+    function renderChronicle() {
+      const chronicle = JSON.parse(localStorage.getItem('cat_chronicle') || '[]');
+      const totalCat  = parseInt(localStorage.getItem('cat_total') || '0');
+      const totalSess = parseInt(localStorage.getItem('cat_session_count') || '0');
+      const totalMin  = Math.round(chronicle.reduce((a, r) => a + (r.elapsed || 0), 0) / 60);
+      const totalComp = chronicle.filter(r => r.completed).length;
+
+      document.getElementById('chrStatTotal').textContent     = totalCat.toLocaleString();
+      document.getElementById('chrStatSessions').textContent  = totalSess.toLocaleString();
+      document.getElementById('chrStatMinutes').textContent   = totalMin.toLocaleString();
+      document.getElementById('chrStatCompleted').textContent = totalComp.toLocaleString();
+
+      // Filter buttons
+      document.querySelectorAll('.chr-filter-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.mode === chrFilter);
+        btn.addEventListener('click', () => {
+          chrFilter = btn.dataset.mode;
+          renderChronicle();
+        });
+      });
+
+      const filtered = chrFilter === 'all'
+        ? chronicle
+        : chronicle.filter(r => r.mode === chrFilter);
+
+      const list = document.getElementById('chronicleListEl');
+      list.innerHTML = '';
+
+      if (filtered.length === 0) {
+        list.innerHTML = chronicle.length === 0
+          ? `<div class="empty-state">
+               <p class="empty-title">The chronicle is empty.</p>
+               <p class="empty-sub">Complete your first session to begin the record.</p>
+             </div>`
+          : `<div class="empty-state">
+               <p class="empty-title">No sessions in this mode yet.</p>
+               <p class="empty-sub">Return to the void to begin.</p>
+             </div>`;
+        return;
+      }
+
+      const modePill = { silence: 'void-pill', sound: 'thresh-pill', visual: 'ignition-pill' };
+      const modeLabel = { silence: 'The Void', sound: 'The Threshold', visual: 'The Ignition' };
+
+      filtered.forEach((rec, i) => {
+        const card = document.createElement('div');
+        card.className = 'chr-entry';
+        card.dataset.mode = rec.mode || 'silence';
+        card.style.animationDelay = (i * 35) + 'ms';
+
+        const d = new Date(rec.date);
+        const dateStr = d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+        const m = Math.floor((rec.elapsed || 0) / 60);
+        const s = (rec.elapsed || 0) % 60;
+        const durationStr = m > 0 ? `${m}m ${s}s` : `${s}s`;
+
+        const hasEntry = rec.entryText && rec.entryText.trim();
+        const hasExit  = rec.exitText  && rec.exitText.trim();
+
+        card.innerHTML = `
+          <div class="chr-entry-inner">
+            <div>
+              <div class="chr-meta-row">
+                <span class="chr-date">${dateStr}</span>
+                <span class="chr-mode-pill ${modePill[rec.mode] || 'void-pill'}">${modeLabel[rec.mode] || 'The Void'}</span>
+                <span class="chr-stage-pill">${rec.stage || 'Acknowledgement'}</span>
+              </div>
+              ${hasEntry ? `<div class="chr-echo-row"><span class="chr-echo-key">Carried in</span><span class="chr-echo-val">${escHtml(rec.entryText)}</span></div>` : ''}
+              ${hasExit  ? `<div class="chr-echo-row"><span class="chr-echo-key">What shifted</span><span class="chr-echo-val">${escHtml(rec.exitText)}</span></div>` : ''}
+              ${!hasEntry && !hasExit ? `<div class="chr-echo-row"><span class="chr-echo-key">—</span><span class="chr-echo-val" style="color:var(--text-dim)">Silent entry.</span></div>` : ''}
+            </div>
+            <div class="chr-right">
+              <span class="chr-catatons-label">Catatons</span>
+              <span class="chr-catatons">+${rec.catatons}</span>
+              <span class="chr-duration">${durationStr}</span>
+              ${!rec.completed ? '<span class="chr-early-tag">surfaced early</span>' : ''}
+            </div>
+          </div>`;
+        list.appendChild(card);
+      });
+    }
 
     // ─── SESSION RETURN — add catatons if returning from session ───
     function checkSessionReturn() {

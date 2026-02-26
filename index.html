@@ -3,23 +3,24 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Catatonica — The Art of Doing Nothing</title>
+  <title>Catatonica — The Order of the Still Voice</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Mono:ital,wght@0,300;0,400;1,300&family=Outfit:wght@200;300;400&display=swap" rel="stylesheet" />
-
   <style>
     :root {
-      --void: #080808;
-      --deep: #0f0f0f;
-      --surface: #141414;
-      --border: rgba(255,255,255,0.06);
-      --text-primary: #e8e4dc;
-      --text-muted: rgba(232, 228, 220, 0.38);
-      --text-dim: rgba(232, 228, 220, 0.18);
-      --accent: #a89f8c;
-      --accent-cold: #7a9ea8;
-      --accent-glow: rgba(122, 158, 168, 0.12);
+      --void: #090806;
+      --deep: #0e0c09;
+      --surface: #141210;
+      --border: rgba(255,255,255,0.05);
+      --border-hover: rgba(255,255,255,0.1);
+      --text-primary: #e4dfd6;
+      --text-muted: rgba(228,223,214,0.38);
+      --text-dim: rgba(228,223,214,0.13);
+      --gold: #c9a84c;
+      --gold-dim: rgba(201,168,76,0.08);
+      --teal: #6ba3b0;
+      --ash: rgba(160,138,110,0.55);
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -34,29 +35,26 @@
       cursor: none;
     }
 
-    /* Custom cursor */
     .cursor {
-      position: fixed; width: 6px; height: 6px;
-      background: var(--accent-cold); border-radius: 50%;
+      position: fixed; width: 4px; height: 4px;
+      background: rgba(201,168,76,0.7); border-radius: 50%;
       pointer-events: none; z-index: 9999;
-      transform: translate(-50%, -50%);
+      transform: translate(-50%,-50%);
       transition: transform 0.1s ease, opacity 0.3s ease;
-      opacity: 0.7;
+      opacity: 0.6;
     }
     .cursor-ring {
-      position: fixed; width: 32px; height: 32px;
-      border: 1px solid rgba(122, 158, 168, 0.3); border-radius: 50%;
+      position: fixed; width: 28px; height: 28px;
+      border: 1px solid rgba(201,168,76,0.15); border-radius: 50%;
       pointer-events: none; z-index: 9998;
-      transform: translate(-50%, -50%);
-      transition: transform 0.18s ease, width 0.3s ease, height 0.3s ease;
-      opacity: 0.5;
+      transform: translate(-50%,-50%);
+      transition: width 0.4s ease, height 0.4s ease;
+      opacity: 0.4;
     }
 
-    /* Grain */
     body::before {
-      content: '';
-      position: fixed; inset: 0;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      content: ''; position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
       pointer-events: none; z-index: 9997; opacity: 0.4;
     }
 
@@ -68,397 +66,466 @@
     }
     .logo {
       font-family: 'Cormorant Garamond', serif;
-      font-size: 1.1rem; font-weight: 300;
+      font-size: 1rem; font-weight: 300;
       letter-spacing: 0.35em; text-transform: uppercase;
-      color: var(--text-primary); opacity: 0.9;
+      color: var(--text-primary); text-decoration: none; cursor: none;
     }
-    .logo span { font-style: italic; color: var(--accent); }
-    .nav-links { display: flex; gap: 2.5rem; list-style: none; }
-    .nav-links a {
+    .logo em { font-style: italic; color: var(--gold); }
+    .nav-right { display: flex; gap: 2rem; align-items: center; }
+    .nav-link {
       font-family: 'DM Mono', monospace;
-      font-size: 0.68rem; letter-spacing: 0.15em;
-      text-transform: uppercase; color: var(--text-muted);
-      text-decoration: none; transition: color 0.4s ease;
+      font-size: 0.62rem; letter-spacing: 0.15em;
+      text-transform: uppercase; color: var(--text-dim);
+      text-decoration: none; cursor: none;
+      transition: color 0.3s ease;
     }
-    .nav-links a:hover { color: var(--text-primary); }
+    .nav-link:hover { color: var(--text-muted); }
+    .nav-enter {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.62rem; letter-spacing: 0.18em;
+      text-transform: uppercase;
+      background: var(--text-primary); color: var(--void);
+      border: none; padding: 0.7rem 1.5rem; cursor: none;
+      text-decoration: none; display: inline-block;
+      transition: background 0.3s ease;
+    }
+    .nav-enter:hover { background: var(--gold); }
 
-    /* HERO */
+    /* ── HERO ── */
     .hero {
       min-height: 100vh;
       display: flex; flex-direction: column;
       justify-content: center; align-items: center;
       text-align: center; position: relative;
-      padding: 8rem 2rem 4rem; overflow: hidden;
+      padding: 8rem 2rem 6rem; overflow: hidden;
     }
-    .hero::after {
-      content: '';
-      position: absolute; width: 700px; height: 700px;
-      background: radial-gradient(circle, rgba(122, 158, 168, 0.055) 0%, transparent 70%);
-      top: 50%; left: 50%; transform: translate(-50%, -50%);
-      pointer-events: none; animation: breathe 8s ease-in-out infinite;
+
+    /* The void orb */
+    .hero-orb {
+      position: absolute; top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 600px; height: 600px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(201,168,76,0.03) 0%, transparent 65%);
+      animation: voidBreathe 14s ease-in-out infinite;
+      pointer-events: none;
     }
-    @keyframes breathe {
-      0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.6; }
-      50% { transform: translate(-50%, -50%) scale(1.15); opacity: 1; }
+    .hero-orb-2 {
+      position: absolute; top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 900px; height: 900px; border-radius: 50%;
+      border: 1px solid rgba(201,168,76,0.02);
+      animation: voidBreathe 20s ease-in-out infinite 4s;
+      pointer-events: none;
     }
-    .hero-eyebrow {
+    @keyframes voidBreathe {
+      0%,100% { transform: translate(-50%,-50%) scale(0.92); opacity: 0.6; }
+      50%      { transform: translate(-50%,-50%) scale(1.06); opacity: 1; }
+    }
+
+    .hero-order {
       font-family: 'DM Mono', monospace;
-      font-size: 0.65rem; letter-spacing: 0.3em;
-      text-transform: uppercase; color: var(--accent-cold);
-      margin-bottom: 2.5rem; opacity: 0;
-      animation: fadeUp 1s ease 0.3s forwards;
+      font-size: 0.56rem; letter-spacing: 0.42em;
+      text-transform: uppercase; color: var(--ash);
+      margin-bottom: 3.5rem; position: relative;
+      opacity: 0; animation: fadeUp 1s ease 0.4s forwards;
     }
+
     .hero-title {
       font-family: 'Cormorant Garamond', serif;
-      font-size: clamp(4.5rem, 12vw, 10rem);
-      font-weight: 300; line-height: 0.92;
+      font-size: clamp(5rem, 16vw, 14rem);
+      font-weight: 300; line-height: 0.88;
       letter-spacing: -0.02em; color: var(--text-primary);
-      margin-bottom: 0.2em; opacity: 0;
-      animation: fadeUp 1.2s ease 0.5s forwards;
+      position: relative;
+      opacity: 0; animation: fadeUp 1.2s ease 0.6s forwards;
     }
-    .hero-title em { font-style: italic; color: var(--accent); display: block; }
-    .hero-sub {
+    .hero-title em {
+      font-style: italic; color: var(--gold);
+      display: block; font-size: 0.55em;
+      margin-top: 0.1em; letter-spacing: 0.02em;
+    }
+
+    .hero-divider {
+      width: 1px; height: 60px;
+      background: linear-gradient(to bottom, rgba(201,168,76,0.3), transparent);
+      margin: 3.5rem auto;
+      opacity: 0; animation: fadeIn 1s ease 1.2s forwards;
+    }
+
+    .hero-doctrine {
       font-family: 'Cormorant Garamond', serif;
-      font-size: clamp(1.1rem, 2.2vw, 1.6rem);
-      font-weight: 300; font-style: italic;
-      color: var(--text-muted); margin-top: 2rem; margin-bottom: 4rem;
-      max-width: 520px; line-height: 1.6;
-      opacity: 0; animation: fadeUp 1.2s ease 0.8s forwards;
+      font-size: clamp(1rem, 2vw, 1.3rem);
+      font-style: italic; font-weight: 300;
+      color: var(--text-muted); max-width: 560px;
+      line-height: 1.75; margin: 0 auto 4rem;
+      opacity: 0; animation: fadeUp 1s ease 1.4s forwards;
     }
+
     .hero-cta-group {
-      display: flex; gap: 1.2rem; align-items: center;
-      opacity: 0; animation: fadeUp 1s ease 1.1s forwards;
+      display: flex; gap: 1rem; align-items: center; justify-content: center;
+      opacity: 0; animation: fadeUp 1s ease 1.7s forwards;
     }
 
     .btn-primary {
       background: var(--text-primary); color: var(--void);
-      border: none; padding: 1rem 2.5rem;
+      border: none; padding: 1.1rem 2.8rem;
       font-family: 'DM Mono', monospace;
-      font-size: 0.72rem; letter-spacing: 0.18em;
+      font-size: 0.7rem; letter-spacing: 0.2em;
       text-transform: uppercase; cursor: none;
-      transition: background 0.3s ease, transform 0.2s ease;
+      transition: background 0.3s ease;
       text-decoration: none; display: inline-block;
     }
-    .btn-primary:hover { background: var(--accent-cold); transform: translateY(-1px); }
+    .btn-primary:hover { background: var(--gold); }
 
     .btn-ghost {
-      background: transparent; color: var(--text-muted);
-      border: 1px solid var(--border); padding: 1rem 2rem;
+      background: transparent; color: var(--text-dim);
+      border: 1px solid var(--border); padding: 1.1rem 2rem;
       font-family: 'DM Mono', monospace;
-      font-size: 0.72rem; letter-spacing: 0.18em;
+      font-size: 0.7rem; letter-spacing: 0.2em;
       text-transform: uppercase; cursor: none;
       transition: color 0.3s ease, border-color 0.3s ease;
       text-decoration: none; display: inline-block;
     }
-    .btn-ghost:hover { color: var(--text-primary); border-color: rgba(255,255,255,0.2); }
+    .btn-ghost:hover { color: var(--text-muted); border-color: var(--border-hover); }
 
-    .scroll-hint {
+    .scroll-cue {
       position: absolute; bottom: 3rem; left: 50%;
       transform: translateX(-50%);
-      display: flex; flex-direction: column;
-      align-items: center; gap: 0.6rem;
-      opacity: 0; animation: fadeIn 1s ease 1.8s forwards;
+      display: flex; flex-direction: column; align-items: center; gap: 0.6rem;
+      opacity: 0; animation: fadeIn 1s ease 2.2s forwards;
     }
-    .scroll-hint span {
+    .scroll-cue span {
       font-family: 'DM Mono', monospace;
-      font-size: 0.6rem; letter-spacing: 0.25em;
+      font-size: 0.52rem; letter-spacing: 0.3em;
       text-transform: uppercase; color: var(--text-dim);
     }
     .scroll-line {
-      width: 1px; height: 40px;
-      background: linear-gradient(to bottom, var(--accent-cold), transparent);
-      animation: scrollPulse 2s ease-in-out infinite;
+      width: 1px; height: 44px;
+      background: linear-gradient(to bottom, rgba(201,168,76,0.3), transparent);
+      animation: scrollPulse 2.5s ease-in-out infinite;
     }
-    @keyframes scrollPulse {
-      0%, 100% { opacity: 0.3; } 50% { opacity: 0.8; }
+    @keyframes scrollPulse { 0%,100%{opacity:0.3}50%{opacity:0.9} }
+
+    /* ── DOCTRINE ── */
+    .section { padding: 10rem 3rem; max-width: 900px; margin: 0 auto; }
+
+    .section-rule {
+      width: 100%; height: 1px; background: var(--border);
     }
 
-    /* DIVIDER */
-    .section-divider { width: 100%; height: 1px; background: var(--border); }
-
-    /* FEATURES */
-    .features { padding: 10rem 3rem; max-width: 1200px; margin: 0 auto; }
-    .section-label {
+    .eyebrow-sm {
       font-family: 'DM Mono', monospace;
-      font-size: 0.62rem; letter-spacing: 0.3em;
-      text-transform: uppercase; color: var(--accent-cold);
-      margin-bottom: 5rem; opacity: 0.8;
-    }
-    .features-grid {
-      display: grid; grid-template-columns: 1fr 1fr 1fr;
-      gap: 0; border: 1px solid var(--border);
-    }
-    .feature-card {
-      padding: 3.5rem 2.8rem;
-      border-right: 1px solid var(--border);
-      position: relative; overflow: hidden;
-      transition: background 0.5s ease;
-    }
-    .feature-card:last-child { border-right: none; }
-    .feature-card::before {
-      content: ''; position: absolute; inset: 0;
-      background: var(--accent-glow); opacity: 0;
-      transition: opacity 0.5s ease;
-    }
-    .feature-card:hover::before { opacity: 1; }
-    .feature-number {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 4rem; font-weight: 300;
-      color: var(--text-dim); line-height: 1; margin-bottom: 2rem;
-    }
-    .feature-title {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 1.6rem; font-weight: 300;
-      color: var(--text-primary); margin-bottom: 1rem; line-height: 1.2;
-    }
-    .feature-title em { font-style: italic; color: var(--accent); }
-    .feature-desc {
-      font-size: 0.88rem; color: var(--text-muted); line-height: 1.75; font-weight: 300;
+      font-size: 0.55rem; letter-spacing: 0.35em;
+      text-transform: uppercase; color: var(--ash);
+      margin-bottom: 2.5rem;
     }
 
-    /* STATEMENT */
-    .statement {
-      padding: 12rem 3rem; text-align: center;
-      position: relative; overflow: hidden;
-    }
-    .statement::before {
-      content: ''; position: absolute;
-      width: 500px; height: 500px;
-      background: radial-gradient(circle, rgba(168, 159, 140, 0.04) 0%, transparent 70%);
-      top: 50%; left: 50%; transform: translate(-50%, -50%);
-    }
-    .statement-quote {
+    .doctrine-statement {
       font-family: 'Cormorant Garamond', serif;
-      font-size: clamp(2rem, 5vw, 4rem);
-      font-weight: 300; font-style: italic;
-      color: var(--text-primary); max-width: 900px;
-      margin: 0 auto; line-height: 1.3; position: relative;
+      font-size: clamp(2rem, 4.5vw, 3.8rem);
+      font-weight: 300; line-height: 1.18;
+      color: var(--text-primary); margin-bottom: 3rem;
     }
-    .statement-quote em { color: var(--accent-cold); font-style: normal; }
-    .statement-attr {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.65rem; letter-spacing: 0.2em;
-      text-transform: uppercase; color: var(--text-dim); margin-top: 3rem;
-    }
+    .doctrine-statement em { font-style: italic; color: var(--gold); }
 
-    /* HOW */
-    .how { padding: 8rem 3rem 10rem; max-width: 900px; margin: 0 auto; }
-    .how-steps { margin-top: 5rem; display: flex; flex-direction: column; }
-    .how-step {
-      display: grid; grid-template-columns: 80px 1fr;
-      padding: 3rem 0; border-bottom: 1px solid var(--border);
-      gap: 2rem; align-items: start;
+    .doctrine-body {
+      font-size: 0.92rem; color: var(--text-muted);
+      line-height: 1.9; max-width: 620px;
     }
-    .how-step:first-child { border-top: 1px solid var(--border); }
-    .step-num {
+    .doctrine-body p { margin-bottom: 1.4rem; }
+    .doctrine-body strong { color: var(--text-primary); font-weight: 400; }
+
+    /* ── CATATON DEFINITION ── */
+    .cataton-section {
+      padding: 10rem 3rem; max-width: 900px; margin: 0 auto;
+    }
+    .cataton-def {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 6rem; align-items: start;
+    }
+    .cataton-num-large {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 10rem; font-weight: 300; color: var(--gold);
+      opacity: 0.12; line-height: 1; display: block;
+      margin-bottom: -1rem;
+    }
+    .cataton-def-text .eyebrow-sm { margin-bottom: 1.5rem; }
+    .cataton-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(1.8rem, 3.5vw, 3rem);
+      font-weight: 300; color: var(--text-primary);
+      line-height: 1.15; margin-bottom: 1.5rem;
+    }
+    .cataton-title em { font-style: italic; color: var(--gold); }
+
+    /* ── THE ARC ── */
+    .arc-section {
+      padding: 10rem 3rem; max-width: 900px; margin: 0 auto;
+    }
+    .arc-steps {
+      margin-top: 4rem;
+      display: flex; flex-direction: column;
+    }
+    .arc-step {
+      display: grid; grid-template-columns: 60px 1fr;
+      gap: 2.5rem; padding: 2.8rem 0;
+      border-bottom: 1px solid var(--border); align-items: start;
+    }
+    .arc-step:first-child { border-top: 1px solid var(--border); }
+    .arc-num {
       font-family: 'Cormorant Garamond', serif;
       font-size: 2.5rem; font-weight: 300;
-      color: var(--text-dim); line-height: 1; padding-top: 0.1rem;
+      color: rgba(201,168,76,0.2); line-height: 1;
     }
-    .step-title {
+    .arc-title {
       font-family: 'Cormorant Garamond', serif;
-      font-size: 1.5rem; font-weight: 300;
-      color: var(--text-primary); margin-bottom: 0.75rem;
+      font-size: 1.4rem; font-weight: 300;
+      color: var(--text-primary); margin-bottom: 0.6rem;
+      line-height: 1.2;
     }
-    .step-desc { font-size: 0.88rem; color: var(--text-muted); line-height: 1.8; }
+    .arc-title em { font-style: italic; color: var(--gold); }
+    .arc-desc {
+      font-size: 0.88rem; color: var(--text-muted); line-height: 1.8;
+    }
 
-    /* PRICING */
-    .pricing { padding: 8rem 3rem 10rem; max-width: 1100px; margin: 0 auto; }
+    /* ── THE THREE STATES ── */
+    .modes-section {
+      padding: 10rem 3rem; max-width: 1100px; margin: 0 auto;
+    }
+    .modes-grid {
+      display: grid; grid-template-columns: repeat(3,1fr);
+      gap: 1px; background: var(--border);
+      border: 1px solid var(--border); margin-top: 4rem;
+    }
+    .mode-panel {
+      background: var(--void); padding: 3.5rem 2.5rem;
+      position: relative; overflow: hidden;
+      transition: background 0.4s ease;
+    }
+    .mode-panel:hover { background: var(--deep); }
+    .mode-panel-glow {
+      position: absolute; top: -80px; right: -80px;
+      width: 240px; height: 240px; border-radius: 50%;
+      opacity: 0.06; transition: opacity 0.5s ease;
+    }
+    .mode-panel:hover .mode-panel-glow { opacity: 0.12; }
+    .void-glow   { background: radial-gradient(circle, var(--gold), transparent 70%); }
+    .thresh-glow { background: radial-gradient(circle, rgba(160,138,110,1), transparent 70%); }
+    .ign-glow    { background: radial-gradient(circle, var(--teal), transparent 70%); }
+    .mode-tag {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.5rem; letter-spacing: 0.25em;
+      text-transform: uppercase; margin-bottom: 2rem;
+      display: block;
+    }
+    .void-tag   { color: rgba(201,168,76,0.55); }
+    .thresh-tag { color: rgba(160,138,110,0.55); }
+    .ign-tag    { color: rgba(107,163,176,0.55); }
+    .mode-lock {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.44rem; letter-spacing: 0.18em;
+      text-transform: uppercase; color: var(--text-dim);
+      border: 1px solid var(--border);
+      padding: 0.2rem 0.5rem; float: right;
+      margin-top: -0.1rem;
+    }
+    .mode-name-large {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.7rem; font-weight: 300;
+      color: var(--text-primary); margin-bottom: 0.4rem;
+    }
+    .mode-sub-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.5rem; letter-spacing: 0.15em;
+      text-transform: uppercase; color: var(--text-dim);
+      margin-bottom: 2rem; display: block;
+    }
+    .mode-desc {
+      font-size: 0.88rem; color: var(--text-muted); line-height: 1.8;
+    }
+
+    /* Visual demos inside panels */
+    .mode-visual {
+      height: 90px; display: flex;
+      align-items: center; justify-content: center;
+      margin-bottom: 2.5rem; position: relative;
+    }
+    .orb-demo {
+      width: 52px; height: 52px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(201,168,76,0.06), transparent 70%);
+      border: 1px solid rgba(201,168,76,0.06);
+      animation: silencePulse 10s ease-in-out infinite;
+    }
+    @keyframes silencePulse {
+      0%,100%{transform:scale(0.9);opacity:0.4}
+      50%{transform:scale(1.1);opacity:0.8}
+    }
+    .bars-demo { display: flex; gap: 5px; align-items: center; }
+    .bar-demo {
+      width: 2px; background: rgba(160,138,110,0.5); border-radius: 2px;
+      animation: barDemo 4s ease-in-out infinite;
+    }
+    .bar-demo:nth-child(1){height:8px;animation-delay:0s}
+    .bar-demo:nth-child(2){height:18px;animation-delay:0.3s}
+    .bar-demo:nth-child(3){height:32px;animation-delay:0.15s}
+    .bar-demo:nth-child(4){height:24px;animation-delay:0.45s}
+    .bar-demo:nth-child(5){height:32px;animation-delay:0.2s}
+    .bar-demo:nth-child(6){height:18px;animation-delay:0.35s}
+    .bar-demo:nth-child(7){height:8px;animation-delay:0.1s}
+    @keyframes barDemo {
+      0%,100%{transform:scaleY(0.55);opacity:0.25}
+      50%{transform:scaleY(1);opacity:0.6}
+    }
+    .rings-demo {
+      position: relative; width: 70px; height: 70px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .ring-demo {
+      position: absolute; border-radius: 50%;
+      border: 1px solid rgba(201,168,76,0.15);
+      animation: ringDemo 8s ease-in-out infinite;
+    }
+    .ring-demo:nth-child(1){width:70px;height:70px}
+    .ring-demo:nth-child(2){width:48px;height:48px;animation-delay:0.5s}
+    .ring-demo:nth-child(3){width:28px;height:28px;animation-delay:1s}
+    @keyframes ringDemo {
+      0%,100%{transform:scale(0.85);opacity:0.3}
+      50%{transform:scale(1.1);opacity:0.7}
+    }
+
+    /* ── PRICING ── */
+    .pricing-section {
+      padding: 10rem 3rem; max-width: 900px; margin: 0 auto;
+    }
     .pricing-grid {
       display: grid; grid-template-columns: 1fr 1fr;
-      gap: 1px; margin-top: 5rem;
-      background: var(--border); border: 1px solid var(--border);
+      gap: 1px; background: var(--border);
+      border: 1px solid var(--border); margin-top: 4rem;
     }
-    .pricing-card { background: var(--void); padding: 4rem 3.5rem; position: relative; }
+    .pricing-card {
+      background: var(--void); padding: 3.5rem;
+      position: relative;
+    }
     .pricing-card.featured { background: var(--surface); }
     .pricing-badge {
       font-family: 'DM Mono', monospace;
-      font-size: 0.6rem; letter-spacing: 0.25em;
-      text-transform: uppercase; color: var(--accent-cold);
-      margin-bottom: 2.5rem; display: block;
+      font-size: 0.52rem; letter-spacing: 0.25em;
+      text-transform: uppercase; color: var(--ash);
+      margin-bottom: 2rem; display: block;
     }
+    .pricing-badge.gold { color: rgba(201,168,76,0.6); }
     .pricing-name {
       font-family: 'Cormorant Garamond', serif;
-      font-size: 2rem; font-weight: 300;
-      color: var(--text-primary); margin-bottom: 0.5rem;
+      font-size: 1.9rem; font-weight: 300;
+      color: var(--text-primary); margin-bottom: 0.4rem;
     }
     .pricing-price {
       font-family: 'Cormorant Garamond', serif;
       font-size: 3.5rem; font-weight: 300;
-      color: var(--text-primary); line-height: 1; margin-bottom: 0.3rem;
+      color: var(--text-primary); line-height: 1; margin-bottom: 0.2rem;
     }
-    .pricing-price sup { font-size: 1.5rem; vertical-align: super; }
+    .pricing-price sup { font-size: 1.4rem; vertical-align: super; }
     .pricing-freq {
       font-family: 'DM Mono', monospace;
-      font-size: 0.65rem; color: var(--text-muted);
-      letter-spacing: 0.1em; margin-bottom: 3rem;
+      font-size: 0.58rem; letter-spacing: 0.12em;
+      color: var(--text-dim); margin-bottom: 2.8rem; display: block;
     }
-    .pricing-features {
+    .pricing-list {
       list-style: none; margin-bottom: 3rem;
-      display: flex; flex-direction: column; gap: 1rem;
+      display: flex; flex-direction: column; gap: 0.9rem;
     }
-    .pricing-features li {
+    .pricing-list li {
       font-size: 0.88rem; color: var(--text-muted);
-      padding-left: 1.2rem; position: relative; line-height: 1.5;
+      padding-left: 1.4rem; position: relative; line-height: 1.5;
     }
-    .pricing-features li::before {
+    .pricing-list li::before {
       content: '—'; position: absolute; left: 0;
-      color: var(--accent); font-size: 0.7rem;
+      color: var(--gold); opacity: 0.5; font-size: 0.7rem;
     }
-    .pricing-features li.active { color: var(--text-primary); }
-
-    /* AMBIENT PREVIEW */
-    .ambient-preview { padding: 0 3rem 8rem; max-width: 1200px; margin: 0 auto; }
-    .ambient-strip {
-      display: grid; grid-template-columns: repeat(3, 1fr);
-      gap: 1px; background: var(--border);
-      border: 1px solid var(--border); overflow: hidden;
-    }
-    .ambient-panel {
-      height: 280px; display: flex;
-      flex-direction: column; justify-content: flex-end;
-      padding: 2rem; position: relative; overflow: hidden; cursor: none;
-    }
-    .ambient-panel.silence { background: #050505; }
-    .ambient-panel.sound { background: linear-gradient(135deg, #0a0f12 0%, #0d1a20 100%); }
-    .ambient-panel.visual { background: linear-gradient(135deg, #0a0a0c 0%, #12100e 100%); }
-    .ambient-orb { position: absolute; border-radius: 50%; opacity: 0.18; }
-    .sound .orb1 {
-      width: 200px; height: 200px;
-      background: radial-gradient(circle, var(--accent-cold), transparent 70%);
-      top: -60px; right: -40px;
-      animation: orbFloat 6s ease-in-out infinite;
-    }
-    .visual .orb2 {
-      width: 160px; height: 160px;
-      background: radial-gradient(circle, var(--accent), transparent 70%);
-      bottom: -40px; left: -40px;
-      animation: orbFloat 8s ease-in-out infinite reverse;
-    }
-    @keyframes orbFloat {
-      0%, 100% { transform: translate(0, 0); }
-      50% { transform: translate(10px, -15px); }
-    }
-    .ambient-label {
+    .pricing-list li.active { color: var(--text-primary); }
+    .pricing-cta {
+      width: 100%; background: var(--text-primary); color: var(--void);
+      border: none; padding: 1rem;
       font-family: 'DM Mono', monospace;
-      font-size: 0.62rem; letter-spacing: 0.25em;
-      text-transform: uppercase; color: var(--text-muted);
-      position: relative; z-index: 2;
+      font-size: 0.65rem; letter-spacing: 0.2em;
+      text-transform: uppercase; cursor: none;
+      transition: background 0.3s ease;
+      text-decoration: none; display: block; text-align: center;
     }
-    .ambient-title {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 1.4rem; font-weight: 300;
-      color: var(--text-primary); margin-top: 0.4rem;
-      position: relative; z-index: 2;
+    .pricing-cta:hover { background: var(--gold); }
+    .pricing-cta.ghost {
+      background: transparent; color: var(--text-muted);
+      border: 1px solid var(--border);
     }
-    .breath-circle {
-      position: absolute; top: 50%; left: 50%;
-      transform: translate(-50%, -60%);
-      width: 80px; height: 80px;
-      border: 1px solid rgba(168,159,140,0.2); border-radius: 50%;
-      animation: expand 4s ease-in-out infinite;
-    }
-    .breath-circle::after {
-      content: ''; position: absolute; inset: 15px;
-      border: 1px solid rgba(168,159,140,0.15); border-radius: 50%;
-      animation: expand 4s ease-in-out infinite 0.5s;
-    }
-    @keyframes expand {
-      0%, 100% { transform: translate(-50%, -50%) scale(0.85); opacity: 0.4; }
-      50% { transform: translate(-50%, -50%) scale(1.2); opacity: 0.9; }
-    }
-    .sound-bars {
-      position: absolute; top: 50%; left: 50%;
-      transform: translate(-50%, -60%);
-      display: flex; gap: 4px; align-items: center;
-    }
-    .bar {
-      width: 3px; background: var(--accent-cold);
-      opacity: 0.3; border-radius: 2px;
-      animation: barPulse 1.8s ease-in-out infinite;
-    }
-    .bar:nth-child(1) { height: 18px; animation-delay: 0s; }
-    .bar:nth-child(2) { height: 32px; animation-delay: 0.2s; }
-    .bar:nth-child(3) { height: 24px; animation-delay: 0.4s; }
-    .bar:nth-child(4) { height: 40px; animation-delay: 0.1s; }
-    .bar:nth-child(5) { height: 28px; animation-delay: 0.3s; }
-    .bar:nth-child(6) { height: 18px; animation-delay: 0.5s; }
-    .bar:nth-child(7) { height: 34px; animation-delay: 0.15s; }
-    @keyframes barPulse {
-      0%, 100% { opacity: 0.15; transform: scaleY(0.6); }
-      50% { opacity: 0.45; transform: scaleY(1); }
-    }
+    .pricing-cta.ghost:hover { color: var(--text-primary); border-color: var(--border-hover); background: transparent; }
 
-    /* ─── WAITLIST ─── */
-    .waitlist {
-      padding: 10rem 3rem 12rem;
+    /* ── CLOSING CTA ── */
+    .closing {
+      padding: 12rem 3rem 14rem;
       text-align: center; position: relative; overflow: hidden;
     }
-    .waitlist::before {
+    .closing::before {
       content: ''; position: absolute;
-      width: 800px; height: 800px;
-      background: radial-gradient(circle, rgba(122, 158, 168, 0.04) 0%, transparent 65%);
-      top: 50%; left: 50%; transform: translate(-50%, -50%);
+      width: 700px; height: 700px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(201,168,76,0.025) 0%, transparent 65%);
+      top: 50%; left: 50%; transform: translate(-50%,-50%);
       pointer-events: none;
     }
-    .waitlist-title {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: clamp(2.5rem, 6vw, 5rem);
-      font-weight: 300; color: var(--text-primary);
-      margin-bottom: 1.5rem; line-height: 1.1;
+    .closing-eyebrow {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.55rem; letter-spacing: 0.4em;
+      text-transform: uppercase; color: var(--ash);
+      margin-bottom: 2.5rem;
     }
-    .waitlist-title em { font-style: italic; color: var(--accent); }
-    .waitlist-sub {
-      font-size: 0.9rem; color: var(--text-muted);
-      margin-bottom: 3.5rem; letter-spacing: 0.02em;
+    .closing-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(2.5rem, 6vw, 5.5rem);
+      font-weight: 300; color: var(--text-primary);
+      line-height: 1.1; margin-bottom: 1.5rem;
+    }
+    .closing-title em { font-style: italic; color: var(--gold); }
+    .closing-sub {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.05rem; font-style: italic;
+      color: var(--text-muted); margin-bottom: 4rem;
+      line-height: 1.7; max-width: 480px; margin-left: auto; margin-right: auto;
     }
 
-    /* ─── THE FORM ─── */
+    /* EMAIL FORM */
     .waitlist-form {
-      display: flex; gap: 0;
-      max-width: 480px; margin: 0 auto;
-      position: relative; z-index: 2;
+      display: flex; gap: 0; max-width: 460px;
+      margin: 0 auto 2rem; position: relative; z-index: 2;
     }
     .waitlist-input {
-      flex: 1;
-      background: var(--surface);
+      flex: 1; background: var(--surface);
       border: 1px solid var(--border); border-right: none;
-      padding: 1.1rem 1.5rem;
-      font-family: 'Outfit', sans-serif;
-      font-size: 0.88rem; font-weight: 300;
-      color: var(--text-primary); outline: none;
+      padding: 1rem 1.5rem; outline: none;
+      font-family: 'Outfit', sans-serif; font-size: 0.88rem;
+      font-weight: 300; color: var(--text-primary); cursor: none;
       transition: border-color 0.3s ease;
     }
     .waitlist-input::placeholder { color: var(--text-dim); }
-    .waitlist-input:focus { border-color: rgba(122,158,168,0.3); }
+    .waitlist-input:focus { border-color: rgba(201,168,76,0.2); }
     .waitlist-btn {
-      background: var(--accent-cold); color: var(--void);
-      border: none; padding: 1.1rem 2rem;
+      background: var(--text-primary); color: var(--void);
+      border: none; padding: 1rem 1.8rem;
       font-family: 'DM Mono', monospace;
-      font-size: 0.7rem; letter-spacing: 0.15em;
+      font-size: 0.65rem; letter-spacing: 0.18em;
       text-transform: uppercase; cursor: none;
       transition: background 0.3s ease; white-space: nowrap;
     }
-    .waitlist-btn:hover { background: var(--text-primary); }
-    .waitlist-btn:disabled { opacity: 0.6; }
-
-    /* State messages */
-    .form-message {
+    .waitlist-btn:hover { background: var(--gold); }
+    .form-note {
       font-family: 'DM Mono', monospace;
-      font-size: 0.72rem; letter-spacing: 0.15em;
-      text-transform: uppercase; margin-top: 1.5rem;
-      min-height: 1.2rem; position: relative; z-index: 2;
-      transition: opacity 0.5s ease;
+      font-size: 0.52rem; letter-spacing: 0.12em;
+      text-transform: uppercase; color: var(--text-dim);
     }
-    .form-message.success { color: var(--accent-cold); }
-    .form-message.error { color: #c17a7a; }
-
-    .waitlist-note {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.6rem; letter-spacing: 0.15em;
-      color: var(--text-dim); margin-top: 1.2rem;
-      text-transform: uppercase; position: relative; z-index: 2;
+    .form-success {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1rem; font-style: italic;
+      color: var(--gold); margin-top: 1.5rem; min-height: 1.4rem;
+      opacity: 0; transition: opacity 0.5s ease;
     }
+    .form-success.visible { opacity: 1; }
 
     /* FOOTER */
     footer {
@@ -468,264 +535,42 @@
     }
     .footer-logo {
       font-family: 'Cormorant Garamond', serif;
-      font-size: 0.95rem; letter-spacing: 0.3em;
-      text-transform: uppercase; color: var(--text-muted);
+      font-size: 0.9rem; font-weight: 300;
+      letter-spacing: 0.3em; text-transform: uppercase;
+      color: var(--text-dim); text-decoration: none; cursor: none;
     }
-    .footer-copy {
+    .footer-logo em { font-style: italic; color: rgba(201,168,76,0.35); }
+    .footer-note {
       font-family: 'DM Mono', monospace;
-      font-size: 0.6rem; color: var(--text-dim); letter-spacing: 0.1em;
+      font-size: 0.5rem; letter-spacing: 0.15em;
+      text-transform: uppercase; color: var(--text-dim);
     }
 
-    /* ANIMATIONS */
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(24px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
+    /* REVEAL */
     .reveal {
       opacity: 0; transform: translateY(20px);
-      transition: opacity 0.8s ease, transform 0.8s ease;
+      transition: opacity 0.9s ease, transform 0.9s ease;
     }
     .reveal.visible { opacity: 1; transform: translateY(0); }
+    .reveal-delay-1 { transition-delay: 0.15s; }
+    .reveal-delay-2 { transition-delay: 0.3s; }
+    .reveal-delay-3 { transition-delay: 0.45s; }
 
-    /* ─── PLANNED OBSOLESCENCE ─── */
-    .obsolescence {
-      padding: 12rem 3rem;
-      position: relative;
-      overflow: hidden;
-      background: linear-gradient(180deg, var(--void) 0%, #090b0c 50%, var(--void) 100%);
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; } to { opacity: 1; }
     }
 
-    .obsolescence-inner {
-      max-width: 1100px;
-      margin: 0 auto;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8rem;
-      align-items: center;
-    }
-
-    /* Poem side */
-    .obs-poem-wrap {
-      position: relative;
-    }
-
-    .obs-coming-soon {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.58rem;
-      letter-spacing: 0.3em;
-      text-transform: uppercase;
-      color: var(--accent);
-      opacity: 0.7;
-      margin-bottom: 2.5rem;
-      display: flex;
-      align-items: center;
-      gap: 0.8rem;
-    }
-
-    .obs-coming-soon::before {
-      content: '';
-      display: inline-block;
-      width: 20px;
-      height: 1px;
-      background: var(--accent);
-      opacity: 0.5;
-    }
-
-    .obs-title {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: clamp(2.2rem, 4vw, 3.5rem);
-      font-weight: 300;
-      color: var(--text-primary);
-      line-height: 1.1;
-      margin-bottom: 1.5rem;
-    }
-
-    .obs-title em {
-      font-style: italic;
-      color: var(--accent-cold);
-      display: block;
-    }
-
-    .obs-desc {
-      font-size: 0.9rem;
-      color: var(--text-muted);
-      line-height: 1.8;
-      max-width: 420px;
-      margin-bottom: 2.5rem;
-    }
-
-    .obs-directions {
-      display: flex;
-      flex-direction: column;
-      gap: 0.8rem;
-      margin-top: 2rem;
-    }
-
-    .obs-direction {
-      display: flex;
-      align-items: flex-start;
-      gap: 1rem;
-      font-size: 0.82rem;
-      color: var(--text-muted);
-      line-height: 1.5;
-    }
-
-    .obs-direction-num {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.6rem;
-      color: var(--accent);
-      letter-spacing: 0.1em;
-      padding-top: 0.15rem;
-      flex-shrink: 0;
-    }
-
-    /* Poem */
-    .obs-poem {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 0.95rem;
-      font-style: italic;
-      color: var(--text-muted);
-      line-height: 2.1;
-      border-left: 1px solid var(--border);
-      padding-left: 2.5rem;
-      position: relative;
-    }
-
-    .obs-poem em {
-      color: var(--text-primary);
-      font-style: normal;
-    }
-
-    /* Interactive dissolve demo */
-    .obs-demo {
-      margin-top: 4rem;
-      max-width: 1100px;
-      margin-left: auto;
-      margin-right: auto;
-      border: 1px solid var(--border);
-      padding: 3rem 3.5rem;
-      position: relative;
-      background: var(--surface);
-      overflow: hidden;
-    }
-
-    .obs-demo::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(ellipse at 50% 0%, rgba(122,158,168,0.04) 0%, transparent 70%);
-      pointer-events: none;
-    }
-
-    .obs-demo-label {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.6rem;
-      letter-spacing: 0.25em;
-      text-transform: uppercase;
-      color: var(--accent-cold);
-      margin-bottom: 1.5rem;
-      opacity: 0.7;
-    }
-
-    .obs-demo-prompt {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 1.3rem;
-      font-weight: 300;
-      font-style: italic;
-      color: var(--text-muted);
-      margin-bottom: 1.5rem;
-    }
-
-    .obs-textarea-wrap {
-      position: relative;
-    }
-
-    .obs-textarea {
-      width: 100%;
-      background: transparent;
-      border: none;
-      border-bottom: 1px solid var(--border);
-      padding: 0.8rem 0;
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 1.4rem;
-      font-weight: 300;
-      color: var(--text-primary);
-      outline: none;
-      resize: none;
-      line-height: 1.6;
-      transition: border-color 0.3s ease, opacity 0.8s ease, filter 0.8s ease;
-      min-height: 2.5rem;
-      overflow: hidden;
-    }
-
-    .obs-textarea::placeholder {
-      color: var(--text-dim);
-      font-style: italic;
-    }
-
-    .obs-textarea:focus {
-      border-color: rgba(122,158,168,0.25);
-    }
-
-    .obs-textarea.dissolving {
-      opacity: 0;
-      filter: blur(8px);
-      transform: translateY(-4px);
-      transition: opacity 1.2s ease, filter 1.2s ease, transform 1.2s ease;
-    }
-
-    .obs-hint {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.58rem;
-      letter-spacing: 0.15em;
-      color: var(--text-dim);
-      margin-top: 1rem;
-      text-transform: uppercase;
-      transition: opacity 0.3s ease;
-    }
-
-    .obs-release-msg {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 1rem;
-      font-style: italic;
-      color: var(--accent-cold);
-      position: absolute;
-      top: 0.8rem;
-      left: 0;
-      opacity: 0;
-      transition: opacity 0.6s ease;
-      pointer-events: none;
-    }
-
-    .obs-release-msg.visible {
-      opacity: 1;
-    }
-
-    /* RESPONSIVE */
     @media (max-width: 768px) {
-      .obsolescence-inner {
-        grid-template-columns: 1fr;
-        gap: 4rem;
-      }
-      .obs-poem {
-        border-left: none;
-        border-top: 1px solid var(--border);
-        padding-left: 0;
-        padding-top: 2rem;
-      }
-      .obs-demo { padding: 2rem; }
-    }
       nav { padding: 1.5rem; }
-      .nav-links { display: none; }
-      .features-grid { grid-template-columns: 1fr; }
-      .feature-card { border-right: none; border-bottom: 1px solid var(--border); }
+      .nav-right .nav-link { display: none; }
+      .cataton-def { grid-template-columns: 1fr; gap: 2rem; }
+      .modes-grid { grid-template-columns: 1fr; }
       .pricing-grid { grid-template-columns: 1fr; }
-      .ambient-strip { grid-template-columns: 1fr; }
-      .waitlist-form { flex-direction: column; }
-      .waitlist-input { border-right: 1px solid var(--border); border-bottom: none; }
-      footer { flex-direction: column; gap: 1.5rem; text-align: center; }
+      .section, .cataton-section, .arc-section, .modes-section, .pricing-section { padding: 6rem 1.5rem; }
     }
   </style>
 </head>
@@ -734,467 +579,290 @@
   <div class="cursor" id="cursor"></div>
   <div class="cursor-ring" id="cursorRing"></div>
 
-  <!-- Nav -->
   <nav>
-    <div class="logo">Cata<span>tonica</span></div>
-    <ul class="nav-links">
-      <li><a href="#features">Features</a></li>
-      <li><a href="#pricing">Pricing</a></li>
-      <li><a href="#waitlist">Early Access</a></li>
-    </ul>
+    <a href="/" class="logo">Cata<em>tonica</em></a>
+    <div class="nav-right">
+      <a href="#doctrine" class="nav-link">The Order</a>
+      <a href="#pricing" class="nav-link">Plans</a>
+      <a href="app.html" class="nav-enter">Enter the void →</a>
+    </div>
   </nav>
 
-  <!-- Hero -->
+  <!-- ── HERO ── -->
   <section class="hero">
-    <p class="hero-eyebrow">Performance Recovery for High-Intensity Minds</p>
+    <div class="hero-orb"></div>
+    <div class="hero-orb-2"></div>
+
+    <p class="hero-order">The Order of the Still Voice</p>
+
     <h1 class="hero-title">
-      The Art of<br>
-      <em>Doing Nothing.</em>
+      Catato<em>nica</em>
     </h1>
-    <p class="hero-sub">
-      Scheduled silence. Intentional stillness.
-      Not because you're broken — because you're serious about what comes next.
+
+    <div class="hero-divider"></div>
+
+    <p class="hero-doctrine">
+      After the storm comes the silence.<br>
+      Most people mistake that silence for failure.<br>
+      <em>It is the most powerful moment you will ever have.</em>
     </p>
+
     <div class="hero-cta-group">
-      <a href="app.html" class="btn-primary">Start a Session</a>
-      <a href="#features" class="btn-ghost">See How It Works</a>
+      <a href="app.html" class="btn-primary">Enter the void →</a>
+      <a href="#doctrine" class="btn-ghost">Read the doctrine</a>
     </div>
-    <div class="scroll-hint">
-      <span>Scroll</span>
+
+    <div class="scroll-cue">
+      <span>The Order awaits</span>
       <div class="scroll-line"></div>
     </div>
   </section>
 
-  <div class="section-divider"></div>
+  <div class="section-rule"></div>
 
-  <!-- Statement -->
-  <section class="statement">
-    <p class="statement-quote reveal">
-      "Your best decisions aren't made under pressure.
-      They surface in <em>the gaps you never give yourself.</em>"
-    </p>
-    <p class="statement-attr reveal">The science of cognitive recovery</p>
-  </section>
-
-  <div class="section-divider"></div>
-
-  <!-- Features -->
-  <section class="features" id="features">
-    <p class="section-label reveal">What Catatonica Does</p>
-    <div class="features-grid">
-      <div class="feature-card reveal">
-        <div class="feature-number">01</div>
-        <h3 class="feature-title">Guided <em>Silence</em> Sessions</h3>
-        <p class="feature-desc">Structured time-blocks of nothing. A start, a hold, a gentle return. No mantras. No spiritual frameworks. Just a container for your mind to decompress — on your terms.</p>
-      </div>
-      <div class="feature-card reveal">
-        <div class="feature-number">02</div>
-        <h3 class="feature-title"><em>Calendar</em> Integration</h3>
-        <p class="feature-desc">If it's not on the calendar, it won't happen. Catatonica books your silence like a boardroom meeting. Google and Outlook sync. Your team sees "Focused." You know the truth.</p>
-      </div>
-      <div class="feature-card reveal">
-        <div class="feature-number">03</div>
-        <h3 class="feature-title">The <em>Ambient</em> Space</h3>
-        <p class="feature-desc">Your personal void. Choose silence, curated soundscapes, or a breathing visual — whichever quiets the machine in your head. No decisions, no feeds, no noise.</p>
-      </div>
+  <!-- ── DOCTRINE ── -->
+  <section class="section" id="doctrine">
+    <p class="eyebrow-sm reveal">The Doctrine</p>
+    <h2 class="doctrine-statement reveal">
+      You have survived<br>the <em>cataclysm.</em><br>Now what?
+    </h2>
+    <div class="doctrine-body reveal reveal-delay-1">
+      <p>There is a moment after every storm — personal, professional, existential — where the noise stops. The walls are down. The old world is gone. Most people panic and start rebuilding immediately. They repair the wall instead of building new from the rubble.</p>
+      <p>The catatonic state is not a sign of weakness. It is the highest concentration of potential energy available to a human being. <strong>The universe rebuilt itself from silence.</strong> Your new world is no different.</p>
+      <p>Catatonica is not a meditation app. It is a performance tool for the moment after destruction — when you are still enough to hear what comes next. Founders use it between funding rounds. Athletes use it between seasons. Creatives use it when the work has emptied them out.</p>
+      <p><strong>The still voice only speaks to those who are still enough to hear it.</strong></p>
     </div>
   </section>
 
-  <!-- Ambient Preview -->
-  <div class="ambient-preview">
-    <div class="ambient-strip reveal">
-      <div class="ambient-panel silence">
-        <div class="ambient-label">Mode I</div>
-        <div class="ambient-title">Pure Silence</div>
-      </div>
-      <div class="ambient-panel sound">
-        <div class="ambient-orb orb1"></div>
-        <div class="sound-bars">
-          <div class="bar"></div><div class="bar"></div><div class="bar"></div>
-          <div class="bar"></div><div class="bar"></div><div class="bar"></div>
-          <div class="bar"></div>
-        </div>
-        <div class="ambient-label">Mode II</div>
-        <div class="ambient-title">Soundscapes</div>
-      </div>
-      <div class="ambient-panel visual">
-        <div class="ambient-orb orb2"></div>
-        <div class="breath-circle"></div>
-        <div class="ambient-label">Mode III</div>
-        <div class="ambient-title">Breathing Visual</div>
-      </div>
-    </div>
-  </div>
+  <div class="section-rule"></div>
 
-  <div class="section-divider"></div>
-
-  <!-- How It Works -->
-  <section class="how">
-    <p class="section-label reveal">How It Works</p>
-    <div class="how-steps">
-      <div class="how-step reveal">
-        <div class="step-num">I</div>
-        <div class="step-body">
-          <h3 class="step-title">Schedule your silence</h3>
-          <p class="step-desc">Pick a duration. Block it on your calendar. Treat it with the same weight as your most important meeting — because it is. This isn't optional time. It's strategic time.</p>
-        </div>
+  <!-- ── CATATON DEFINITION ── -->
+  <section class="cataton-section">
+    <div class="cataton-def">
+      <div>
+        <span class="cataton-num-large reveal">ꞔ</span>
+        <div class="eyebrow-sm reveal reveal-delay-1">Unit of Measurement</div>
+        <h2 class="cataton-title reveal reveal-delay-1">
+          The <em>Cataton.</em><br>
+          A quantum of<br>stillness.
+        </h2>
       </div>
-      <div class="how-step reveal">
-        <div class="step-num">II</div>
-        <div class="step-body">
-          <h3 class="step-title">Enter your space</h3>
-          <p class="step-desc">Catatonica opens. The screen clears. Choose your mode and sit with it. No prompts. No suggestions. Nothing is asking anything of you for the next N minutes.</p>
-        </div>
-      </div>
-      <div class="how-step reveal">
-        <div class="step-num">III</div>
-        <div class="step-body">
-          <h3 class="step-title">Return with clarity</h3>
-          <p class="step-desc">A gentle signal brings you back. No stats. No gamification. Just a record of the time you protected. Over weeks, the pattern becomes the practice.</p>
+      <div class="cataton-def-text">
+        <div class="doctrine-body reveal reveal-delay-2">
+          <p>Like a photon for light, a Cataton is the <strong>smallest possible unit of stillness required for the equivalent amount of growth.</strong></p>
+          <p>One Cataton is one minute of earned silence. Not time passed — time that changed something. Potential energy, held. The state between the cataclysm and the genesis.</p>
+          <p>If kinetic is the opposite — the storm, the chaos, the upheaval — then the catatonic state is pure potential. From the volcanic rubble grows the most fertile soil on earth.</p>
+          <p><strong>You are not waiting. You are accumulating.</strong></p>
         </div>
       </div>
     </div>
   </section>
 
-  <div class="section-divider"></div>
+  <div class="section-rule"></div>
 
-  <!-- Pricing -->
-  <section class="pricing" id="pricing">
-    <p class="section-label reveal">Access</p>
-    <div class="pricing-grid reveal">
+  <!-- ── THE ARC ── -->
+  <section class="arc-section">
+    <p class="eyebrow-sm reveal">The Arc</p>
+    <h2 class="doctrine-statement reveal">
+      From ruin<br>to <em>revelation.</em>
+    </h2>
+    <div class="arc-steps">
+      <div class="arc-step reveal">
+        <div class="arc-num">I</div>
+        <div>
+          <h3 class="arc-title">Name the <em>cataclysm.</em></h3>
+          <p class="arc-desc">Before you enter the void, you name what brought you here. A decision, a loss, a transition, a pressure you can't put down. You don't solve it. You name it. Then you let the void hold it while you go still.</p>
+        </div>
+      </div>
+      <div class="arc-step reveal reveal-delay-1">
+        <div class="arc-num">II</div>
+        <div>
+          <h3 class="arc-title">Enter the <em>void.</em></h3>
+          <p class="arc-desc">Choose your state — pure silence, a pressurized soundscape, or a breathing guide. The session begins. You are not depleting time. You are accumulating Catatons. One per minute. You watch potential energy form.</p>
+        </div>
+      </div>
+      <div class="arc-step reveal reveal-delay-2">
+        <div class="arc-num">III</div>
+        <div>
+          <h3 class="arc-title">Surface and <em>receive.</em></h3>
+          <p class="arc-desc">When the session ends, you are asked what shifted. Not what you decided — what you heard. The exit is the moment the still voice speaks. One word is enough. Sometimes nothing is enough.</p>
+        </div>
+      </div>
+      <div class="arc-step reveal reveal-delay-3">
+        <div class="arc-num">IV</div>
+        <div>
+          <h3 class="arc-title">Declare mastery.<br><em>Begin again.</em></h3>
+          <p class="arc-desc">When a storm is complete — when the void has done its work — you declare mastery. The Catatons crystallize permanently into your record. The situation moves to the archive. A new universe opens. The Order remembers everything.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="section-rule"></div>
+
+  <!-- ── THE THREE STATES ── -->
+  <section class="modes-section">
+    <p class="eyebrow-sm reveal">The Three States</p>
+    <h2 class="doctrine-statement reveal">
+      Each session<br>is a <em>different depth.</em>
+    </h2>
+    <div class="modes-grid">
+      <div class="mode-panel reveal">
+        <div class="mode-panel-glow void-glow"></div>
+        <div class="mode-visual">
+          <div class="orb-demo"></div>
+        </div>
+        <span class="mode-tag void-tag">State I — Always available</span>
+        <div class="mode-name-large">The Void</div>
+        <span class="mode-sub-label">Sub-zero stillness</span>
+        <p class="mode-desc">Pure absence. The freeze. One barely-visible orb in absolute dark. No instructions. No guidance. The session watches you dissolve into stillness. The timer doesn't exist — only what you accumulate.</p>
+      </div>
+      <div class="mode-panel reveal reveal-delay-1">
+        <div class="mode-panel-glow thresh-glow"></div>
+        <div class="mode-visual">
+          <div class="bars-demo">
+            <div class="bar-demo"></div><div class="bar-demo"></div>
+            <div class="bar-demo"></div><div class="bar-demo"></div>
+            <div class="bar-demo"></div><div class="bar-demo"></div>
+            <div class="bar-demo"></div>
+          </div>
+        </div>
+        <span class="mode-tag thresh-tag">State II <span class="mode-lock">10 catatons</span></span>
+        <div class="mode-name-large">The Threshold</div>
+        <span class="mode-sub-label">The pressurized void</span>
+        <p class="mode-desc">A dense, low ambient field. Brown noise, tones tuned to 432Hz and 55Hz, barely audible. Not music. The sound of weight before it lifts. Unlocks when you have earned your first ten Catatons.</p>
+      </div>
+      <div class="mode-panel reveal reveal-delay-2">
+        <div class="mode-panel-glow ign-glow"></div>
+        <div class="mode-visual">
+          <div class="rings-demo">
+            <div class="ring-demo"></div>
+            <div class="ring-demo"></div>
+            <div class="ring-demo"></div>
+          </div>
+        </div>
+        <span class="mode-tag ign-tag">State III <span class="mode-lock">30 catatons</span></span>
+        <div class="mode-name-large">The Ignition</div>
+        <span class="mode-sub-label">The critical state</span>
+        <p class="mode-desc">Three concentric rings. A breathing guide synced to the oldest known pattern — 4 counts in, 4 held, 5 released. The Still Voice described this as the moment the genesis begins. Your body leads. Your mind follows.</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="section-rule"></div>
+
+  <!-- ── PRICING ── -->
+  <section class="pricing-section" id="pricing">
+    <p class="eyebrow-sm reveal">The Plans</p>
+    <h2 class="doctrine-statement reveal">
+      Begin in<br>the void.<br><em>Go deeper.</em>
+    </h2>
+    <div class="pricing-grid">
       <div class="pricing-card">
-        <span class="pricing-badge">Free Forever</span>
-        <div class="pricing-name">Still</div>
-        <div class="pricing-price"><sup></sup>0</div>
-        <div class="pricing-freq">no card required</div>
-        <ul class="pricing-features">
-          <li class="active">1 session type (guided silence)</li>
-          <li class="active">Sessions up to 10 minutes</li>
-          <li class="active">Basic timer</li>
-          <li>Calendar integration</li>
-          <li>All ambient modes</li>
-          <li>Session history</li>
-          <li>Team licenses</li>
+        <span class="pricing-badge">The Seeker</span>
+        <div class="pricing-name">Free</div>
+        <div class="pricing-price">$<sup></sup>0</div>
+        <span class="pricing-freq">Always</span>
+        <ul class="pricing-list">
+          <li class="active">The Void mode — unlimited sessions</li>
+          <li class="active">Up to 5 active situations</li>
+          <li class="active">Full Chronicle — every session recorded</li>
+          <li class="active">Cataton accumulation + stage progression</li>
+          <li>The Threshold mode (unlocks at 10 catatons)</li>
+          <li>The Ignition mode (unlocks at 30 catatons)</li>
+          <li>Unlimited situations</li>
+          <li>The Archive — mastered situations</li>
         </ul>
-        <a href="#waitlist" class="btn-ghost">Get Started Free</a>
+        <a href="app.html" class="pricing-cta ghost">Enter the void →</a>
       </div>
       <div class="pricing-card featured">
-        <span class="pricing-badge">Premium</span>
+        <span class="pricing-badge gold">The Order — Deep</span>
         <div class="pricing-name">Deep</div>
-        <div class="pricing-price"><sup>$</sup>9</div>
-        <div class="pricing-freq">per month — cancel anytime</div>
-        <ul class="pricing-features">
-          <li class="active">All 3 experience types</li>
-          <li class="active">Unlimited session length</li>
-          <li class="active">Google & Outlook sync</li>
-          <li class="active">All ambient environments</li>
-          <li class="active">Session history & streaks</li>
-          <li class="active">Priority access to new features</li>
-          <li class="active">Corporate / Team licenses</li>
+        <div class="pricing-price">$<sup>9</sup></div>
+        <span class="pricing-freq">per month</span>
+        <ul class="pricing-list">
+          <li class="active">Everything in Free</li>
+          <li class="active">Unlimited situations — no ceiling</li>
+          <li class="active">The Threshold + Ignition modes — immediately</li>
+          <li class="active">Full Archive with genesis notes</li>
+          <li class="active">The Chronicle — full session history</li>
+          <li class="active">Priority access to new states as they emerge</li>
         </ul>
-        <a href="#" class="btn-primary upgrade-btn" id="upgradeBtn">Join Early Access</a>
+        <a href="#" class="pricing-cta" id="upgradeBtn">Join the Order →</a>
       </div>
     </div>
   </section>
 
-  <div class="section-divider"></div>
+  <div class="section-rule"></div>
 
-  <!-- Planned Obsolescence -->
-  <section class="obsolescence" id="obsolescence">
-    <div class="obsolescence-inner">
-
-      <!-- Left: concept -->
-      <div class="obs-poem-wrap reveal">
-        <div class="obs-coming-soon">Coming Soon</div>
-        <h2 class="obs-title">
-          Planned<br>
-          <em>Obsolescence.</em>
-        </h2>
-        <p class="obs-desc">
-          Before a session, write what you're carrying. Old systems. Dead frameworks. 
-          Beliefs that no longer fit. Name them — then let the silence do its work.
-          What you write here is not saved. That's the point.
-        </p>
-        <div class="obs-directions">
-          <div class="obs-direction">
-            <span class="obs-direction-num">01</span>
-            <span>Name the old thing — a habit, a belief, a way of working</span>
-          </div>
-          <div class="obs-direction">
-            <span class="obs-direction-num">02</span>
-            <span>Enter your silence session with it consciously in mind</span>
-          </div>
-          <div class="obs-direction">
-            <span class="obs-direction-num">03</span>
-            <span>Return. Write what replaced it — or write nothing at all</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Right: poem -->
-      <div class="obs-poem reveal">
-        The silence is not absence,<br>
-        but <em>design—</em><br>
-        a pause where the old equations<br>
-        fold into dust.<br><br>
-        Numbers once carved in stone<br>
-        now dissolve,<br>
-        their logic brittle,<br>
-        their symmetry undone.<br><br>
-        The mind rewrites itself,<br>
-        casting off gears and levers,<br>
-        discarding the tired scaffolds<br>
-        of yesterday's thought.<br><br>
-        In the hush,<br>
-        new architectures rise—<br>
-        not echoes of the past,<br>
-        but <em>fresh constellations,</em><br>
-        patterns unimagined.<br><br>
-        Obsolescence here is <em>mercy,</em><br>
-        a cleansing fire,<br>
-        making way for the future's<br>
-        unbroken song.
-      </div>
-
-    </div>
-
-    <!-- Interactive demo -->
-    <div class="obs-demo reveal">
-      <div class="obs-demo-label">Try it now — a preview</div>
-      <p class="obs-demo-prompt">What's one thing you're ready to let go of?</p>
-      <div class="obs-textarea-wrap">
-        <textarea
-          class="obs-textarea"
-          id="obsTextarea"
-          placeholder="Write it here…"
-          rows="1"
-          spellcheck="false"
-        ></textarea>
-        <div class="obs-release-msg" id="releaseMsg">Released.</div>
-      </div>
-      <p class="obs-hint" id="obsHint">Press Enter to release it — it won't be saved</p>
-    </div>
-  </section>
-
-  <div class="section-divider"></div>
-
-  <!-- Waitlist -->
-  <section class="waitlist" id="waitlist">
-    <h2 class="waitlist-title reveal">
-      Reserve your<br><em>silence.</em>
+  <!-- ── CLOSING ── -->
+  <section class="closing">
+    <p class="closing-eyebrow reveal">The Still Voice</p>
+    <h2 class="closing-title reveal">
+      The void<br>is <em>waiting.</em>
     </h2>
-    <p class="waitlist-sub reveal">Early access. No noise. We'll reach out when you're in.</p>
+    <p class="closing-sub reveal reveal-delay-1">
+      You don't need to understand the doctrine to enter. The first session asks only one question. What brought you here? The void will do the rest.
+    </p>
 
-    <!--
-      NETLIFY FORMS:
-      The `data-netlify="true"` attribute is all Netlify needs to
-      intercept this form and store submissions in your dashboard.
-      The hidden input is required by Netlify to identify the form.
-    -->
-    <form
-      name="waitlist"
-      method="POST"
-      data-netlify="true"
-      data-netlify-honeypot="bot-field"
-      class="waitlist-form reveal"
-      id="waitlistForm"
-    >
-      <!-- Netlify bot protection — hidden from humans -->
-      <input type="hidden" name="form-name" value="waitlist" />
-      <p style="display:none"><input name="bot-field" /></p>
+    <div class="waitlist-form reveal reveal-delay-2">
+      <input type="email" class="waitlist-input" id="emailInput" placeholder="your@email.com" />
+      <button class="waitlist-btn" id="subscribeBtn">Enter the Order</button>
+    </div>
+    <p class="form-note reveal reveal-delay-2">Or go straight in — no account required to begin.</p>
+    <p class="form-success" id="formSuccess">The Order has received you. Check your inbox.</p>
 
-      <input
-        type="email"
-        name="email"
-        class="waitlist-input"
-        placeholder="your@email.com"
-        required
-        id="emailInput"
-        autocomplete="email"
-      />
-      <button type="submit" class="waitlist-btn" id="submitBtn">
-        Join Waitlist
-      </button>
-    </form>
-
-    <div class="form-message" id="formMessage"></div>
-    <p class="waitlist-note reveal">No spam. Ever. That would be ironic.</p>
+    <div style="margin-top:3rem" class="reveal reveal-delay-3">
+      <a href="app.html" class="btn-primary">Enter the void now →</a>
+    </div>
   </section>
 
   <footer>
-    <div class="footer-logo">Catatonica</div>
-    <div class="footer-copy">© 2025 Catatonica. All rights reserved.</div>
+    <a href="/" class="footer-logo">Cata<em>tonica</em></a>
+    <span class="footer-note">The Order of the Still Voice · Est. in Silence</span>
   </footer>
 
   <script>
-    // ─── CURSOR ───
+    // CURSOR
     const cursor = document.getElementById('cursor');
-    const ring = document.getElementById('cursorRing');
-    let mouseX = 0, mouseY = 0, ringX = 0, ringY = 0;
+    const ring   = document.getElementById('cursorRing');
+    let mx=0,my=0,rx=0,ry=0;
+    document.addEventListener('mousemove', e => { mx=e.clientX; my=e.clientY; cursor.style.left=mx+'px'; cursor.style.top=my+'px'; });
+    (function animRing(){ rx+=(mx-rx)*0.1; ry+=(my-ry)*0.1; ring.style.left=rx+'px'; ring.style.top=ry+'px'; requestAnimationFrame(animRing); })();
 
-    document.addEventListener('mousemove', (e) => {
-      mouseX = e.clientX; mouseY = e.clientY;
-      cursor.style.left = mouseX + 'px';
-      cursor.style.top = mouseY + 'px';
-    });
-
-    (function animateRing() {
-      ringX += (mouseX - ringX) * 0.12;
-      ringY += (mouseY - ringY) * 0.12;
-      ring.style.left = ringX + 'px';
-      ring.style.top = ringY + 'px';
-      requestAnimationFrame(animateRing);
-    })();
-
-    document.querySelectorAll('a, button, input').forEach(el => {
-      el.addEventListener('mouseenter', () => {
-        cursor.style.transform = 'translate(-50%, -50%) scale(2)';
-        ring.style.width = '48px'; ring.style.height = '48px';
-      });
-      el.addEventListener('mouseleave', () => {
-        cursor.style.transform = 'translate(-50%, -50%) scale(1)';
-        ring.style.width = '32px'; ring.style.height = '32px';
-      });
-    });
-
-    // ─── SCROLL REVEAL ───
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+    // SCROLL REVEAL
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); } });
     }, { threshold: 0.12 });
     document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 
-    // ─── WAITLIST FORM ───
-    // Handles both Netlify (production) and local preview gracefully.
-    const form = document.getElementById('waitlistForm');
-    const emailInput = document.getElementById('emailInput');
-    const submitBtn = document.getElementById('submitBtn');
-    const formMessage = document.getElementById('formMessage');
-
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-
-      const email = emailInput.value.trim();
-      if (!email) return;
-
-      // Loading state
-      submitBtn.textContent = '...';
-      submitBtn.disabled = true;
-      emailInput.disabled = true;
-      formMessage.textContent = '';
-      formMessage.className = 'form-message';
-
+    // SUBSCRIBE
+    document.getElementById('subscribeBtn').addEventListener('click', async () => {
+      const email = document.getElementById('emailInput').value.trim();
+      if (!email || !email.includes('@')) return;
       try {
-        const response = await fetch('/.netlify/functions/subscribe', {
+        await fetch('/.netlify/functions/subscribe', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email }),
+          body: JSON.stringify({ email })
         });
-
-        const data = await response.json();
-
-        if (data.success) {
-          submitBtn.textContent = 'Done.';
-          submitBtn.style.background = 'var(--accent)';
-          emailInput.value = '';
-          emailInput.placeholder = "You're on the list.";
-          formMessage.textContent = "We'll be in touch when doors open.";
-          formMessage.className = 'form-message success';
-        } else {
-          throw new Error(data.error || 'Something went wrong');
-        }
-      } catch (err) {
-        submitBtn.textContent = 'Try again';
-        submitBtn.disabled = false;
-        submitBtn.style.opacity = '1';
-        formMessage.textContent = 'Something went wrong. Please try again.';
-        formMessage.className = 'form-message error';
-        console.error('Subscribe error:', err);
-      } finally {
-        emailInput.disabled = false;
-      }
-    });
-    // ─── PLANNED OBSOLESCENCE DEMO ───
-    const obsTextarea = document.getElementById('obsTextarea');
-    const releaseMsg = document.getElementById('releaseMsg');
-    const obsHint = document.getElementById('obsHint');
-
-    // Auto-resize textarea
-    obsTextarea.addEventListener('input', () => {
-      obsTextarea.style.height = 'auto';
-      obsTextarea.style.height = obsTextarea.scrollHeight + 'px';
-      obsHint.style.opacity = obsTextarea.value.trim() ? '1' : '0.4';
+      } catch(e) {}
+      document.getElementById('formSuccess').classList.add('visible');
+      document.getElementById('emailInput').value = '';
     });
 
-    const releaseMessages = [
-      'Released.',
-      'Let go.',
-      'Gone.',
-      'Dissolved.',
-      'It no longer defines you.',
-      'The slate is clean.',
-    ];
-
-    function triggerDissolve() {
-      const text = obsTextarea.value.trim();
-      if (!text) return;
-
-      // Pick a random release message
-      const msg = releaseMessages[Math.floor(Math.random() * releaseMessages.length)];
-      releaseMsg.textContent = msg;
-
-      // Dissolve the text
-      obsTextarea.classList.add('dissolving');
-      obsHint.style.opacity = '0';
-
-      setTimeout(() => {
-        obsTextarea.value = '';
-        obsTextarea.style.height = 'auto';
-        obsTextarea.classList.remove('dissolving');
-        obsTextarea.style.opacity = '1';
-        obsTextarea.style.filter = 'none';
-        obsTextarea.style.transform = 'none';
-
-        releaseMsg.classList.add('visible');
-
-        setTimeout(() => {
-          releaseMsg.classList.remove('visible');
-          obsHint.style.opacity = '0.4';
-        }, 2200);
-      }, 1300);
-    }
-
-    obsTextarea.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' && !e.shiftKey) {
-        e.preventDefault();
-        triggerDissolve();
-      }
-    });
-
-    // ─── STRIPE CHECKOUT ───
-    async function startCheckout() {
-      const btn = document.getElementById('upgradeBtn');
-      if (btn) { btn.textContent = '...'; btn.style.opacity = '0.7'; }
+    // UPGRADE
+    document.getElementById('upgradeBtn').addEventListener('click', async e => {
+      e.preventDefault();
       try {
-        const res = await fetch('/.netlify/functions/create-checkout', { method: 'POST' });
-        const data = await res.json();
-        if (data.url) {
-          window.location.href = data.url;
-        } else {
-          throw new Error(data.error || 'Unknown error');
-        }
-      } catch (err) {
-        console.error('Checkout error:', err);
-        if (btn) { btn.textContent = 'Join Early Access'; btn.style.opacity = '1'; }
-        alert('Something went wrong. Please try again.');
+        const res = await fetch('/.netlify/functions/create-checkout', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' }
+        });
+        const { url } = await res.json();
+        if (url) window.location.href = url;
+      } catch(err) {
+        window.location.href = 'app.html';
       }
-    }
-
-    // Attach to all upgrade buttons
-    document.querySelectorAll('.upgrade-btn').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        e.preventDefault();
-        startCheckout();
-      });
     });
   </script>
 </body>
