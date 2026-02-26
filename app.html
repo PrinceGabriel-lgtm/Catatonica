@@ -1487,6 +1487,12 @@
     // ─── THREE-VIEW TAB SYSTEM ───
     let activeView = 'active';
 
+    function escHtml(str) {
+      return String(str)
+        .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+        .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
     function switchView(view) {
       activeView = view;
       document.getElementById('activeView').style.display    = view === 'active'    ? '' : 'none';
