@@ -119,6 +119,105 @@
       text-transform: uppercase; color: var(--text-dim);
       line-height: 1.4;
     }
+    .cataton-label-wrap {
+      display: flex; flex-direction: column; gap: 0.2rem;
+    }
+    .cataton-info-btn {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.44rem; letter-spacing: 0.1em;
+      color: var(--text-dim); background: none;
+      border: 1px solid var(--border); cursor: none;
+      width: 14px; height: 14px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      padding: 0; transition: color 0.3s ease, border-color 0.3s ease;
+      line-height: 1;
+    }
+    .cataton-info-btn:hover { color: var(--gold); border-color: rgba(201,168,76,0.3); }
+
+    /* Cataton explainer modal */
+    .cataton-modal-overlay {
+      position: fixed; inset: 0;
+      background: rgba(9,8,6,0.88);
+      z-index: 2000;
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.4s ease;
+      backdrop-filter: blur(8px);
+    }
+    .cataton-modal-overlay.open { opacity: 1; pointer-events: all; }
+
+    .cataton-modal {
+      max-width: 500px; width: 90%;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      padding: 3rem 3.5rem;
+      position: relative;
+      transform: translateY(16px);
+      transition: transform 0.4s ease;
+    }
+    .cataton-modal-overlay.open .cataton-modal { transform: translateY(0); }
+
+    .cataton-modal-close {
+      position: absolute; top: 1.2rem; right: 1.5rem;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.55rem; letter-spacing: 0.15em;
+      text-transform: uppercase; color: var(--text-dim);
+      background: none; border: none; cursor: none;
+      transition: color 0.3s ease;
+    }
+    .cataton-modal-close:hover { color: var(--text-muted); }
+
+    .cataton-modal-eye {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.52rem; letter-spacing: 0.3em;
+      text-transform: uppercase; color: rgba(160,138,110,0.5);
+      margin-bottom: 1.2rem;
+    }
+    .cataton-modal-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2.4rem; font-weight: 300;
+      color: var(--text-primary); line-height: 1.05;
+      margin-bottom: 0.3rem;
+    }
+    .cataton-modal-title em { font-style: italic; color: var(--gold); }
+    .cataton-modal-sub {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.5rem; letter-spacing: 0.18em;
+      text-transform: uppercase; color: var(--text-dim);
+      margin-bottom: 2rem;
+    }
+    .cataton-modal-body {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1rem; font-weight: 300;
+      color: var(--text-muted); line-height: 1.85;
+    }
+    .cataton-modal-body p { margin-bottom: 1.1rem; }
+    .cataton-modal-body p:last-child { margin-bottom: 0; }
+    .cataton-modal-body strong { color: var(--text-primary); font-weight: 400; }
+    .cataton-modal-body em { font-style: italic; color: var(--gold); }
+
+    .cataton-stage-list {
+      margin-top: 1.8rem; padding-top: 1.8rem;
+      border-top: 1px solid var(--border);
+      display: flex; flex-direction: column; gap: 0.7rem;
+    }
+    .cataton-stage-row {
+      display: flex; justify-content: space-between; align-items: baseline;
+    }
+    .csr-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 0.95rem; font-style: italic; color: var(--text-muted);
+    }
+    .csr-range {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.48rem; letter-spacing: 0.14em;
+      text-transform: uppercase; color: var(--text-dim);
+    }
+    .csr-unlock {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.44rem; letter-spacing: 0.1em;
+      text-transform: uppercase; color: rgba(107,163,176,0.45);
+    }
 
     .nav-tabs {
       display: flex; gap: 1px; background: var(--border);
@@ -809,7 +908,10 @@
       </div>
       <div class="nav-catatons">
         <span class="cataton-count" id="totalCatatons">0</span>
-        <span class="cataton-label">Total<br>Catatons</span>
+        <div class="cataton-label-wrap">
+          <span class="cataton-label">Total<br>Catatons</span>
+          <button class="cataton-info-btn" id="catatonInfoBtn" title="What is a Cataton?">?</button>
+        </div>
       </div>
       <div class="nav-tabs">
         <button class="nav-tab active" data-view="active">Void</button>
@@ -903,6 +1005,43 @@
   </main>
 
   <!-- ─── MODALS ─── -->
+
+  <!-- Cataton Explainer Modal -->
+  <div class="cataton-modal-overlay" id="catatonModal">
+    <div class="cataton-modal">
+      <button class="cataton-modal-close" id="catatonModalClose">✕ Close</button>
+      <p class="cataton-modal-eye">Unit of Measurement</p>
+      <h2 class="cataton-modal-title">The <em>Cataton.</em></h2>
+      <p class="cataton-modal-sub">Quantum of potential energy</p>
+      <div class="cataton-modal-body">
+        <p>A Cataton is <strong>one minute of earned stillness.</strong> Not time that passed — time that changed something. The smallest possible unit of silence required to generate an equivalent unit of growth.</p>
+        <p>Like a photon carries light, a Cataton carries <em>potential.</em> You don't spend it. You accumulate it. Each session adds to a lifetime total that never resets — the permanent record of your stillness.</p>
+        <p>When you declare mastery on a storm, those Catatons <strong>crystallize</strong> permanently. The storm closes. A new universe opens. Your total only ever grows.</p>
+      </div>
+      <div class="cataton-stage-list">
+        <div class="cataton-stage-row">
+          <span class="csr-name">Acknowledgement</span>
+          <span class="csr-range">0 – 9</span>
+          <span class="csr-unlock">The Void</span>
+        </div>
+        <div class="cataton-stage-row">
+          <span class="csr-name">Acceptance</span>
+          <span class="csr-range">10 – 29</span>
+          <span class="csr-unlock">+ The Threshold</span>
+        </div>
+        <div class="cataton-stage-row">
+          <span class="csr-name">Receiving</span>
+          <span class="csr-range">30 – 69</span>
+          <span class="csr-unlock">+ The Ignition</span>
+        </div>
+        <div class="cataton-stage-row">
+          <span class="csr-name">The Threshold</span>
+          <span class="csr-range">70 +</span>
+          <span class="csr-unlock">All states</span>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- Session Modal -->
   <div class="modal-overlay" id="sessionModal">
@@ -1484,14 +1623,20 @@
       }, 3200);
     });
 
+    // ─── CATATON EXPLAINER ───
+    document.getElementById('catatonInfoBtn').addEventListener('click', () => {
+      document.getElementById('catatonModal').classList.add('open');
+    });
+    document.getElementById('catatonModalClose').addEventListener('click', () => {
+      document.getElementById('catatonModal').classList.remove('open');
+    });
+    document.getElementById('catatonModal').addEventListener('click', e => {
+      if (e.target === document.getElementById('catatonModal'))
+        document.getElementById('catatonModal').classList.remove('open');
+    });
+
     // ─── THREE-VIEW TAB SYSTEM ───
     let activeView = 'active';
-
-    function escHtml(str) {
-      return String(str)
-        .replace(/&/g,'&amp;').replace(/</g,'&lt;')
-        .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-    }
 
     function switchView(view) {
       activeView = view;
@@ -1501,6 +1646,7 @@
       document.querySelectorAll('.nav-tab').forEach(t =>
         t.classList.toggle('active', t.dataset.view === view)
       );
+      if (view === 'archive')   renderArchive();
       if (view === 'chronicle') renderChronicle();
     }
 
@@ -1508,9 +1654,19 @@
       btn.addEventListener('click', () => switchView(btn.dataset.view));
     });
 
-    // ─── CHRONICLE RENDER ───
+    // ─── CHRONICLE FILTER (bound once) ───
     let chrFilter = 'all';
+    document.querySelectorAll('.chr-filter-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        chrFilter = btn.dataset.mode;
+        document.querySelectorAll('.chr-filter-btn').forEach(b =>
+          b.classList.toggle('active', b.dataset.mode === chrFilter)
+        );
+        renderChronicle();
+      });
+    });
 
+    // ─── CHRONICLE RENDER ───
     function renderChronicle() {
       const chronicle = JSON.parse(localStorage.getItem('cat_chronicle') || '[]');
       const totalCat  = parseInt(localStorage.getItem('cat_total') || '0');
@@ -1523,14 +1679,10 @@
       document.getElementById('chrStatMinutes').textContent   = totalMin.toLocaleString();
       document.getElementById('chrStatCompleted').textContent = totalComp.toLocaleString();
 
-      // Filter buttons
-      document.querySelectorAll('.chr-filter-btn').forEach(btn => {
-        btn.classList.toggle('active', btn.dataset.mode === chrFilter);
-        btn.addEventListener('click', () => {
-          chrFilter = btn.dataset.mode;
-          renderChronicle();
-        });
-      });
+      // Sync filter button states
+      document.querySelectorAll('.chr-filter-btn').forEach(b =>
+        b.classList.toggle('active', b.dataset.mode === chrFilter)
+      );
 
       const filtered = chrFilter === 'all'
         ? chronicle
@@ -1620,7 +1772,9 @@
 
     // ─── HELPERS ───
     function escHtml(str) {
-      return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+      return String(str || '')
+        .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+        .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
     }
 
     function formatDate(ts) {
