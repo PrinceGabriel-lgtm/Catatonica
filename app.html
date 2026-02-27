@@ -3,10 +3,17 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Catatonica — Your Void</title>
+  <meta name="theme-color" content="#080808" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  <meta name="apple-mobile-web-app-title" content="Catatonica" />
+  <title>Catatonica</title>
+  <link rel="manifest" href="manifest.json" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Mono:ital,wght@0,300;0,400;1,300&family=Outfit:wght@200;300;400&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
   <style>
     :root {
       --void: #080808;
@@ -20,9 +27,9 @@
       --text-dim: rgba(232,228,220,0.16);
       --accent: #a89f8c;
       --accent-cold: #7a9ea8;
-      --accent-glow: rgba(122,158,168,0.1);
       --gold: #c4a96d;
       --gold-dim: rgba(196,169,109,0.15);
+      --danger: rgba(200,80,80,0.7);
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -34,889 +41,606 @@
       font-family: 'Outfit', sans-serif;
       font-weight: 300;
       min-height: 100vh;
-      cursor: none;
       overflow-x: hidden;
     }
 
-    /* ─── CURSOR ─── */
-    .cursor {
-      position: fixed; width: 5px; height: 5px;
-      background: var(--accent-cold); border-radius: 50%;
-      pointer-events: none; z-index: 9999;
-      transform: translate(-50%,-50%);
-      transition: transform 0.1s ease;
-      opacity: 0.6;
-    }
-    .cursor-ring {
-      position: fixed; width: 28px; height: 28px;
-      border: 1px solid rgba(122,158,168,0.25); border-radius: 50%;
-      pointer-events: none; z-index: 9998;
-      transform: translate(-50%,-50%);
-      transition: width 0.3s ease, height 0.3s ease;
-      opacity: 0.4;
+    /* ─── CURSOR (desktop only) ─── */
+    @media (hover: hover) {
+      body { cursor: none; }
+      .cursor {
+        position: fixed; width: 5px; height: 5px;
+        background: var(--accent-cold); border-radius: 50%;
+        pointer-events: none; z-index: 9999;
+        transform: translate(-50%,-50%);
+        transition: transform 0.1s ease;
+        opacity: 0.6;
+      }
+      .cursor-ring {
+        position: fixed; width: 28px; height: 28px;
+        border: 1px solid rgba(122,158,168,0.25); border-radius: 50%;
+        pointer-events: none; z-index: 9998;
+        transform: translate(-50%,-50%);
+        transition: width 0.3s ease, height 0.3s ease;
+        opacity: 0.4;
+      }
     }
 
-    /* ─── GRAIN ─── */
-    body::before {
-      content: ''; position: fixed; inset: 0;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
-      pointer-events: none; z-index: 9997; opacity: 0.3;
+    /* ─── SCREENS ─── */
+    .screen { display: none; min-height: 100vh; }
+    .screen.active { display: flex; flex-direction: column; }
+
+    /* ─── LOADING ─── */
+    #loadingScreen {
+      align-items: center; justify-content: center;
+      background: var(--void);
     }
+    .loading-logo {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.2rem; letter-spacing: 0.4em;
+      text-transform: uppercase; color: var(--text-muted);
+      animation: pulse 2s ease infinite;
+    }
+    @keyframes pulse {
+      0%,100% { opacity: 0.3; } 50% { opacity: 0.8; }
+    }
+
+    /* ─── AUTH SCREEN ─── */
+    #authScreen {
+      align-items: center; justify-content: center;
+      padding: 2rem;
+    }
+
+    .auth-box {
+      width: 100%; max-width: 420px;
+      border: 1px solid var(--border);
+      padding: 3rem;
+      background: var(--surface);
+    }
+
+    .auth-logo {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1rem; letter-spacing: 0.35em;
+      text-transform: uppercase; color: var(--text-primary);
+      margin-bottom: 0.4rem;
+    }
+    .auth-logo span { font-style: italic; color: var(--accent); }
+
+    .auth-tagline {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.55rem; letter-spacing: 0.2em;
+      text-transform: uppercase; color: var(--text-dim);
+      margin-bottom: 2.5rem;
+    }
+
+    .auth-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.8rem; font-weight: 300;
+      color: var(--text-primary); margin-bottom: 0.4rem;
+    }
+    .auth-title em { font-style: italic; color: var(--accent); }
+
+    .auth-sub {
+      font-size: 0.8rem; color: var(--text-muted);
+      margin-bottom: 2rem; line-height: 1.6;
+    }
+
+    .field { margin-bottom: 1rem; }
+    .field label {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.55rem; letter-spacing: 0.2em;
+      text-transform: uppercase; color: var(--text-dim);
+      display: block; margin-bottom: 0.5rem;
+    }
+    .field input {
+      width: 100%; background: var(--void);
+      border: 1px solid var(--border); outline: none;
+      padding: 0.9rem 1rem;
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.9rem; font-weight: 300;
+      color: var(--text-primary);
+      transition: border-color 0.3s ease;
+    }
+    .field input:focus { border-color: rgba(122,158,168,0.3); }
+    .field input::placeholder { color: var(--text-dim); }
+
+    .auth-btn {
+      width: 100%; padding: 1rem;
+      background: var(--text-primary); color: var(--void);
+      border: none; cursor: pointer;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.65rem; letter-spacing: 0.2em;
+      text-transform: uppercase;
+      transition: background 0.3s ease;
+      margin-top: 0.5rem;
+    }
+    .auth-btn:hover { background: var(--accent-cold); color: var(--void); }
+    .auth-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    .auth-switch {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.6rem; letter-spacing: 0.1em;
+      color: var(--text-dim); margin-top: 1.5rem;
+      text-align: center;
+    }
+    .auth-switch button {
+      background: none; border: none; cursor: pointer;
+      color: var(--accent-cold);
+      font-family: 'DM Mono', monospace;
+      font-size: 0.6rem; letter-spacing: 0.1em;
+      transition: color 0.3s ease;
+    }
+    .auth-switch button:hover { color: var(--text-primary); }
+
+    .auth-message {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.6rem; letter-spacing: 0.1em;
+      margin-top: 1rem; padding: 0.7rem 1rem;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      display: none;
+      line-height: 1.6;
+    }
+    .auth-message.error { border-color: var(--danger); color: var(--danger); }
+    .auth-message.success { border-color: rgba(122,158,168,0.3); color: var(--accent-cold); }
 
     /* ─── NAV ─── */
     nav {
       position: sticky; top: 0;
       border-bottom: 1px solid var(--border);
-      padding: 1.5rem 3rem;
+      padding: 1.2rem 2.5rem;
       display: flex; justify-content: space-between; align-items: center;
-      background: rgba(8,8,8,0.92);
+      background: rgba(8,8,8,0.94);
       backdrop-filter: blur(12px);
-      z-index: 100;
+      z-index: 100; flex-shrink: 0;
     }
 
     .nav-logo {
       font-family: 'Cormorant Garamond', serif;
-      font-size: 1rem; font-weight: 300;
+      font-size: 0.95rem; font-weight: 300;
       letter-spacing: 0.35em; text-transform: uppercase;
-      color: var(--text-primary); text-decoration: none; cursor: none;
+      color: var(--text-primary); text-decoration: none;
     }
     .nav-logo span { font-style: italic; color: var(--accent); }
 
-    .nav-right {
-      display: flex; align-items: center; gap: 2rem;
-    }
+    .nav-right { display: flex; align-items: center; gap: 1.5rem; }
 
-    .nav-stage {
-      display: flex; flex-direction: column; align-items: flex-end;
-      gap: 0.15rem; padding-right: 1.5rem;
-      border-right: 1px solid var(--border);
+    .total-catatons {
+      display: flex; align-items: center; gap: 0.6rem;
     }
-    .stage-name {
+    .tc-num {
       font-family: 'Cormorant Garamond', serif;
-      font-size: 0.85rem; font-weight: 300; font-style: italic;
-      color: rgba(160,138,110,0.75); letter-spacing: 0.04em;
+      font-size: 1.5rem; font-weight: 300;
+      color: var(--gold); line-height: 1;
     }
-    .stage-sub {
+    .tc-label {
       font-family: 'DM Mono', monospace;
-      font-size: 0.46rem; letter-spacing: 0.22em;
-      text-transform: uppercase; color: var(--text-dim);
-    }
-
-    .nav-catatons {
-      display: flex; align-items: center; gap: 0.7rem;
-    }
-
-    .cataton-count {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 1.6rem; font-weight: 300;
-      color: var(--gold);
-      line-height: 1;
-    }
-
-    .cataton-label {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.55rem; letter-spacing: 0.2em;
+      font-size: 0.5rem; letter-spacing: 0.18em;
       text-transform: uppercase; color: var(--text-dim);
       line-height: 1.4;
     }
-    .cataton-label-wrap {
-      display: flex; flex-direction: column; gap: 0.2rem;
-    }
-    .cataton-info-btn {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.44rem; letter-spacing: 0.1em;
-      color: var(--text-dim); background: none;
-      border: 1px solid var(--border); cursor: none;
-      width: 14px; height: 14px; border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      padding: 0; transition: color 0.3s ease, border-color 0.3s ease;
-      line-height: 1;
-    }
-    .cataton-info-btn:hover { color: var(--gold); border-color: rgba(201,168,76,0.3); }
 
-    /* Cataton explainer modal */
-    .cataton-modal-overlay {
-      position: fixed; inset: 0;
-      background: rgba(9,8,6,0.88);
-      z-index: 2000;
-      display: flex; align-items: center; justify-content: center;
-      opacity: 0; pointer-events: none;
-      transition: opacity 0.4s ease;
-      backdrop-filter: blur(8px);
-    }
-    .cataton-modal-overlay.open { opacity: 1; pointer-events: all; }
-
-    .cataton-modal {
-      max-width: 500px; width: 90%;
-      border: 1px solid var(--border);
-      background: var(--surface);
-      padding: 3rem 3.5rem;
-      position: relative;
-      transform: translateY(16px);
-      transition: transform 0.4s ease;
-    }
-    .cataton-modal-overlay.open .cataton-modal { transform: translateY(0); }
-
-    .cataton-modal-close {
-      position: absolute; top: 1.2rem; right: 1.5rem;
-      font-family: 'DM Mono', monospace;
-      font-size: 0.55rem; letter-spacing: 0.15em;
-      text-transform: uppercase; color: var(--text-dim);
-      background: none; border: none; cursor: none;
-      transition: color 0.3s ease;
-    }
-    .cataton-modal-close:hover { color: var(--text-muted); }
-
-    .cataton-modal-eye {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.52rem; letter-spacing: 0.3em;
-      text-transform: uppercase; color: rgba(160,138,110,0.5);
-      margin-bottom: 1.2rem;
-    }
-    .cataton-modal-title {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 2.4rem; font-weight: 300;
-      color: var(--text-primary); line-height: 1.05;
-      margin-bottom: 0.3rem;
-    }
-    .cataton-modal-title em { font-style: italic; color: var(--gold); }
-    .cataton-modal-sub {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.5rem; letter-spacing: 0.18em;
-      text-transform: uppercase; color: var(--text-dim);
-      margin-bottom: 2rem;
-    }
-    .cataton-modal-body {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 1rem; font-weight: 300;
-      color: var(--text-muted); line-height: 1.85;
-    }
-    .cataton-modal-body p { margin-bottom: 1.1rem; }
-    .cataton-modal-body p:last-child { margin-bottom: 0; }
-    .cataton-modal-body strong { color: var(--text-primary); font-weight: 400; }
-    .cataton-modal-body em { font-style: italic; color: var(--gold); }
-
-    .cataton-stage-list {
-      margin-top: 1.8rem; padding-top: 1.8rem;
-      border-top: 1px solid var(--border);
-      display: flex; flex-direction: column; gap: 0.7rem;
-    }
-    .cataton-stage-row {
-      display: flex; justify-content: space-between; align-items: baseline;
-    }
-    .csr-name {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 0.95rem; font-style: italic; color: var(--text-muted);
-    }
-    .csr-range {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.48rem; letter-spacing: 0.14em;
-      text-transform: uppercase; color: var(--text-dim);
-    }
-    .csr-unlock {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.44rem; letter-spacing: 0.1em;
-      text-transform: uppercase; color: rgba(107,163,176,0.45);
-    }
-
-    .nav-tabs {
-      display: flex; gap: 1px; background: var(--border);
-      border: 1px solid var(--border);
-    }
-    .nav-tab {
-      background: var(--void); border: none; cursor: none;
+    .nav-btn {
       font-family: 'DM Mono', monospace;
       font-size: 0.58rem; letter-spacing: 0.18em;
-      text-transform: uppercase; color: var(--text-dim);
-      padding: 0.55rem 1.1rem;
-      transition: background 0.25s ease, color 0.25s ease;
-      position: relative;
+      text-transform: uppercase; color: var(--text-muted);
+      background: none; border: none; cursor: pointer;
+      transition: color 0.3s ease; padding: 0;
     }
-    .nav-tab:hover { color: var(--text-muted); background: var(--deep); }
-    .nav-tab.active { color: var(--text-primary); background: var(--surface); }
-    .nav-tab.active::after {
-      content: ''; position: absolute; bottom: 0; left: 0; right: 0;
-      height: 1px; background: var(--gold);
-    }
+    .nav-btn:hover { color: var(--text-primary); }
+    .nav-btn.active { color: var(--accent-cold); }
 
-    /* ─── CHRONICLE VIEW ─── */
-    #chronicleView { display: none; }
-
-    .chronicle-stats {
-      display: grid; grid-template-columns: repeat(4, 1fr);
-      gap: 1px; background: var(--border);
-      border: 1px solid var(--border); margin-bottom: 3rem;
-    }
-    .chr-stat {
-      background: var(--void); padding: 1.5rem 1.8rem;
-    }
-    .chr-stat-num {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 2rem; font-weight: 300;
-      color: var(--gold); line-height: 1; display: block; margin-bottom: 0.25rem;
-    }
-    .chr-stat-label {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.48rem; letter-spacing: 0.18em;
-      text-transform: uppercase; color: var(--text-dim);
-    }
-
-    .chr-filter {
-      display: flex; gap: 1px; background: var(--border);
-      border: 1px solid var(--border); margin-bottom: 2rem;
-    }
-    .chr-filter-btn {
-      flex: 1; background: var(--void); border: none;
-      padding: 0.75rem 0.5rem; cursor: none; text-align: center;
-      font-family: 'DM Mono', monospace; font-size: 0.52rem;
-      letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-dim);
-      transition: background 0.25s ease, color 0.25s ease; position: relative;
-    }
-    .chr-filter-btn:hover { background: var(--deep); color: var(--text-muted); }
-    .chr-filter-btn.active { background: var(--surface); color: var(--text-primary); }
-    .chr-filter-btn.active::after {
-      content: ''; position: absolute; bottom: 0; left: 0; right: 0;
-      height: 1px; background: var(--gold);
-    }
-
-    .chronicle-list {
-      display: flex; flex-direction: column; gap: 1px;
-    }
-
-    .chr-entry {
-      background: var(--surface); border: 1px solid var(--border);
-      position: relative; overflow: hidden;
-      transition: border-color 0.3s ease;
-      animation: fadeUp 0.5s ease forwards; opacity: 0;
-    }
-    .chr-entry:hover { border-color: var(--border-hover); }
-
-    /* mode accent — left edge */
-    .chr-entry::before {
-      content: ''; position: absolute;
-      top: 0; left: 0; bottom: 0; width: 1px;
-    }
-    .chr-entry[data-mode="silence"]::before  { background: rgba(201,168,76,0.4); }
-    .chr-entry[data-mode="sound"]::before    { background: rgba(160,138,110,0.4); }
-    .chr-entry[data-mode="visual"]::before   { background: rgba(107,163,176,0.4); }
-
-    .chr-entry-inner {
-      padding: 1.6rem 2rem 1.6rem 2.4rem;
-      display: grid; grid-template-columns: 1fr auto;
-      gap: 1.5rem; align-items: start;
-    }
-
-    .chr-meta-row {
-      display: flex; align-items: center; gap: 1rem;
-      margin-bottom: 0.9rem; flex-wrap: wrap;
-    }
-    .chr-date {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.5rem; letter-spacing: 0.18em;
-      text-transform: uppercase; color: var(--text-dim);
-    }
-    .chr-mode-pill {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.45rem; letter-spacing: 0.14em;
-      text-transform: uppercase; padding: 0.18rem 0.5rem;
-      border: 1px solid var(--border);
-    }
-    .chr-mode-pill.void-pill     { border-color: rgba(201,168,76,0.2);  color: rgba(201,168,76,0.55); }
-    .chr-mode-pill.thresh-pill   { border-color: rgba(160,138,110,0.2); color: rgba(160,138,110,0.55); }
-    .chr-mode-pill.ignition-pill { border-color: rgba(107,163,176,0.2); color: rgba(107,163,176,0.55); }
-    .chr-stage-pill {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.43rem; letter-spacing: 0.12em;
-      text-transform: uppercase; color: rgba(160,138,110,0.45);
-    }
-
-    .chr-echo-row {
-      display: flex; gap: 0.6rem; align-items: baseline;
-      margin-bottom: 0.45rem;
-    }
-    .chr-echo-key {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.44rem; letter-spacing: 0.14em;
-      text-transform: uppercase; color: var(--text-dim);
-      flex-shrink: 0; width: 68px;
-    }
-    .chr-echo-val {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 0.9rem; font-style: italic;
-      color: var(--text-muted); line-height: 1.5;
-    }
-
-    .chr-right { text-align: right; flex-shrink: 0; }
-    .chr-catatons {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 2.2rem; font-weight: 300;
-      color: var(--gold); line-height: 1; display: block;
-    }
-    .chr-catatons-label {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.44rem; letter-spacing: 0.16em;
-      text-transform: uppercase; color: var(--text-dim);
-      display: block; margin-bottom: 0.4rem;
-    }
-    .chr-duration {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.48rem; letter-spacing: 0.1em;
-      text-transform: uppercase; color: var(--text-dim);
-    }
-    .chr-early-tag {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.42rem; letter-spacing: 0.1em;
-      text-transform: uppercase; color: rgba(107,163,176,0.35);
-      display: block; margin-top: 0.3rem;
-    }
-
-    /* ─── CHRONICLE CHAPTERS ─── */
-    .chr-chapter { margin-bottom: 3rem; }
-    .chr-chapter-header {
-      display: flex; justify-content: space-between; align-items: baseline;
-      padding: 0.8rem 0; border-bottom: 1px solid var(--border);
-      margin-bottom: 1px; cursor: none;
-    }
-    .chr-chapter-name {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 1.15rem; font-weight: 300; font-style: italic;
-      color: var(--text-primary);
-    }
-    .chr-chapter-stats {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.46rem; letter-spacing: 0.15em;
-      text-transform: uppercase; color: var(--text-dim);
-      display: flex; gap: 1.5rem;
-    }
-    .chr-chapter-stats em { color: rgba(201,168,76,0.55); font-style: normal; }
-    .chr-unsituated-label {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.5rem; letter-spacing: 0.22em;
-      text-transform: uppercase; color: var(--text-dim);
-      padding: 0.8rem 0; border-bottom: 1px solid var(--border);
-      margin-bottom: 1px;
-    }
-
-    /* ─── MAIN ─── */
-    main {
-      max-width: 900px;
-      margin: 0 auto;
-      padding: 4rem 3rem 8rem;
+    /* ─── MAIN CONTENT ─── */
+    .app-content {
+      flex: 1; max-width: 860px;
+      margin: 0 auto; width: 100%;
+      padding: 3.5rem 2.5rem 7rem;
     }
 
     /* ─── PAGE HEADER ─── */
-    .page-header {
-      margin-bottom: 4rem;
-      animation: fadeUp 0.8s ease forwards;
-    }
-
+    .page-header { margin-bottom: 3rem; }
     .page-eyebrow {
       font-family: 'DM Mono', monospace;
-      font-size: 0.58rem; letter-spacing: 0.3em;
+      font-size: 0.55rem; letter-spacing: 0.28em;
       text-transform: uppercase; color: var(--accent-cold);
-      margin-bottom: 1rem; opacity: 0.7;
+      margin-bottom: 0.8rem; opacity: 0.7;
     }
-
     .page-title {
       font-family: 'Cormorant Garamond', serif;
-      font-size: clamp(2rem, 4vw, 3rem);
+      font-size: clamp(1.8rem, 4vw, 2.8rem);
       font-weight: 300; color: var(--text-primary);
       line-height: 1.1;
     }
     .page-title em { font-style: italic; color: var(--accent); }
 
     /* ─── ADD SITUATION ─── */
-    .add-situation {
+    .add-bar {
       border: 1px solid var(--border);
-      margin-bottom: 1px;
-      position: relative;
       transition: border-color 0.3s ease;
+      margin-bottom: 1px;
     }
-    .add-situation:hover { border-color: var(--border-hover); }
+    .add-bar:focus-within { border-color: rgba(122,158,168,0.2); }
 
-    .add-situation-inner {
-      padding: 2rem 2.5rem;
-      display: flex; align-items: center; gap: 1.5rem;
+    .add-inner {
+      padding: 1.4rem 2rem;
+      display: flex; align-items: center; gap: 1.2rem;
     }
 
-    .add-icon {
-      width: 32px; height: 32px; flex-shrink: 0;
-      border: 1px solid var(--border);
-      border-radius: 50%;
+    .add-plus {
+      width: 28px; height: 28px; flex-shrink: 0;
+      border: 1px solid var(--border); border-radius: 50%;
       display: flex; align-items: center; justify-content: center;
-      color: var(--text-dim);
-      font-size: 1.2rem;
-      font-weight: 200;
+      color: var(--text-dim); font-size: 1rem;
       transition: border-color 0.3s ease, color 0.3s ease;
     }
-
-    .add-situation:hover .add-icon {
-      border-color: var(--accent-cold);
-      color: var(--accent-cold);
+    .add-bar:focus-within .add-plus {
+      border-color: var(--accent-cold); color: var(--accent-cold);
     }
 
     .add-input {
       flex: 1; background: transparent; border: none; outline: none;
       font-family: 'Cormorant Garamond', serif;
-      font-size: 1.2rem; font-weight: 300;
+      font-size: 1.1rem; font-weight: 300; font-style: italic;
       color: var(--text-primary);
-      cursor: none;
     }
-    .add-input::placeholder { color: var(--text-dim); font-style: italic; }
+    .add-input::placeholder { color: var(--text-dim); }
 
-    .add-confirm {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.6rem; letter-spacing: 0.2em;
-      text-transform: uppercase; color: var(--text-dim);
-      background: none; border: none; cursor: none;
-      transition: color 0.3s ease;
-      opacity: 0;
-      transition: opacity 0.3s ease, color 0.3s ease;
-    }
-    .add-confirm.visible { opacity: 1; }
-    .add-confirm:hover { color: var(--accent-cold); }
-
-    /* ─── FREE TIER NOTICE ─── */
-    .tier-notice {
+    .add-enter {
       font-family: 'DM Mono', monospace;
       font-size: 0.58rem; letter-spacing: 0.15em;
-      text-transform: uppercase;
-      color: var(--text-dim);
-      padding: 0.8rem 2.5rem;
-      border: 1px solid var(--border);
-      border-top: none;
-      margin-bottom: 3rem;
+      text-transform: uppercase; color: var(--text-dim);
+      background: none; border: none; cursor: pointer;
+      transition: color 0.3s ease;
+      opacity: 0; pointer-events: none;
+    }
+    .add-enter.show { opacity: 1; pointer-events: all; }
+    .add-enter:hover { color: var(--accent-cold); }
+
+    /* ─── TIER BAR ─── */
+    .tier-bar {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.55rem; letter-spacing: 0.13em;
+      text-transform: uppercase; color: var(--text-dim);
+      padding: 0.7rem 2rem;
+      border: 1px solid var(--border); border-top: none;
+      margin-bottom: 2.5rem;
       display: flex; justify-content: space-between; align-items: center;
     }
-
-    .tier-upgrade {
-      color: var(--accent-cold);
-      background: none; border: none; cursor: none;
-      font-family: 'DM Mono', monospace;
-      font-size: 0.58rem; letter-spacing: 0.15em;
+    .upgrade-link {
+      color: var(--accent-cold); background: none; border: none;
+      cursor: pointer; font-family: 'DM Mono', monospace;
+      font-size: 0.55rem; letter-spacing: 0.13em;
       text-transform: uppercase;
       transition: color 0.3s ease;
     }
-    .tier-upgrade:hover { color: var(--text-primary); }
+    .upgrade-link:hover { color: var(--text-primary); }
 
     /* ─── SECTION LABEL ─── */
-    .section-label {
+    .section-lbl {
       font-family: 'DM Mono', monospace;
-      font-size: 0.58rem; letter-spacing: 0.28em;
+      font-size: 0.55rem; letter-spacing: 0.26em;
       text-transform: uppercase; color: var(--text-dim);
       margin-bottom: 1px;
     }
 
-    /* ─── SITUATION CARD ─── */
-    .situations-list {
-      display: flex; flex-direction: column; gap: 1px;
-      margin-bottom: 4rem;
-    }
+    /* ─── SITUATIONS LIST ─── */
+    .sit-list { display: flex; flex-direction: column; gap: 1px; }
 
-    .situation-card {
+    /* ─── SITUATION CARD ─── */
+    .sit-card {
       background: var(--surface);
       border: 1px solid var(--border);
       position: relative; overflow: hidden;
-      transition: border-color 0.4s ease, background 0.4s ease;
-      animation: fadeUp 0.6s ease forwards;
-      opacity: 0;
+      transition: border-color 0.3s ease, background 0.3s ease;
     }
+    .sit-card:hover { border-color: var(--border-hover); background: var(--surface2); }
 
-    .situation-card:hover {
-      border-color: var(--border-hover);
-      background: var(--surface2);
+    .progress-bar {
+      position: absolute; bottom: 0; left: 0; height: 1px;
+      background: var(--accent-cold); opacity: 0.4;
+      transition: width 1s ease;
     }
+    .progress-bar.threshold { background: var(--gold); opacity: 0.7; height: 2px; }
 
-    /* Cataton fill bar — bottom accent */
-    .cataton-bar {
-      position: absolute; bottom: 0; left: 0;
-      height: 1px; background: var(--accent-cold);
-      transition: width 0.8s ease;
-      opacity: 0.5;
-    }
-
-    .cataton-bar.threshold-reached {
-      background: var(--gold);
-      opacity: 0.8;
-      height: 2px;
-    }
-
-    .situation-main {
-      padding: 2rem 2.5rem;
+    .sit-main {
+      padding: 1.8rem 2rem;
       display: grid;
       grid-template-columns: 1fr auto;
-      gap: 2rem; align-items: center;
+      gap: 1.5rem; align-items: center;
     }
 
-    .situation-left {}
-
-    .situation-name {
+    .sit-name {
       font-family: 'Cormorant Garamond', serif;
-      font-size: 1.3rem; font-weight: 300;
-      color: var(--text-primary);
-      margin-bottom: 0.5rem;
-      line-height: 1.2;
+      font-size: 1.2rem; font-weight: 300;
+      color: var(--text-primary); margin-bottom: 0.4rem;
     }
 
-    .situation-meta {
-      display: flex; align-items: center; gap: 1.5rem;
+    .sit-meta {
+      display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;
     }
-
-    .situation-sessions {
+    .sit-sessions {
       font-family: 'DM Mono', monospace;
-      font-size: 0.58rem; letter-spacing: 0.12em;
+      font-size: 0.55rem; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--text-dim);
+    }
+    .threshold-badge {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.52rem; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--gold);
+      border: 1px solid rgba(196,169,109,0.25);
+      padding: 0.2rem 0.5rem;
+      opacity: 0; transition: opacity 0.4s ease;
+    }
+    .threshold-badge.show { opacity: 1; }
+
+    .sit-right { display: flex; align-items: center; gap: 1rem; }
+
+    .cataton-display { text-align: right; }
+    .cat-num {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2rem; font-weight: 300;
+      color: var(--gold); line-height: 1; display: block;
+    }
+    .cat-unit {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.48rem; letter-spacing: 0.18em;
       text-transform: uppercase; color: var(--text-dim);
     }
 
-    .situation-threshold {
+    .sit-actions { display: flex; flex-direction: column; gap: 0.4rem; }
+
+    .s-btn {
       font-family: 'DM Mono', monospace;
-      font-size: 0.58rem; letter-spacing: 0.12em;
-      text-transform: uppercase;
-      padding: 0.25rem 0.6rem;
-      border: 1px solid rgba(196,169,109,0.2);
-      color: var(--gold);
-      opacity: 0;
-      transition: opacity 0.5s ease;
-    }
-    .situation-threshold.visible { opacity: 1; }
-
-    .situation-right {
-      display: flex; align-items: center; gap: 1.2rem;
-    }
-
-    /* Cataton display */
-    .cataton-display {
-      text-align: right;
-    }
-    .cataton-num {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 2.2rem; font-weight: 300;
-      color: var(--gold); line-height: 1;
-      display: block;
-    }
-    .cataton-unit {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.5rem; letter-spacing: 0.2em;
-      text-transform: uppercase; color: var(--text-dim);
-    }
-
-    /* Situation actions */
-    .situation-actions {
-      display: flex; flex-direction: column; gap: 0.5rem;
-    }
-
-    .sit-btn {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.58rem; letter-spacing: 0.15em;
-      text-transform: uppercase; cursor: none;
-      background: none; border: none;
-      padding: 0.4rem 0.8rem;
-      border: 1px solid var(--border);
-      color: var(--text-muted);
+      font-size: 0.55rem; letter-spacing: 0.13em;
+      text-transform: uppercase; cursor: pointer;
+      background: none; border: 1px solid var(--border);
+      color: var(--text-muted); padding: 0.35rem 0.7rem;
       white-space: nowrap;
       transition: all 0.3s ease;
     }
-    .sit-btn:hover { color: var(--text-primary); border-color: var(--border-hover); }
-    .sit-btn.primary {
-      background: var(--text-primary); color: var(--void);
-      border-color: transparent;
-    }
-    .sit-btn.primary:hover { background: var(--accent-cold); }
-    .sit-btn.gold {
-      border-color: rgba(196,169,109,0.3);
-      color: var(--gold);
-    }
-    .sit-btn.gold:hover {
-      background: var(--gold-dim);
-      border-color: rgba(196,169,109,0.5);
-    }
-
-    /* Expanded manifesto area */
-    .situation-manifesto {
-      border-top: 1px solid var(--border);
-      padding: 0 2.5rem;
-      max-height: 0; overflow: hidden;
-      transition: max-height 0.5s ease, padding 0.3s ease;
-    }
-    .situation-manifesto.open {
-      max-height: 300px;
-      padding: 1.5rem 2.5rem;
-    }
-
-    .manifesto-label {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.55rem; letter-spacing: 0.2em;
-      text-transform: uppercase; color: var(--accent-cold);
-      margin-bottom: 0.8rem; opacity: 0.6;
-    }
-
-    .manifesto-textarea {
-      width: 100%; background: transparent;
-      border: none; border-bottom: 1px solid var(--border);
-      outline: none; resize: none;
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 1rem; font-style: italic; font-weight: 300;
-      color: var(--text-muted); line-height: 1.8;
-      padding: 0.5rem 0;
-      transition: color 0.3s ease, border-color 0.3s ease;
-      min-height: 60px;
-    }
-    .manifesto-textarea::placeholder { color: var(--text-dim); }
-    .manifesto-textarea:focus {
-      color: var(--text-primary);
-      border-color: rgba(122,158,168,0.2);
-    }
-
-    .manifesto-save {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.55rem; letter-spacing: 0.15em;
-      text-transform: uppercase; color: var(--text-dim);
-      background: none; border: none; cursor: none;
-      margin-top: 0.8rem; padding: 0;
-      transition: color 0.3s ease;
-    }
-    .manifesto-save:hover { color: var(--accent-cold); }
+    .s-btn:hover { color: var(--text-primary); border-color: var(--border-hover); }
+    .s-btn.primary { background: var(--text-primary); color: var(--void); border-color: transparent; }
+    .s-btn.primary:hover { background: var(--accent-cold); }
+    .s-btn.gold { border-color: rgba(196,169,109,0.3); color: var(--gold); }
+    .s-btn.gold:hover { background: var(--gold-dim); border-color: rgba(196,169,109,0.5); }
+    .s-btn.danger { border-color: rgba(200,80,80,0.2); color: rgba(200,80,80,0.6); }
+    .s-btn.danger:hover { border-color: rgba(200,80,80,0.4); color: rgba(200,80,80,0.9); }
 
     /* ─── EMPTY STATE ─── */
-    .empty-state {
-      text-align: center; padding: 5rem 2rem;
+    .empty {
       border: 1px solid var(--border);
+      padding: 4rem 2rem; text-align: center;
     }
-
     .empty-title {
       font-family: 'Cormorant Garamond', serif;
-      font-size: 1.6rem; font-weight: 300; font-style: italic;
-      color: var(--text-muted); margin-bottom: 1rem;
+      font-size: 1.4rem; font-weight: 300; font-style: italic;
+      color: var(--text-muted); margin-bottom: 0.8rem;
     }
     .empty-sub {
       font-family: 'DM Mono', monospace;
-      font-size: 0.6rem; letter-spacing: 0.15em;
+      font-size: 0.58rem; letter-spacing: 0.13em;
       text-transform: uppercase; color: var(--text-dim);
     }
 
-    /* ─── ARCHIVE VIEW ─── */
-    #archiveView {
-      display: none;
-    }
-
-    .archive-list {
-      display: flex; flex-direction: column; gap: 1px;
-    }
-
+    /* ─── ARCHIVE ─── */
+    .archive-list { display: flex; flex-direction: column; gap: 1px; }
     .archive-card {
       background: var(--deep);
       border: 1px solid var(--border);
-      padding: 1.5rem 2.5rem;
+      padding: 1.4rem 2rem;
       display: grid; grid-template-columns: 1fr auto;
-      gap: 2rem; align-items: center;
-      opacity: 0.6;
-      transition: opacity 0.3s ease;
+      gap: 1.5rem; align-items: center;
+      opacity: 0.55; transition: opacity 0.3s ease;
     }
     .archive-card:hover { opacity: 1; }
-
-    .archive-name {
+    .arc-name {
       font-family: 'Cormorant Garamond', serif;
       font-size: 1.1rem; font-weight: 300; font-style: italic;
       color: var(--text-muted);
     }
-
-    .archive-meta {
+    .arc-meta {
       font-family: 'DM Mono', monospace;
-      font-size: 0.55rem; letter-spacing: 0.12em;
+      font-size: 0.53rem; letter-spacing: 0.1em;
       text-transform: uppercase; color: var(--text-dim);
       margin-top: 0.3rem;
     }
-
-    .archive-catatons {
+    .arc-genesis {
       font-family: 'Cormorant Garamond', serif;
-      font-size: 1.4rem; font-weight: 300;
+      font-size: 0.9rem; font-style: italic;
+      color: var(--text-muted); margin-top: 0.5rem;
+      line-height: 1.6;
+    }
+    .arc-catatons {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.3rem; font-weight: 300;
       color: var(--gold); opacity: 0.5;
     }
 
-    /* ─── MODAL OVERLAY ─── */
-    .modal-overlay {
+    /* ─── MODALS ─── */
+    .overlay {
       position: fixed; inset: 0;
-      background: rgba(8,8,8,0.92);
-      z-index: 1000;
+      background: rgba(8,8,8,0.9);
+      z-index: 500;
       display: flex; align-items: center; justify-content: center;
+      padding: 1.5rem;
       opacity: 0; pointer-events: none;
-      transition: opacity 0.4s ease;
-      backdrop-filter: blur(8px);
+      transition: opacity 0.35s ease;
+      backdrop-filter: blur(6px);
     }
-    .modal-overlay.open { opacity: 1; pointer-events: all; }
+    .overlay.open { opacity: 1; pointer-events: all; }
 
     .modal {
-      max-width: 520px; width: 90%;
+      width: 100%; max-width: 500px;
       border: 1px solid var(--border);
       background: var(--surface);
-      padding: 3.5rem;
+      padding: 3rem;
       position: relative;
-      transform: translateY(20px);
-      transition: transform 0.4s ease;
+      transform: translateY(16px);
+      transition: transform 0.35s ease;
     }
-    .modal-overlay.open .modal { transform: translateY(0); }
+    .overlay.open .modal { transform: translateY(0); }
 
     .modal-eyebrow {
       font-family: 'DM Mono', monospace;
-      font-size: 0.58rem; letter-spacing: 0.25em;
+      font-size: 0.55rem; letter-spacing: 0.24em;
       text-transform: uppercase; color: var(--accent-cold);
-      margin-bottom: 1.5rem; opacity: 0.7;
+      margin-bottom: 1.2rem; opacity: 0.7;
     }
-
     .modal-title {
       font-family: 'Cormorant Garamond', serif;
-      font-size: 2.2rem; font-weight: 300;
-      color: var(--text-primary); margin-bottom: 0.5rem;
-      line-height: 1.1;
+      font-size: 2rem; font-weight: 300;
+      color: var(--text-primary); line-height: 1.1;
+      margin-bottom: 0.4rem;
     }
     .modal-title em { font-style: italic; color: var(--accent); }
-
-    .modal-situation {
+    .modal-sit {
       font-family: 'Cormorant Garamond', serif;
-      font-size: 1rem; font-style: italic;
-      color: var(--text-muted); margin-bottom: 2.5rem;
+      font-size: 0.95rem; font-style: italic;
+      color: var(--text-muted); margin-bottom: 2rem;
     }
-
-    .modal-textarea {
-      width: 100%; background: var(--void);
-      border: 1px solid var(--border);
-      padding: 1.2rem 1.5rem; outline: none; resize: none;
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 1rem; font-style: italic; font-weight: 300;
-      color: var(--text-primary); line-height: 1.8; min-height: 120px;
-      transition: border-color 0.3s ease;
-      cursor: none;
-    }
-    .modal-textarea::placeholder { color: var(--text-dim); }
-    .modal-textarea:focus { border-color: rgba(122,158,168,0.2); }
-
-    .modal-textarea.dissolving {
-      opacity: 0; filter: blur(8px);
-      transform: translateY(-4px);
-      transition: opacity 1.4s ease, filter 1.4s ease, transform 1.4s ease;
-    }
-
-    .modal-actions {
-      display: flex; gap: 0.8rem; margin-top: 2rem;
-    }
-
-    .modal-release-msg {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 1.1rem; font-style: italic;
-      color: var(--accent-cold);
-      margin-top: 1.5rem; min-height: 1.5rem;
-      opacity: 0; transition: opacity 0.6s ease;
-    }
-    .modal-release-msg.visible { opacity: 1; }
 
     .modal-close {
-      position: absolute; top: 1.5rem; right: 1.5rem;
+      position: absolute; top: 1.2rem; right: 1.2rem;
       font-family: 'DM Mono', monospace;
-      font-size: 0.6rem; letter-spacing: 0.15em;
+      font-size: 0.58rem; letter-spacing: 0.13em;
       text-transform: uppercase; color: var(--text-dim);
-      background: none; border: none; cursor: none;
+      background: none; border: none; cursor: pointer;
       transition: color 0.3s ease;
     }
     .modal-close:hover { color: var(--text-muted); }
 
-    /* ─── MASTERY MODAL ─── */
+    .modal-textarea {
+      width: 100%; background: var(--void);
+      border: 1px solid var(--border);
+      padding: 1rem 1.2rem; outline: none; resize: none;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1rem; font-style: italic; font-weight: 300;
+      color: var(--text-primary); line-height: 1.8; min-height: 110px;
+      transition: border-color 0.3s ease;
+    }
+    .modal-textarea::placeholder { color: var(--text-dim); }
+    .modal-textarea:focus { border-color: rgba(122,158,168,0.2); }
+    .modal-textarea.dissolving {
+      opacity: 0; filter: blur(8px); transform: translateY(-4px);
+      transition: opacity 1.4s ease, filter 1.4s ease, transform 1.4s ease;
+    }
+
+    .modal-actions { display: flex; gap: 0.8rem; margin-top: 1.5rem; }
+
+    .modal-release {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1rem; font-style: italic;
+      color: var(--accent-cold);
+      margin-top: 1.2rem; min-height: 1.4rem;
+      opacity: 0; transition: opacity 0.6s ease;
+    }
+    .modal-release.show { opacity: 1; }
+
+    /* Session modal specifics */
+    .mode-grid {
+      display: grid; grid-template-columns: repeat(3,1fr);
+      gap: 1px; background: var(--border);
+      border: 1px solid var(--border); margin-bottom: 1px;
+    }
+    .mode-btn {
+      background: var(--void); border: none;
+      padding: 1rem 0.5rem; cursor: pointer; text-align: center;
+      transition: background 0.3s ease; position: relative;
+    }
+    .mode-btn:hover, .mode-btn.active { background: var(--surface2); }
+    .mode-btn.active::after {
+      content: ''; position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 1px; background: var(--accent-cold);
+    }
+    .mode-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 0.95rem; color: var(--text-primary); display: block;
+    }
+    .mode-desc {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.5rem; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--text-dim);
+    }
+
+    .dur-grid {
+      display: flex; gap: 1px;
+      background: var(--border); border: 1px solid var(--border);
+      margin-bottom: 1.5rem;
+    }
+    .dur-btn {
+      flex: 1; background: var(--void); border: none;
+      padding: 0.7rem; cursor: pointer;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.6rem; letter-spacing: 0.08em;
+      text-transform: uppercase; color: var(--text-muted);
+      transition: background 0.3s ease, color 0.3s ease;
+      position: relative;
+    }
+    .dur-btn:hover, .dur-btn.active { background: var(--surface2); color: var(--text-primary); }
+    .dur-btn.active::after {
+      content: ''; position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 1px; background: var(--accent-cold);
+    }
+
+    /* Mastery modal */
+    .mastery-num {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 3.5rem; font-weight: 300;
+      color: var(--gold); text-align: center;
+      display: block; margin: 1rem 0 0.3rem;
+    }
+    .mastery-num-lbl {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.52rem; letter-spacing: 0.22em;
+      text-transform: uppercase; color: var(--text-dim);
+      text-align: center; display: block; margin-bottom: 1.5rem;
+    }
     .mastery-nudge {
       font-family: 'Cormorant Garamond', serif;
       font-size: 0.95rem; font-style: italic;
       color: var(--text-muted); line-height: 1.7;
-      margin-bottom: 2rem;
+      margin-bottom: 1.5rem;
     }
     .mastery-nudge em { color: var(--gold); font-style: normal; }
 
-    .cataton-final {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 4rem; font-weight: 300;
-      color: var(--gold); text-align: center;
-      margin: 1.5rem 0;
-      display: block;
-    }
-    .cataton-final-label {
+    /* ─── TOAST ─── */
+    .toast {
+      position: fixed; bottom: 2rem; left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: var(--surface2); border: 1px solid var(--border);
+      padding: 0.8rem 1.5rem;
       font-family: 'DM Mono', monospace;
-      font-size: 0.58rem; letter-spacing: 0.25em;
-      text-transform: uppercase; color: var(--text-dim);
-      text-align: center; display: block;
-      margin-bottom: 2rem;
-    }
-
-    /* ─── SESSION SELECT MODAL ─── */
-    .session-modes {
-      display: grid; grid-template-columns: repeat(3, 1fr);
-      gap: 1px; background: var(--border);
-      border: 1px solid var(--border); margin-bottom: 1.5rem;
-    }
-    .sess-mode-btn {
-      background: var(--void); border: none;
-      padding: 1.2rem 1rem; cursor: none; text-align: center;
-      transition: background 0.3s ease;
-    }
-    .sess-mode-btn:hover, .sess-mode-btn.active { background: var(--surface2); }
-    .sess-mode-btn.active { position: relative; }
-    .sess-mode-btn.active::after {
-      content: ''; position: absolute;
-      bottom: 0; left: 0; right: 0;
-      height: 1px; background: var(--accent-cold);
-    }
-    .sess-mode-name {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 1rem; font-weight: 300;
-      color: var(--text-primary); display: block;
-    }
-    .sess-mode-desc {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.52rem; letter-spacing: 0.1em;
-      text-transform: uppercase; color: var(--text-dim);
-    }
-
-    .session-durations {
-      display: flex; gap: 1px;
-      background: var(--border); border: 1px solid var(--border);
-      margin-bottom: 2rem;
-    }
-    .sess-dur-btn {
-      flex: 1; background: var(--void);
-      border: none; padding: 0.8rem;
-      cursor: none; text-align: center;
-      font-family: 'DM Mono', monospace;
-      font-size: 0.62rem; letter-spacing: 0.1em;
+      font-size: 0.6rem; letter-spacing: 0.15em;
       text-transform: uppercase; color: var(--text-muted);
-      transition: background 0.3s ease, color 0.3s ease;
+      z-index: 9999;
+      transition: transform 0.4s ease;
+      pointer-events: none;
     }
-    .sess-dur-btn:hover, .sess-dur-btn.active {
-      background: var(--surface2); color: var(--text-primary);
-    }
-    .sess-dur-btn.active { position: relative; }
-    .sess-dur-btn.active::after {
-      content: ''; position: absolute;
-      bottom: 0; left: 0; right: 0;
-      height: 1px; background: var(--accent-cold);
-    }
+    .toast.show { transform: translateX(-50%) translateY(0); }
 
-    /* ─── ANIMATIONS ─── */
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(16px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
+    /* ─── CATATON POP ─── */
     @keyframes catatonPop {
       0% { transform: scale(1); }
-      50% { transform: scale(1.3); color: var(--gold); }
+      40% { transform: scale(1.4); color: var(--gold); }
       100% { transform: scale(1); }
     }
-    .cataton-pop { animation: catatonPop 0.5s ease; }
+    .pop { animation: catatonPop 0.5s ease; }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .fade-up { animation: fadeUp 0.5s ease forwards; }
 
     /* ─── RESPONSIVE ─── */
-    @media (max-width: 640px) {
-      nav { padding: 1.2rem 1.5rem; }
-      main { padding: 2.5rem 1.5rem 6rem; }
-      .situation-main { grid-template-columns: 1fr; gap: 1rem; }
-      .situation-right { justify-content: space-between; }
-      .session-modes { grid-template-columns: 1fr; }
-      .modal { padding: 2.5rem 2rem; }
+    @media (max-width: 600px) {
+      nav { padding: 1rem 1.2rem; }
+      .app-content { padding: 2rem 1.2rem 6rem; }
+      .sit-main { grid-template-columns: 1fr; gap: 1rem; }
+      .sit-right { justify-content: space-between; }
+      .mode-grid { grid-template-columns: 1fr; }
+      .modal { padding: 2rem 1.5rem; }
     }
   </style>
 </head>
@@ -925,912 +649,734 @@
   <div class="cursor" id="cursor"></div>
   <div class="cursor-ring" id="cursorRing"></div>
 
-  <!-- NAV -->
-  <nav>
-    <a href="index.html" class="nav-logo">Cata<span>tonica</span></a>
-    <div class="nav-right">
-      <div class="nav-stage" id="navStage" title="Your current stage in the Order">
-        <span class="stage-name" id="stageName">Acknowledgement</span>
-        <span class="stage-sub" id="stageSub">Stage 1 of 4</span>
+  <!-- ─── LOADING ─── -->
+  <div class="screen active" id="loadingScreen">
+    <p class="loading-logo">Cata<em style="font-style:italic;color:#a89f8c">tonica</em></p>
+  </div>
+
+  <!-- ─── AUTH ─── -->
+  <div class="screen" id="authScreen">
+    <div class="auth-box">
+      <div class="auth-logo">Cata<span>tonica</span></div>
+      <div class="auth-tagline">The Art of Doing Nothing</div>
+
+      <h2 class="auth-title" id="authTitle">Enter the <em>void.</em></h2>
+      <p class="auth-sub" id="authSub">Sign in to begin accumulating Catatons across all your devices.</p>
+
+      <div class="field">
+        <label>Email</label>
+        <input type="email" id="authEmail" placeholder="your@email.com" autocomplete="email" />
       </div>
-      <div class="nav-catatons">
-        <span class="cataton-count" id="totalCatatons">0</span>
-        <div class="cataton-label-wrap">
-          <span class="cataton-label">Total<br>Catatons</span>
-          <button class="cataton-info-btn" id="catatonInfoBtn" title="What is a Cataton?">?</button>
-        </div>
+      <div class="field" id="passwordField">
+        <label>Password</label>
+        <input type="password" id="authPassword" placeholder="••••••••" autocomplete="current-password" />
       </div>
-      <div class="nav-tabs">
-        <button class="nav-tab active" data-view="active">Void</button>
-        <button class="nav-tab" data-view="archive">Archive</button>
-        <button class="nav-tab" data-view="chronicle">Chronicle</button>
+
+      <button class="auth-btn" id="authSubmit">Enter →</button>
+
+      <div class="auth-message" id="authMessage"></div>
+
+      <div class="auth-switch">
+        <span id="authSwitchText">No account yet?</span>
+        <button id="authSwitchBtn">Create one</button>
       </div>
     </div>
-  </nav>
+  </div>
 
-  <!-- MAIN -->
-  <main>
+  <!-- ─── MAIN APP ─── -->
+  <div class="screen" id="appScreen">
+    <nav>
+      <a href="index.html" class="nav-logo">Cata<span>tonica</span></a>
+      <div class="nav-right">
+        <div class="total-catatons">
+          <span class="tc-num" id="totalCatons">0</span>
+          <span class="tc-label">Total<br>Catatons</span>
+        </div>
+        <button class="nav-btn" id="archiveBtn">Archive</button>
+        <button class="nav-btn" id="signOutBtn">Sign out</button>
+      </div>
+    </nav>
 
-    <!-- Active Situations View -->
-    <div id="activeView">
+    <!-- Active view -->
+    <div class="app-content" id="activeView">
       <div class="page-header">
         <p class="page-eyebrow">Your Void</p>
         <h1 class="page-title">What are you <em>sitting with?</em></h1>
       </div>
 
-      <!-- Add new situation -->
-      <div class="add-situation" id="addSituationCard">
-        <div class="add-situation-inner">
-          <div class="add-icon">+</div>
-          <input
-            type="text"
-            class="add-input"
-            id="newSituationInput"
+      <div class="add-bar">
+        <div class="add-inner">
+          <div class="add-plus">+</div>
+          <input type="text" class="add-input" id="newSitInput"
             placeholder="Name a situation, a weight, a transition…"
-            maxlength="120"
-            autocomplete="off"
-          />
-          <button class="add-confirm" id="addConfirmBtn">Enter →</button>
+            maxlength="120" autocomplete="off" />
+          <button class="add-enter" id="addEnterBtn">Enter →</button>
         </div>
       </div>
+      <div class="tier-bar">
+        <span id="tierText">Free tier — 0 of 5 situations</span>
+        <button class="upgrade-link" id="upgradeBtn">Upgrade</button>
+      </div>
 
-      <p class="section-label" id="activeLabel" style="display:none">Active</p>
-      <div class="situations-list" id="situationsList"></div>
+      <p class="section-lbl" id="activeLabel" style="display:none">Active</p>
+      <div class="sit-list" id="sitList"></div>
     </div>
 
-    <!-- Archive View -->
-    <div id="archiveView" style="display:none">
+    <!-- Archive view -->
+    <div class="app-content" id="archiveView" style="display:none">
       <div class="page-header">
         <p class="page-eyebrow">Mastered</p>
         <h1 class="page-title">What you've <em>released.</em></h1>
       </div>
-      <div class="archive-list" id="archiveList"></div>
-    </div>
-
-    <!-- Chronicle View -->
-    <div id="chronicleView" style="display:none">
-      <div class="page-header">
-        <p class="page-eyebrow">The Order of the Still Voice</p>
-        <h1 class="page-title">The <em>Chronicle.</em></h1>
-        <p style="font-family:'Cormorant Garamond',serif;font-size:0.95rem;font-style:italic;color:var(--text-muted);margin-top:0.8rem;line-height:1.7">Every session. Every storm you entered. Every cataton earned.</p>
-      </div>
-
-      <div class="chronicle-stats">
-        <div class="chr-stat">
-          <span class="chr-stat-num" id="chrStatTotal">0</span>
-          <span class="chr-stat-label">Total Catatons</span>
-        </div>
-        <div class="chr-stat">
-          <span class="chr-stat-num" id="chrStatSessions">0</span>
-          <span class="chr-stat-label">Sessions</span>
-        </div>
-        <div class="chr-stat">
-          <span class="chr-stat-num" id="chrStatMinutes">0</span>
-          <span class="chr-stat-label">Minutes in Stillness</span>
-        </div>
-        <div class="chr-stat">
-          <span class="chr-stat-num" id="chrStatCompleted">0</span>
-          <span class="chr-stat-label">Completed</span>
-        </div>
-      </div>
-
-      <div class="chr-filter">
-        <button class="chr-filter-btn active" data-mode="all">All</button>
-        <button class="chr-filter-btn" data-mode="silence">The Void</button>
-        <button class="chr-filter-btn" data-mode="sound">The Threshold</button>
-        <button class="chr-filter-btn" data-mode="visual">The Ignition</button>
-      </div>
-
-      <div class="chronicle-list" id="chronicleListEl"></div>
-    </div>
-
-  </main>
-
-  <!-- ─── MODALS ─── -->
-
-  <!-- Cataton Explainer Modal -->
-  <div class="cataton-modal-overlay" id="catatonModal">
-    <div class="cataton-modal">
-      <button class="cataton-modal-close" id="catatonModalClose">✕ Close</button>
-      <p class="cataton-modal-eye">Unit of Measurement</p>
-      <h2 class="cataton-modal-title">The <em>Cataton.</em></h2>
-      <p class="cataton-modal-sub">Quantum of potential energy</p>
-      <div class="cataton-modal-body">
-        <p>A Cataton is <strong>one minute of earned stillness.</strong> Not time that passed — time that changed something. The smallest possible unit of silence required to generate an equivalent unit of growth.</p>
-        <p>Like a photon carries light, a Cataton carries <em>potential.</em> You don't spend it. You accumulate it. Each session adds to a lifetime total that never resets — the permanent record of your stillness.</p>
-        <p>When you declare mastery on a storm, those Catatons <strong>crystallize</strong> permanently. The storm closes. A new universe opens. Your total only ever grows.</p>
-      </div>
-      <div class="cataton-stage-list">
-        <div class="cataton-stage-row">
-          <span class="csr-name">Acknowledgement</span>
-          <span class="csr-range">0 – 9</span>
-          <span class="csr-unlock">The Void</span>
-        </div>
-        <div class="cataton-stage-row">
-          <span class="csr-name">Acceptance</span>
-          <span class="csr-range">10 – 29</span>
-          <span class="csr-unlock">+ The Threshold</span>
-        </div>
-        <div class="cataton-stage-row">
-          <span class="csr-name">Receiving</span>
-          <span class="csr-range">30 – 69</span>
-          <span class="csr-unlock">+ The Ignition</span>
-        </div>
-        <div class="cataton-stage-row">
-          <span class="csr-name">The Threshold</span>
-          <span class="csr-range">70 +</span>
-          <span class="csr-unlock">All states</span>
-        </div>
-      </div>
+      <div class="archive-list" id="arcList"></div>
     </div>
   </div>
 
-  <!-- Session Modal -->
-  <div class="modal-overlay" id="sessionModal">
+  <!-- ─── SESSION MODAL ─── -->
+  <div class="overlay" id="sessionOverlay">
     <div class="modal">
-      <button class="modal-close" id="sessionModalClose">✕ Close</button>
+      <button class="modal-close" data-close="sessionOverlay">✕</button>
       <p class="modal-eyebrow">Begin Session</p>
       <h2 class="modal-title">Enter the <em>void.</em></h2>
-      <p class="modal-situation" id="sessionSituationName"></p>
+      <p class="modal-sit" id="sessSitName"></p>
 
-      <div class="session-modes" id="sessionModes">
-        <button class="sess-mode-btn active" data-mode="silence">
-          <span class="sess-mode-name">The Void</span>
-          <span class="sess-mode-desc">Sub-zero stillness</span>
+      <div class="mode-grid">
+        <button class="mode-btn active" data-mode="silence">
+          <span class="mode-name">Silence</span>
+          <span class="mode-desc">Pure void</span>
         </button>
-        <button class="sess-mode-btn" data-mode="sound" id="dashModeThreshold">
-          <span class="sess-mode-name">The Threshold</span>
-          <span class="sess-mode-desc">Pressurized void</span>
+        <button class="mode-btn" data-mode="sound">
+          <span class="mode-name">Sound</span>
+          <span class="mode-desc">Ambient tones</span>
         </button>
-        <button class="sess-mode-btn" data-mode="visual" id="dashModeIgnition">
-          <span class="sess-mode-name">The Ignition</span>
-          <span class="sess-mode-desc">Critical state</span>
+        <button class="mode-btn" data-mode="visual">
+          <span class="mode-name">Breathing</span>
+          <span class="mode-desc">Visual guide</span>
         </button>
       </div>
 
-      <div class="session-durations" id="sessionDurations">
-        <button class="sess-dur-btn" data-min="5">5m</button>
-        <button class="sess-dur-btn active" data-min="10">10m</button>
-        <button class="sess-dur-btn" data-min="15">15m</button>
-        <button class="sess-dur-btn" data-min="20">20m</button>
-        <button class="sess-dur-btn" data-min="30">30m</button>
+      <div class="dur-grid">
+        <button class="dur-btn" data-min="5">5m</button>
+        <button class="dur-btn active" data-min="10">10m</button>
+        <button class="dur-btn" data-min="15">15m</button>
+        <button class="dur-btn" data-min="20">20m</button>
+        <button class="dur-btn" data-min="30">30m</button>
       </div>
 
       <div class="modal-actions">
-        <button class="sit-btn primary" id="startSessionBtn" style="flex:1; padding: 1rem;">Begin</button>
+        <button class="s-btn primary" id="startSessBtn" style="flex:1;padding:1rem">Begin</button>
       </div>
     </div>
   </div>
 
-  <!-- Planned Obsolescence Modal (Manifesto + Completion) -->
-  <div class="modal-overlay" id="obsModal">
+  <!-- ─── PLANNED OBSOLESCENCE MODAL ─── -->
+  <div class="overlay" id="obsOverlay">
     <div class="modal">
-      <button class="modal-close" id="obsModalClose">✕ Close</button>
-      <p class="modal-eyebrow" id="obsModalEyebrow">Planned Obsolescence</p>
-      <h2 class="modal-title" id="obsModalTitle">Before <em>the void.</em></h2>
-      <p class="modal-situation" id="obsModalSituation"></p>
-
-      <textarea
-        class="modal-textarea"
-        id="obsModalText"
-        placeholder="Write what this situation has meant. What it cost you. What you're ready to leave behind…"
-        rows="5"
-      ></textarea>
-
-      <div class="modal-release-msg" id="obsReleaseMsg"></div>
-
-      <div class="modal-actions" id="obsModalActions">
-        <button class="sit-btn primary" id="obsActionBtn" style="flex:1; padding: 1rem;">Save Intention</button>
-        <button class="sit-btn" id="obsSecondaryBtn" style="padding: 1rem 1.5rem;">Begin Session</button>
+      <button class="modal-close" data-close="obsOverlay">✕</button>
+      <p class="modal-eyebrow" id="obsEyebrow">Planned Obsolescence</p>
+      <h2 class="modal-title" id="obsTitle">Before <em>the void.</em></h2>
+      <p class="modal-sit" id="obsSitName"></p>
+      <textarea class="modal-textarea" id="obsText"
+        placeholder="What are you bringing into this silence…" rows="5"></textarea>
+      <div class="modal-release" id="obsRelease"></div>
+      <div class="modal-actions" id="obsActions">
+        <button class="s-btn primary" id="obsActionBtn" style="flex:1;padding:1rem">Save Intention</button>
+        <button class="s-btn" id="obsSessionBtn" style="padding:1rem 1.2rem">Begin Session →</button>
       </div>
     </div>
   </div>
 
-  <!-- Mastery / Completion Modal -->
-  <div class="modal-overlay" id="masteryModal">
+  <!-- ─── MASTERY MODAL ─── -->
+  <div class="overlay" id="masteryOverlay">
     <div class="modal">
-      <button class="modal-close" id="masteryModalClose">✕ Close</button>
+      <button class="modal-close" data-close="masteryOverlay">✕</button>
       <p class="modal-eyebrow">Declare Mastery</p>
       <h2 class="modal-title">The <em>Genesis.</em></h2>
-
-      <span class="cataton-final" id="masteryCount">0</span>
-      <span class="cataton-final-label">Catatons Accumulated</span>
-
+      <span class="mastery-num" id="masteryNum">0</span>
+      <span class="mastery-num-lbl">Catatons Accumulated</span>
       <p class="mastery-nudge" id="masteryNudge"></p>
-
-      <textarea
-        class="modal-textarea"
-        id="masteryText"
-        placeholder="What emerged from this silence? What is new? (Optional — write nothing, or write everything)"
-        rows="4"
-      ></textarea>
-
-      <div class="modal-release-msg" id="masteryReleaseMsg"></div>
-
+      <textarea class="modal-textarea" id="masteryText"
+        placeholder="What emerged from this silence? What is new? (Optional)" rows="4"></textarea>
+      <div class="modal-release" id="masteryRelease"></div>
       <div class="modal-actions" id="masteryActions">
-        <button class="sit-btn gold" id="declareBtn" style="flex:1; padding:1rem;">
-          Declare Mastery — Release
-        </button>
-        <button class="sit-btn" id="masteryNotYetBtn" style="padding:1rem 1.5rem;">
-          Not Yet
-        </button>
+        <button class="s-btn gold" id="declareBtn" style="flex:1;padding:1rem">Declare — Release</button>
+        <button class="s-btn" id="notYetBtn" style="padding:1rem 1.2rem">Not Yet</button>
       </div>
     </div>
   </div>
 
+  <!-- ─── TOAST ─── -->
+  <div class="toast" id="toast"></div>
+
   <script>
-    // ─── CURSOR ───
-    const cursor = document.getElementById('cursor');
-    const ring = document.getElementById('cursorRing');
+  // ─── SUPABASE ───
+  const { createClient } = supabase;
+  const sb = createClient(
+    'https://azqlxjvlxttztjzjvryt.supabase.co',
+    'sb_publishable_j0rnqo9byK5ep3UlrGgQDg_4nnm9Pv4'
+  );
+
+  const FREE_LIMIT = 5;
+  const THRESHOLD = 7;
+
+  // ─── STATE ───
+  let currentUser = null;
+  let situations = [];
+  let archive = [];
+  let profile = {};
+  let activeSitId = null;
+  let sessMode = 'silence';
+  let sessDuration = 10;
+  let obsMode = 'manifesto';
+  let showingArchive = false;
+
+  // ─── CURSOR ───
+  const cursorEl = document.getElementById('cursor');
+  const ringEl = document.getElementById('cursorRing');
+  if (cursorEl) {
     let mx=0,my=0,rx=0,ry=0;
     document.addEventListener('mousemove', e => {
       mx=e.clientX; my=e.clientY;
-      cursor.style.left=mx+'px'; cursor.style.top=my+'px';
+      cursorEl.style.left=mx+'px'; cursorEl.style.top=my+'px';
     });
     (function animRing(){
       rx+=(mx-rx)*0.12; ry+=(my-ry)*0.12;
-      ring.style.left=rx+'px'; ring.style.top=ry+'px';
+      ringEl.style.left=rx+'px'; ringEl.style.top=ry+'px';
       requestAnimationFrame(animRing);
     })();
     document.addEventListener('mouseover', e => {
       if(e.target.matches('button,a,input,textarea')) {
-        cursor.style.transform='translate(-50%,-50%) scale(2.5)';
-        ring.style.width='44px'; ring.style.height='44px';
+        cursorEl.style.transform='translate(-50%,-50%) scale(2.5)';
+        ringEl.style.width='44px'; ringEl.style.height='44px';
       }
     });
     document.addEventListener('mouseout', e => {
       if(e.target.matches('button,a,input,textarea')) {
-        cursor.style.transform='translate(-50%,-50%) scale(1)';
-        ring.style.width='28px'; ring.style.height='28px';
+        cursorEl.style.transform='translate(-50%,-50%) scale(1)';
+        ringEl.style.width='28px'; ringEl.style.height='28px';
       }
     });
+  }
 
-    // ─── STATE & STORAGE ───
-    const FREE_LIMIT = 5;
-    const THRESHOLD_SESSIONS = 3; // minimum sessions before mastery suggested
+  // ─── SCREEN HELPER ───
+  function showScreen(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+  }
 
-    function loadData() {
-      return {
-        situations: JSON.parse(localStorage.getItem('cat_situations') || '[]'),
-        archive: JSON.parse(localStorage.getItem('cat_archive') || '[]'),
-        totalCatatons: parseInt(localStorage.getItem('cat_total') || '0'),
-        isPremium: localStorage.getItem('cat_premium') === 'true',
-      };
+  // ─── TOAST ───
+  function toast(msg, duration = 2500) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), duration);
+  }
+
+  // ─── AUTH INIT ───
+  async function init() {
+    const { data: { session } } = await sb.auth.getSession();
+    if (session?.user) {
+      currentUser = session.user;
+      await loadData();
+      showScreen('appScreen');
+    } else {
+      showScreen('authScreen');
     }
+  }
 
-    function saveData(data) {
-      localStorage.setItem('cat_situations', JSON.stringify(data.situations));
-      localStorage.setItem('cat_archive', JSON.stringify(data.archive));
-      localStorage.setItem('cat_total', data.totalCatatons);
-    }
+  // ─── AUTH MODE TOGGLE ───
+  let authMode = 'signin';
+  document.getElementById('authSwitchBtn').addEventListener('click', () => {
+    authMode = authMode === 'signin' ? 'signup' : 'signin';
+    document.getElementById('authTitle').innerHTML =
+      authMode === 'signin' ? 'Enter the <em>void.</em>' : 'Begin the <em>journey.</em>';
+    document.getElementById('authSub').textContent =
+      authMode === 'signin'
+        ? 'Sign in to continue accumulating Catatons.'
+        : 'Create your account. Your silence awaits.';
+    document.getElementById('authSubmit').textContent =
+      authMode === 'signin' ? 'Enter →' : 'Create Account →';
+    document.getElementById('authSwitchText').textContent =
+      authMode === 'signin' ? 'No account yet?' : 'Already have one?';
+    document.getElementById('authSwitchBtn').textContent =
+      authMode === 'signin' ? 'Create one' : 'Sign in';
+    hideAuthMsg();
+  });
 
-    let data = loadData();
-    let activeSituationId = null;
-    let sessionMode = 'silence';
-    let sessionDuration = 10;
-    let obsMode = 'manifesto';
+  document.getElementById('authSubmit').addEventListener('click', handleAuth);
+  document.getElementById('authEmail').addEventListener('keydown', e => {
+    if (e.key === 'Enter') document.getElementById('authPassword').focus();
+  });
+  document.getElementById('authPassword').addEventListener('keydown', e => {
+    if (e.key === 'Enter') handleAuth();
+  });
 
-    // ── STAGE SYSTEM ──
-    const APP_STAGES = [
-      { name: 'Acknowledgement', label: 'Stage 1 of 4', min: 0,  max: 9,        modesUnlocked: ['silence'] },
-      { name: 'Acceptance',      label: 'Stage 2 of 4', min: 10, max: 29,       modesUnlocked: ['silence','sound'] },
-      { name: 'Receiving',       label: 'Stage 3 of 4', min: 30, max: 69,       modesUnlocked: ['silence','sound','visual'] },
-      { name: 'The Threshold',   label: 'Stage 4 of 4', min: 70, max: Infinity, modesUnlocked: ['silence','sound','visual'] },
-    ];
-    function getAppStage(total) {
-      return APP_STAGES.find(s => total >= s.min && total <= s.max) || APP_STAGES[0];
-    }
-    function applyAppStage() {
-      const stage = getAppStage(data.totalCatatons);
-      document.getElementById('stageName').textContent = stage.name;
-      document.getElementById('stageSub').textContent = stage.label;
-      // Lock modes in session modal
-      const threshBtn = document.getElementById('dashModeThreshold');
-      const ignBtn = document.getElementById('dashModeIgnition');
-      if (threshBtn) {
-        const locked = !stage.modesUnlocked.includes('sound');
-        threshBtn.style.opacity = locked ? '0.3' : '1';
-        threshBtn.style.pointerEvents = locked ? 'none' : 'auto';
-        threshBtn.querySelector('.sess-mode-desc').textContent = locked ? 'Unlocks at 10 catatons' : 'Pressurized void';
+  async function handleAuth() {
+    const email = document.getElementById('authEmail').value.trim();
+    const password = document.getElementById('authPassword').value;
+    const btn = document.getElementById('authSubmit');
+
+    if (!email || !password) { showAuthMsg('Please fill in both fields.', 'error'); return; }
+    if (password.length < 6) { showAuthMsg('Password must be at least 6 characters.', 'error'); return; }
+
+    btn.disabled = true;
+    btn.textContent = 'One moment…';
+
+    if (authMode === 'signup') {
+      const { error } = await sb.auth.signUp({ email, password });
+      if (error) { showAuthMsg(error.message, 'error'); }
+      else { showAuthMsg('Check your email to confirm your account, then sign in.', 'success'); }
+    } else {
+      const { data, error } = await sb.auth.signInWithPassword({ email, password });
+      if (error) { showAuthMsg(error.message, 'error'); }
+      else {
+        currentUser = data.user;
+        await loadData();
+        showScreen('appScreen');
       }
-      if (ignBtn) {
-        const locked = !stage.modesUnlocked.includes('visual');
-        ignBtn.style.opacity = locked ? '0.3' : '1';
-        ignBtn.style.pointerEvents = locked ? 'none' : 'auto';
-        ignBtn.querySelector('.sess-mode-desc').textContent = locked ? 'Unlocks at 30 catatons' : 'Critical state';
-      }
     }
 
-    // ─── RENDER ───
-    function render() {
-      data = loadData();
-      renderSituations();
-      renderArchive();
-      updateTotalCatatons();
-      applyAppStage();
-    }
+    btn.disabled = false;
+    btn.textContent = authMode === 'signin' ? 'Enter →' : 'Create Account →';
+  }
+
+  function showAuthMsg(msg, type) {
+    const el = document.getElementById('authMessage');
+    el.textContent = msg;
+    el.className = `auth-message ${type}`;
+    el.style.display = 'block';
+  }
+  function hideAuthMsg() {
+    document.getElementById('authMessage').style.display = 'none';
+  }
+
+  // ─── SIGN OUT ───
+  document.getElementById('signOutBtn').addEventListener('click', async () => {
+    await sb.auth.signOut();
+    currentUser = null; situations = []; archive = []; profile = {};
+    showScreen('authScreen');
+  });
+
+  // ─── LOAD DATA ───
+  async function loadData() {
+    const uid = currentUser.id;
+
+    const [profRes, sitRes, arcRes] = await Promise.all([
+      sb.from('profiles').select('*').eq('id', uid).single(),
+      sb.from('situations').select('*').eq('user_id', uid).order('created_at', { ascending: true }),
+      sb.from('archive').select('*').eq('user_id', uid).order('completed_at', { ascending: false }),
+    ]);
+
+    profile = profRes.data || {};
+    situations = sitRes.data || [];
+    archive = arcRes.data || [];
 
-    function updateTotalCatatons() {
-      document.getElementById('totalCatatons').textContent =
-        data.totalCatatons.toLocaleString();
-    }
-
-    function renderSituations() {
-      const list = document.getElementById('situationsList');
-      const label = document.getElementById('activeLabel');
-      list.innerHTML = '';
-
-      if (data.situations.length === 0) {
-        label.style.display = 'none';
-        list.innerHTML = `
-          <div class="empty-state">
-            <p class="empty-title">The void is clear.</p>
-            <p class="empty-sub">Name what you're carrying to begin.</p>
-          </div>`;
-        return;
-      }
-
-      label.style.display = 'block';
-
-      data.situations.forEach((sit, i) => {
-        const progress = Math.min((sit.sessions / THRESHOLD_SESSIONS) * 100, 100);
-        const thresholdReached = sit.sessions >= THRESHOLD_SESSIONS;
-        const delay = i * 80;
-
-        const card = document.createElement('div');
-        card.className = 'situation-card';
-        card.style.animationDelay = delay + 'ms';
-        card.dataset.id = sit.id;
-
-        card.innerHTML = `
-          <div class="cataton-bar ${thresholdReached ? 'threshold-reached' : ''}"
-            style="width: ${progress}%"></div>
-
-          <div class="situation-main">
-            <div class="situation-left">
-              <div class="situation-name">${escHtml(sit.name)}</div>
-              <div class="situation-meta">
-                <span class="situation-sessions">
-                  ${sit.sessions} session${sit.sessions !== 1 ? 's' : ''}
-                </span>
-                <span class="situation-threshold ${thresholdReached ? 'visible' : ''}">
-                  Mastery threshold reached
-                </span>
-              </div>
-            </div>
-            <div class="situation-right">
-              <div class="cataton-display">
-                <span class="cataton-num" id="cnum-${sit.id}">${sit.catatons}</span>
-                <span class="cataton-unit">Catatons</span>
-              </div>
-              <div class="situation-actions">
-                <button class="sit-btn primary" data-action="session" data-id="${sit.id}">
-                  Begin Session
-                </button>
-                <button class="sit-btn" data-action="manifesto" data-id="${sit.id}">
-                  Write Intention
-                </button>
-                ${thresholdReached
-                  ? `<button class="sit-btn gold" data-action="mastery" data-id="${sit.id}">
-                      Declare Mastery
-                    </button>`
-                  : ''}
-              </div>
-            </div>
-          </div>
-
-          <div class="situation-manifesto" id="manifesto-${sit.id}">
-            <div class="manifesto-label">Intention</div>
-            <textarea class="manifesto-textarea"
-              placeholder="What are you bringing into this silence…"
-              data-sit-id="${sit.id}"
-            >${escHtml(sit.manifesto || '')}</textarea>
-            <button class="manifesto-save" data-save="${sit.id}">Save →</button>
-          </div>
-        `;
-
-        list.appendChild(card);
-      });
-
-      // Bind card actions
-      list.querySelectorAll('[data-action]').forEach(btn => {
-        btn.addEventListener('click', e => {
-          const action = btn.dataset.action;
-          const id = btn.dataset.id;
-          if (action === 'session') openSessionModal(id);
-          if (action === 'manifesto') openObsModal(id, 'manifesto');
-          if (action === 'mastery') openMasteryModal(id);
-        });
-      });
-
-      // Inline manifesto save
-      list.querySelectorAll('[data-save]').forEach(btn => {
-        btn.addEventListener('click', () => {
-          const id = btn.dataset.save;
-          const ta = list.querySelector(`textarea[data-sit-id="${id}"]`);
-          const sit = data.situations.find(s => s.id === id);
-          if (sit) {
-            sit.manifesto = ta.value;
-            saveData(data);
-            btn.textContent = 'Saved.';
-            setTimeout(() => btn.textContent = 'Save →', 1500);
-          }
-        });
-      });
-    }
-
-    function renderArchive() {
-      const list = document.getElementById('archiveList');
-      list.innerHTML = '';
-
-      if (data.archive.length === 0) {
-        list.innerHTML = `
-          <div class="empty-state">
-            <p class="empty-title">Nothing mastered yet.</p>
-            <p class="empty-sub">Completed situations will appear here.</p>
-          </div>`;
-        return;
-      }
-
-      data.archive.forEach(sit => {
-        const div = document.createElement('div');
-        div.className = 'archive-card';
-        div.innerHTML = `
-          <div>
-            <div class="archive-name">${escHtml(sit.name)}</div>
-            <div class="archive-meta">
-              Mastered ${formatDate(sit.completedAt)} ·
-              ${sit.sessions} sessions
-            </div>
-            ${sit.genesis ? `<div class="archive-meta" style="margin-top:0.5rem;font-style:italic;color:var(--text-muted)">"${escHtml(sit.genesis)}"</div>` : ''}
-          </div>
-          <div class="archive-catatons">${sit.catatons}</div>
-        `;
-        list.appendChild(div);
-      });
-    }
-
-    // ─── ADD SITUATION ───
-    const input = document.getElementById('newSituationInput');
-    const confirmBtn = document.getElementById('addConfirmBtn');
-
-    input.addEventListener('input', () => {
-      confirmBtn.classList.toggle('visible', input.value.trim().length > 0);
-    });
-
-    input.addEventListener('keydown', e => {
-      if (e.key === 'Enter') addSituation();
-    });
-    confirmBtn.addEventListener('click', addSituation);
-
-    function addSituation() {
-      const name = input.value.trim();
-      if (!name) return;
-
-      const sit = {
-        id: Date.now().toString(),
-        name,
-        sessions: 0,
-        catatons: 0,
-        manifesto: '',
-        genesis: '',
-        createdAt: Date.now(),
-      };
-
-      data.situations.push(sit);
-      saveData(data);
-      input.value = '';
-      confirmBtn.classList.remove('visible');
-      render();
-    }
-
-    // ─── SESSION MODAL ───
-    let pendingSessionSitId = null;
-
-    function openSessionModal(id) {
-      pendingSessionSitId = id;
-      const sit = data.situations.find(s => s.id === id);
-      document.getElementById('sessionSituationName').textContent =
-        `"${sit.name}"`;
-      document.getElementById('sessionModal').classList.add('open');
-    }
-
-    // Mode buttons
-    document.getElementById('sessionModes').querySelectorAll('.sess-mode-btn')
-      .forEach(btn => {
-        btn.addEventListener('click', () => {
-          document.getElementById('sessionModes')
-            .querySelectorAll('.sess-mode-btn')
-            .forEach(b => b.classList.remove('active'));
-          btn.classList.add('active');
-          sessionMode = btn.dataset.mode;
-        });
-      });
-
-    // Duration buttons
-    document.getElementById('sessionDurations').querySelectorAll('.sess-dur-btn')
-      .forEach(btn => {
-        btn.addEventListener('click', () => {
-          document.getElementById('sessionDurations')
-            .querySelectorAll('.sess-dur-btn')
-            .forEach(b => b.classList.remove('active'));
-          btn.classList.add('active');
-          sessionDuration = parseInt(btn.dataset.min);
-        });
-      });
-
-    document.getElementById('sessionModalClose').addEventListener('click', () => {
-      document.getElementById('sessionModal').classList.remove('open');
-    });
-
-    document.getElementById('startSessionBtn').addEventListener('click', () => {
-      document.getElementById('sessionModal').classList.remove('open');
-      // Pass situation id, mode, duration to session page via sessionStorage
-      sessionStorage.setItem('cat_session', JSON.stringify({
-        sitId: pendingSessionSitId,
-        mode: sessionMode,
-        duration: sessionDuration,
-      }));
-      window.location.href = 'catatonica-session.html';
-    });
-
-    // ─── OBS MODAL (MANIFESTO + COMPLETION WRITE) ───
-    function openObsModal(id, mode) {
-      activeSituationId = id;
-      obsMode = mode;
-      const sit = data.situations.find(s => s.id === id);
-
-      document.getElementById('obsModalSituation').textContent = `"${sit.name}"`;
-      document.getElementById('obsModalText').value = sit.manifesto || '';
-      document.getElementById('obsModalText').classList.remove('dissolving');
-      document.getElementById('obsReleaseMsg').classList.remove('visible');
-
-      if (mode === 'manifesto') {
-        document.getElementById('obsModalEyebrow').textContent = 'Planned Obsolescence — Intention';
-        document.getElementById('obsModalTitle').innerHTML = 'Before <em>the void.</em>';
-        document.getElementById('obsModalText').placeholder =
-          'What are you bringing into this silence? What are you hoping to release?…';
-        document.getElementById('obsActionBtn').textContent = 'Save Intention';
-        document.getElementById('obsSecondaryBtn').style.display = '';
-        document.getElementById('obsSecondaryBtn').textContent = 'Begin Session →';
-      } else {
-        document.getElementById('obsModalEyebrow').textContent = 'Planned Obsolescence — Completion';
-        document.getElementById('obsModalTitle').innerHTML = 'The <em>release.</em>';
-        document.getElementById('obsModalText').placeholder =
-          'Write what you are releasing. Name it one final time before it dissolves…';
-        document.getElementById('obsActionBtn').textContent = 'Release It';
-        document.getElementById('obsSecondaryBtn').style.display = 'none';
-      }
-
-      document.getElementById('obsModal').classList.add('open');
-    }
-
-    document.getElementById('obsModalClose').addEventListener('click', () => {
-      document.getElementById('obsModal').classList.remove('open');
-    });
-
-    document.getElementById('obsSecondaryBtn').addEventListener('click', () => {
-      // Save then go to session
-      const sit = data.situations.find(s => s.id === activeSituationId);
-      if (sit) {
-        sit.manifesto = document.getElementById('obsModalText').value;
-        saveData(data);
-      }
-      document.getElementById('obsModal').classList.remove('open');
-      openSessionModal(activeSituationId);
-    });
-
-    document.getElementById('obsActionBtn').addEventListener('click', () => {
-      const sit = data.situations.find(s => s.id === activeSituationId);
-      if (!sit) return;
-
-      if (obsMode === 'manifesto') {
-        sit.manifesto = document.getElementById('obsModalText').value;
-        saveData(data);
-        document.getElementById('obsActionBtn').textContent = 'Saved.';
-        setTimeout(() => {
-          document.getElementById('obsModal').classList.remove('open');
-          document.getElementById('obsActionBtn').textContent = 'Save Intention';
-        }, 1000);
-      } else {
-        // Completion dissolve ritual
-        const ta = document.getElementById('obsModalText');
-        ta.classList.add('dissolving');
-        document.getElementById('obsModalActions').style.opacity = '0';
-        document.getElementById('obsModalActions').style.pointerEvents = 'none';
-
-        const msgs = ['Released.', 'Let go.', 'Gone.', 'It no longer defines you.', 'The slate is clean.'];
-        const msg = msgs[Math.floor(Math.random() * msgs.length)];
-
-        setTimeout(() => {
-          document.getElementById('obsReleaseMsg').textContent = msg;
-          document.getElementById('obsReleaseMsg').classList.add('visible');
-          sit.manifesto = '';
-          saveData(data);
-        }, 1400);
-
-        setTimeout(() => {
-          document.getElementById('obsModal').classList.remove('open');
-          document.getElementById('obsModalActions').style.opacity = '1';
-          document.getElementById('obsModalActions').style.pointerEvents = '';
-          document.getElementById('obsReleaseMsg').classList.remove('visible');
-          ta.classList.remove('dissolving');
-          ta.style.opacity = '1';
-          ta.style.filter = 'none';
-        }, 3500);
-      }
-    });
-
-    // ─── MASTERY MODAL ───
-    function openMasteryModal(id) {
-      activeSituationId = id;
-      const sit = data.situations.find(s => s.id === id);
-
-      document.getElementById('masteryCount').textContent = sit.catatons;
-      document.getElementById('masteryText').value = '';
-      document.getElementById('masteryReleaseMsg').classList.remove('visible');
-      document.getElementById('masteryActions').style.opacity = '1';
-      document.getElementById('masteryActions').style.pointerEvents = '';
-
-      const nudge = sit.sessions >= THRESHOLD_SESSIONS
-        ? `This storm has given you <em>${sit.catatons} catatons.</em> When you declare mastery, they crystallize permanently into your total — and this situation enters the archive. The storm is complete. The void did its work.`
-        : `You've entered this void ${sit.sessions} time${sit.sessions !== 1 ? 's' : ''}. You may declare mastery now — or return again. There is no wrong answer. The still voice will wait.`;
-
-      document.getElementById('masteryNudge').innerHTML = nudge;
-      document.getElementById('masteryModal').classList.add('open');
-    }
-
-    document.getElementById('masteryModalClose').addEventListener('click', () => {
-      document.getElementById('masteryModal').classList.remove('open');
-    });
-
-    document.getElementById('masteryNotYetBtn').addEventListener('click', () => {
-      document.getElementById('masteryModal').classList.remove('open');
-    });
-
-    document.getElementById('declareBtn').addEventListener('click', () => {
-      const sit = data.situations.find(s => s.id === activeSituationId);
-      if (!sit) return;
-
-      sit.genesis = document.getElementById('masteryText').value.trim();
-
-      // Crystallize — catatons are already in the lifetime total from sessions.
-      // Archive the situation with its full record.
-      data.archive.unshift({
-        ...sit,
-        completedAt: Date.now(),
-      });
-
-      // Remove from active
-      data.situations = data.situations.filter(s => s.id !== activeSituationId);
-      saveData(data);
-
-      // Crystallize moment
-      document.getElementById('masteryActions').style.opacity = '0';
-      document.getElementById('masteryActions').style.pointerEvents = 'none';
-
-      const crystallizeEl = document.getElementById('masteryReleaseMsg');
-      crystallizeEl.style.color = 'var(--gold)';
-      crystallizeEl.textContent = `${sit.catatons} catatons crystallized.`;
-      crystallizeEl.classList.add('visible');
-
-      setTimeout(() => {
-        crystallizeEl.style.transition = 'opacity 0.8s ease';
-        crystallizeEl.style.opacity = '0.4';
-        setTimeout(() => {
-          const msgs = ['The genesis has begun.', 'It is finished.', 'The new world begins.', 'A new universe opens.', 'Amen.'];
-          crystallizeEl.textContent = msgs[Math.floor(Math.random() * msgs.length)];
-          crystallizeEl.style.color = '';
-          crystallizeEl.style.opacity = '1';
-        }, 800);
-      }, 1200);
-
-      setTimeout(() => {
-        document.getElementById('masteryModal').classList.remove('open');
-        crystallizeEl.classList.remove('visible');
-        crystallizeEl.style.opacity = '';
-        render();
-      }, 3200);
-    });
-
-    // ─── CATATON EXPLAINER ───
-    document.getElementById('catatonInfoBtn').addEventListener('click', () => {
-      document.getElementById('catatonModal').classList.add('open');
-    });
-    document.getElementById('catatonModalClose').addEventListener('click', () => {
-      document.getElementById('catatonModal').classList.remove('open');
-    });
-    document.getElementById('catatonModal').addEventListener('click', e => {
-      if (e.target === document.getElementById('catatonModal'))
-        document.getElementById('catatonModal').classList.remove('open');
-    });
-
-    // ─── THREE-VIEW TAB SYSTEM ───
-    let activeView = 'active';
-
-    function switchView(view) {
-      activeView = view;
-      document.getElementById('activeView').style.display    = view === 'active'    ? '' : 'none';
-      document.getElementById('archiveView').style.display   = view === 'archive'   ? '' : 'none';
-      document.getElementById('chronicleView').style.display = view === 'chronicle' ? '' : 'none';
-      document.querySelectorAll('.nav-tab').forEach(t =>
-        t.classList.toggle('active', t.dataset.view === view)
-      );
-      if (view === 'archive')   renderArchive();
-      if (view === 'chronicle') renderChronicle();
-    }
-
-    document.querySelectorAll('.nav-tab').forEach(btn => {
-      btn.addEventListener('click', () => switchView(btn.dataset.view));
-    });
-
-    // ─── CHRONICLE FILTER (bound once) ───
-    let chrFilter = 'all';
-    document.querySelectorAll('.chr-filter-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        chrFilter = btn.dataset.mode;
-        document.querySelectorAll('.chr-filter-btn').forEach(b =>
-          b.classList.toggle('active', b.dataset.mode === chrFilter)
-        );
-        renderChronicle();
-      });
-    });
-
-    // ─── CHRONICLE RENDER — grouped by situation ───
-    function renderChronicle() {
-      const chronicle = JSON.parse(localStorage.getItem('cat_chronicle') || '[]');
-      const totalCat  = parseInt(localStorage.getItem('cat_total') || '0');
-      const totalSess = parseInt(localStorage.getItem('cat_session_count') || '0');
-      const totalMin  = Math.round(chronicle.reduce((a, r) => a + (r.elapsed || 0), 0) / 60);
-      const totalComp = chronicle.filter(r => r.completed).length;
-
-      document.getElementById('chrStatTotal').textContent     = totalCat.toLocaleString();
-      document.getElementById('chrStatSessions').textContent  = totalSess.toLocaleString();
-      document.getElementById('chrStatMinutes').textContent   = totalMin.toLocaleString();
-      document.getElementById('chrStatCompleted').textContent = totalComp.toLocaleString();
-
-      document.querySelectorAll('.chr-filter-btn').forEach(b =>
-        b.classList.toggle('active', b.dataset.mode === chrFilter)
-      );
-
-      const filtered = chrFilter === 'all'
-        ? chronicle
-        : chronicle.filter(r => r.mode === chrFilter);
-
-      const list = document.getElementById('chronicleListEl');
-      list.innerHTML = '';
-
-      if (filtered.length === 0) {
-        list.innerHTML = chronicle.length === 0
-          ? `<div class="empty-state"><p class="empty-title">The chronicle is empty.</p><p class="empty-sub">Complete your first session to begin the record.</p></div>`
-          : `<div class="empty-state"><p class="empty-title">No sessions in this mode yet.</p></div>`;
-        return;
-      }
-
-      // Group by situation id — unsituated sessions go under null
-      const chapters = {};
-      const chapterOrder = [];
-      filtered.forEach(rec => {
-        const key = rec.sitId || '__free__';
-        if (!chapters[key]) { chapters[key] = []; chapterOrder.push(key); }
-        chapters[key].push(rec);
-      });
-
-      const modePill  = { silence: 'void-pill', sound: 'thresh-pill', visual: 'ignition-pill' };
-      const modeLabel = { silence: 'The Void', sound: 'The Threshold', visual: 'The Ignition' };
-
-      // Resolve situation name — check active and archive
-      function getSitName(sitId) {
-        if (!sitId || sitId === '__free__') return null;
-        const active  = data.situations.find(s => s.id === sitId);
-        const archived = (data.archive || []).find(s => s.id === sitId);
-        return (active || archived)?.name || 'Unnamed storm';
-      }
-
-      function buildEntry(rec, i) {
-        const d = new Date(rec.date);
-        const dateStr = d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
-        const m = Math.floor((rec.elapsed || 0) / 60);
-        const s = (rec.elapsed || 0) % 60;
-        const dur = m > 0 ? `${m}m ${s}s` : `${s}s`;
-        const hasEntry = rec.entryText && rec.entryText.trim();
-        const hasExit  = rec.exitText  && rec.exitText.trim();
-
-        const card = document.createElement('div');
-        card.className = 'chr-entry';
-        card.dataset.mode = rec.mode || 'silence';
-        card.style.animationDelay = (i * 30) + 'ms';
-        card.innerHTML = `
-          <div class="chr-entry-inner">
-            <div>
-              <div class="chr-meta-row">
-                <span class="chr-date">${dateStr}</span>
-                <span class="chr-mode-pill ${modePill[rec.mode] || 'void-pill'}">${modeLabel[rec.mode] || 'The Void'}</span>
-                <span class="chr-stage-pill">${rec.stage || 'Acknowledgement'}</span>
-              </div>
-              ${hasEntry ? `<div class="chr-echo-row"><span class="chr-echo-key">Carried in</span><span class="chr-echo-val">${escHtml(rec.entryText)}</span></div>` : ''}
-              ${hasExit  ? `<div class="chr-echo-row"><span class="chr-echo-key">What shifted</span><span class="chr-echo-val">${escHtml(rec.exitText)}</span></div>` : ''}
-              ${!hasEntry && !hasExit ? `<div class="chr-echo-row"><span class="chr-echo-key">—</span><span class="chr-echo-val" style="color:var(--text-dim)">Silent entry.</span></div>` : ''}
-            </div>
-            <div class="chr-right">
-              <span class="chr-catatons-label">Catatons</span>
-              <span class="chr-catatons">+${rec.catatons}</span>
-              <span class="chr-duration">${dur}</span>
-              ${!rec.completed ? '<span class="chr-early-tag">surfaced early</span>' : ''}
-            </div>
-          </div>`;
-        return card;
-      }
-
-      chapterOrder.forEach(key => {
-        const recs = chapters[key];
-        const sitName = getSitName(key);
-        const chapterCatatons = recs.reduce((a, r) => a + (r.catatons || 0), 0);
-
-        const chapter = document.createElement('div');
-        chapter.className = 'chr-chapter';
-
-        if (sitName) {
-          const header = document.createElement('div');
-          header.className = 'chr-chapter-header';
-          header.innerHTML = `
-            <span class="chr-chapter-name">${escHtml(sitName)}</span>
-            <span class="chr-chapter-stats">
-              <span>${recs.length} session${recs.length !== 1 ? 's' : ''}</span>
-              <span><em>${chapterCatatons}</em> catatons</span>
-            </span>`;
-          chapter.appendChild(header);
-        } else {
-          const label = document.createElement('div');
-          label.className = 'chr-unsituated-label';
-          label.textContent = 'Free sessions';
-          chapter.appendChild(label);
-        }
-
-        recs.forEach((rec, i) => chapter.appendChild(buildEntry(rec, i)));
-        list.appendChild(chapter);
-      });
-    }
-
-    // ─── SESSION RETURN — add catatons if returning from session ───
-    function checkSessionReturn() {
-      const result = sessionStorage.getItem('cat_session_result');
-      if (!result) return;
-      sessionStorage.removeItem('cat_session_result');
-
-      const { sitId, catatonsEarned } = JSON.parse(result);
-      const sit = data.situations.find(s => s.id === sitId);
-      if (!sit) return;
-
-      sit.sessions++;
-      sit.catatons += catatonsEarned;
-      data.totalCatatons += catatonsEarned;
-      saveData(data);
-
-      // Animate the count
-      setTimeout(() => {
-        const el = document.getElementById(`cnum-${sitId}`);
-        if (el) {
-          el.classList.add('cataton-pop');
-          setTimeout(() => el.classList.remove('cataton-pop'), 500);
-        }
-      }, 400);
-    }
-
-    // ─── HELPERS ───
-    function escHtml(str) {
-      return String(str || '')
-        .replace(/&/g,'&amp;').replace(/</g,'&lt;')
-        .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-    }
-
-    function formatDate(ts) {
-      return new Date(ts).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-    }
-
-    // ─── INIT ───
-    checkSessionReturn();
     render();
+    checkSessionReturn();
+  }
+
+  // ─── RENDER ───
+  function render() {
+    renderSituations();
+    renderArchive();
+    updateNav();
+  }
+
+  function updateNav() {
+    document.getElementById('totalCatons').textContent =
+      (profile.total_catatons || 0).toLocaleString();
+  }
+
+  function renderSituations() {
+    const list = document.getElementById('sitList');
+    const lbl = document.getElementById('activeLabel');
+    list.innerHTML = '';
+
+    // Tier bar
+    document.getElementById('tierText').textContent =
+      profile.is_premium
+        ? `Premium — ${situations.length} active situations`
+        : `Free tier — ${situations.length} of ${FREE_LIMIT} situations`;
+
+    if (situations.length === 0) {
+      lbl.style.display = 'none';
+      list.innerHTML = `<div class="empty">
+        <p class="empty-title">The void is clear.</p>
+        <p class="empty-sub">Name what you're carrying to begin.</p>
+      </div>`;
+      return;
+    }
+
+    lbl.style.display = 'block';
+    situations.forEach((sit, i) => {
+      const progress = Math.min((sit.sessions / THRESHOLD) * 100, 100);
+      const atThreshold = sit.sessions >= THRESHOLD;
+
+      const card = document.createElement('div');
+      card.className = 'sit-card fade-up';
+      card.style.animationDelay = (i * 60) + 'ms';
+      card.dataset.id = sit.id;
+
+      card.innerHTML = `
+        <div class="progress-bar ${atThreshold ? 'threshold' : ''}"
+          style="width:${progress}%"></div>
+        <div class="sit-main">
+          <div>
+            <div class="sit-name">${esc(sit.name)}</div>
+            <div class="sit-meta">
+              <span class="sit-sessions">${sit.sessions} session${sit.sessions !== 1 ? 's' : ''}</span>
+              <span class="threshold-badge ${atThreshold ? 'show' : ''}">Mastery threshold reached</span>
+            </div>
+          </div>
+          <div class="sit-right">
+            <div class="cataton-display">
+              <span class="cat-num" id="cnum-${sit.id}">${sit.catatons}</span>
+              <span class="cat-unit">Catatons</span>
+            </div>
+            <div class="sit-actions">
+              <button class="s-btn primary" data-action="session" data-id="${sit.id}">Begin Session</button>
+              <button class="s-btn" data-action="obs" data-id="${sit.id}">Write Intention</button>
+              ${atThreshold
+                ? `<button class="s-btn gold" data-action="mastery" data-id="${sit.id}">Declare Mastery</button>`
+                : ''}
+              <button class="s-btn danger" data-action="delete" data-id="${sit.id}">Remove</button>
+            </div>
+          </div>
+        </div>`;
+
+      list.appendChild(card);
+    });
+
+    list.querySelectorAll('[data-action]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const { action, id } = btn.dataset;
+        if (action === 'session') openSessionModal(id);
+        if (action === 'obs') openObsModal(id, 'manifesto');
+        if (action === 'mastery') openMasteryModal(id);
+        if (action === 'delete') deleteSituation(id);
+      });
+    });
+  }
+
+  function renderArchive() {
+    const list = document.getElementById('arcList');
+    list.innerHTML = '';
+
+    if (archive.length === 0) {
+      list.innerHTML = `<div class="empty">
+        <p class="empty-title">Nothing mastered yet.</p>
+        <p class="empty-sub">Completed situations will live here.</p>
+      </div>`;
+      return;
+    }
+
+    archive.forEach(sit => {
+      const d = document.createElement('div');
+      d.className = 'archive-card';
+      d.innerHTML = `
+        <div>
+          <div class="arc-name">${esc(sit.name)}</div>
+          <div class="arc-meta">Mastered ${fmtDate(sit.completed_at)} · ${sit.sessions} sessions</div>
+          ${sit.genesis ? `<div class="arc-genesis">"${esc(sit.genesis)}"</div>` : ''}
+        </div>
+        <div class="arc-catatons">${sit.catatons}</div>`;
+      list.appendChild(d);
+    });
+  }
+
+  // ─── ADD SITUATION ───
+  const newInput = document.getElementById('newSitInput');
+  const enterBtn = document.getElementById('addEnterBtn');
+
+  newInput.addEventListener('input', () => {
+    enterBtn.classList.toggle('show', newInput.value.trim().length > 0);
+  });
+  newInput.addEventListener('keydown', e => { if (e.key === 'Enter') addSituation(); });
+  enterBtn.addEventListener('click', addSituation);
+
+  async function addSituation() {
+    const name = newInput.value.trim();
+    if (!name) return;
+
+    if (!profile.is_premium && situations.length >= FREE_LIMIT) {
+      toast('Free tier limit reached. Upgrade for unlimited situations.');
+      return;
+    }
+
+    const { data, error } = await sb.from('situations').insert({
+      user_id: currentUser.id,
+      name,
+    }).select().single();
+
+    if (error) { toast('Error adding situation.'); return; }
+
+    situations.push(data);
+    newInput.value = '';
+    enterBtn.classList.remove('show');
+    renderSituations();
+    toast('Situation added.');
+  }
+
+  // ─── DELETE SITUATION ───
+  async function deleteSituation(id) {
+    if (!confirm('Remove this situation? This cannot be undone.')) return;
+    await sb.from('situations').delete().eq('id', id);
+    situations = situations.filter(s => s.id !== id);
+    renderSituations();
+    toast('Situation removed.');
+  }
+
+  // ─── ARCHIVE TOGGLE ───
+  document.getElementById('archiveBtn').addEventListener('click', () => {
+    showingArchive = !showingArchive;
+    document.getElementById('activeView').style.display = showingArchive ? 'none' : '';
+    document.getElementById('archiveView').style.display = showingArchive ? '' : 'none';
+    document.getElementById('archiveBtn').textContent = showingArchive ? 'Active' : 'Archive';
+    document.getElementById('archiveBtn').classList.toggle('active', showingArchive);
+  });
+
+  // ─── SESSION MODAL ───
+  function openSessionModal(id) {
+    activeSitId = id;
+    const sit = situations.find(s => s.id === id);
+    document.getElementById('sessSitName').textContent = `"${sit.name}"`;
+    openOverlay('sessionOverlay');
+  }
+
+  document.getElementById('sessionOverlay').querySelectorAll('.mode-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.getElementById('sessionOverlay').querySelectorAll('.mode-btn')
+        .forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      sessMode = btn.dataset.mode;
+    });
+  });
+
+  document.getElementById('sessionOverlay').querySelectorAll('.dur-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.getElementById('sessionOverlay').querySelectorAll('.dur-btn')
+        .forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      sessDuration = parseInt(btn.dataset.min);
+    });
+  });
+
+  document.getElementById('startSessBtn').addEventListener('click', () => {
+    closeOverlay('sessionOverlay');
+    sessionStorage.setItem('cat_session', JSON.stringify({
+      sitId: activeSitId,
+      mode: sessMode,
+      duration: sessDuration,
+      userId: currentUser.id,
+    }));
+    window.location.href = 'session.html';
+  });
+
+  // ─── OBS MODAL ───
+  function openObsModal(id, mode) {
+    activeSitId = id;
+    obsMode = mode;
+    const sit = situations.find(s => s.id === id);
+    document.getElementById('obsSitName').textContent = `"${sit.name}"`;
+    document.getElementById('obsText').value = sit.manifesto || '';
+    document.getElementById('obsText').classList.remove('dissolving');
+    document.getElementById('obsRelease').classList.remove('show');
+    document.getElementById('obsActions').style.opacity = '1';
+    document.getElementById('obsActions').style.pointerEvents = '';
+
+    if (mode === 'manifesto') {
+      document.getElementById('obsEyebrow').textContent = 'Planned Obsolescence — Intention';
+      document.getElementById('obsTitle').innerHTML = 'Before <em>the void.</em>';
+      document.getElementById('obsText').placeholder = 'What are you bringing into this silence? What are you ready to release?…';
+      document.getElementById('obsActionBtn').textContent = 'Save Intention';
+      document.getElementById('obsSessionBtn').style.display = '';
+    } else {
+      document.getElementById('obsEyebrow').textContent = 'Planned Obsolescence — Completion';
+      document.getElementById('obsTitle').innerHTML = 'The <em>release.</em>';
+      document.getElementById('obsText').placeholder = 'Name it one final time before it dissolves…';
+      document.getElementById('obsActionBtn').textContent = 'Release It';
+      document.getElementById('obsSessionBtn').style.display = 'none';
+    }
+
+    openOverlay('obsOverlay');
+  }
+
+  document.getElementById('obsSessionBtn').addEventListener('click', async () => {
+    await saveManifesto();
+    closeOverlay('obsOverlay');
+    openSessionModal(activeSitId);
+  });
+
+  document.getElementById('obsActionBtn').addEventListener('click', async () => {
+    if (obsMode === 'manifesto') {
+      await saveManifesto();
+      document.getElementById('obsActionBtn').textContent = 'Saved.';
+      setTimeout(() => closeOverlay('obsOverlay'), 800);
+    } else {
+      // Dissolution ritual
+      const ta = document.getElementById('obsText');
+      ta.classList.add('dissolving');
+      document.getElementById('obsActions').style.opacity = '0';
+      document.getElementById('obsActions').style.pointerEvents = 'none';
+      const msgs = ['Released.', 'Let go.', 'Gone.', 'It no longer defines you.', 'The slate is clean.'];
+      setTimeout(() => {
+        document.getElementById('obsRelease').textContent = msgs[Math.floor(Math.random()*msgs.length)];
+        document.getElementById('obsRelease').classList.add('show');
+        // Clear manifesto in DB
+        sb.from('situations').update({ manifesto: '' }).eq('id', activeSitId);
+        const sit = situations.find(s => s.id === activeSitId);
+        if (sit) sit.manifesto = '';
+      }, 1400);
+      setTimeout(() => closeOverlay('obsOverlay'), 3200);
+    }
+  });
+
+  async function saveManifesto() {
+    const text = document.getElementById('obsText').value;
+    await sb.from('situations').update({ manifesto: text }).eq('id', activeSitId);
+    const sit = situations.find(s => s.id === activeSitId);
+    if (sit) sit.manifesto = text;
+  }
+
+  // ─── MASTERY MODAL ───
+  function openMasteryModal(id) {
+    activeSitId = id;
+    const sit = situations.find(s => s.id === id);
+    document.getElementById('masteryNum').textContent = sit.catatons;
+    document.getElementById('masteryText').value = '';
+    document.getElementById('masteryRelease').classList.remove('show');
+    document.getElementById('masteryActions').style.opacity = '1';
+    document.getElementById('masteryActions').style.pointerEvents = '';
+
+    const nudge = sit.sessions >= THRESHOLD
+      ? `You've completed <em>${sit.sessions} sessions</em> in this silence. You are ready — when you feel it.`
+      : `You've completed ${sit.sessions} sessions. Suggested threshold is ${THRESHOLD}. You may declare now, or continue accumulating.`;
+    document.getElementById('masteryNudge').innerHTML = nudge;
+
+    openOverlay('masteryOverlay');
+  }
+
+  document.getElementById('notYetBtn').addEventListener('click', () => closeOverlay('masteryOverlay'));
+
+  document.getElementById('declareBtn').addEventListener('click', async () => {
+    const sit = situations.find(s => s.id === activeSitId);
+    if (!sit) return;
+
+    const genesis = document.getElementById('masteryText').value.trim();
+
+    // Move to archive
+    const { error } = await sb.from('archive').insert({
+      user_id: currentUser.id,
+      name: sit.name,
+      sessions: sit.sessions,
+      catatons: sit.catatons,
+      manifesto: sit.manifesto || '',
+      genesis,
+      completed_at: new Date().toISOString(),
+    });
+
+    if (error) { toast('Error archiving situation.'); return; }
+
+    // Delete from active
+    await sb.from('situations').delete().eq('id', activeSitId);
+    situations = situations.filter(s => s.id !== activeSitId);
+
+    // Update archive list
+    archive.unshift({ ...sit, genesis, completed_at: new Date().toISOString() });
+
+    // Release animation
+    document.getElementById('masteryActions').style.opacity = '0';
+    document.getElementById('masteryActions').style.pointerEvents = 'none';
+    const msgs = ['Released.', 'Genesis.', 'It is finished.', 'The new world begins.', 'Amen.'];
+    document.getElementById('masteryRelease').textContent = msgs[Math.floor(Math.random()*msgs.length)];
+    document.getElementById('masteryRelease').classList.add('show');
+
+    setTimeout(() => {
+      closeOverlay('masteryOverlay');
+      render();
+    }, 2400);
+  });
+
+  // ─── SESSION RETURN — receive catatons from session.html ───
+  async function checkSessionReturn() {
+    const result = sessionStorage.getItem('cat_session_result');
+    if (!result) return;
+    sessionStorage.removeItem('cat_session_result');
+
+    const { sitId, catatonsEarned } = JSON.parse(result);
+    const sit = situations.find(s => s.id === sitId);
+    if (!sit) return;
+
+    // Update in Supabase
+    const newCatatons = sit.catatons + catatonsEarned;
+    const newSessions = sit.sessions + 1;
+    const newTotal = (profile.total_catatons || 0) + catatonsEarned;
+
+    await Promise.all([
+      sb.from('situations').update({ catatons: newCatatons, sessions: newSessions }).eq('id', sitId),
+      sb.from('profiles').update({ total_catatons: newTotal }).eq('id', currentUser.id),
+      sb.from('sessions_log').insert({
+        user_id: currentUser.id,
+        situation_id: sitId,
+        situation_name: sit.name,
+        mode: sessMode,
+        duration_minutes: sessDuration,
+        catatons_earned: catatonsEarned,
+        completed: true,
+      }),
+    ]);
+
+    sit.catatons = newCatatons;
+    sit.sessions = newSessions;
+    profile.total_catatons = newTotal;
+
+    render();
+
+    // Animate
+    setTimeout(() => {
+      const el = document.getElementById(`cnum-${sitId}`);
+      if (el) { el.classList.add('pop'); setTimeout(() => el.classList.remove('pop'), 600); }
+    }, 300);
+
+    toast(`+${catatonsEarned} Catatons accumulated.`);
+  }
+
+  // ─── OVERLAY HELPERS ───
+  function openOverlay(id) { document.getElementById(id).classList.add('open'); }
+  function closeOverlay(id) { document.getElementById(id).classList.remove('open'); }
+
+  document.querySelectorAll('.modal-close[data-close]').forEach(btn => {
+    btn.addEventListener('click', () => closeOverlay(btn.dataset.close));
+  });
+
+  document.querySelectorAll('.overlay').forEach(ov => {
+    ov.addEventListener('click', e => {
+      if (e.target === ov) closeOverlay(ov.id);
+    });
+  });
+
+  // ─── UPGRADE ───
+  document.getElementById('upgradeBtn').addEventListener('click', () => {
+    toast('Premium coming soon — you\'ll be first to know.');
+  });
+
+  // ─── HELPERS ───
+  function esc(str) {
+    return String(str)
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+  function fmtDate(ts) {
+    return new Date(ts).toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' });
+  }
+
+  // ─── SERVICE WORKER ───
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js').catch(() => {});
+  }
+
+  // ─── BOOT ───
+  init();
   </script>
 </body>
 </html>
