@@ -5,3 +5,4 @@
 sounds/*.mp3
 audio/*.mp3
 node_modules
+sounds/brown-noise-raw.mp3
