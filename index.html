@@ -485,10 +485,16 @@
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
     .reveal {
-      opacity: 0; transform: translateY(20px);
+      opacity: 1; transform: translateY(0);
       transition: opacity 0.8s ease, transform 0.8s ease;
     }
     .reveal.visible { opacity: 1; transform: translateY(0); }
+    .js-loaded .reveal {
+      opacity: 0; transform: translateY(20px);
+    }
+    .js-loaded .reveal.visible {
+      opacity: 1; transform: translateY(0);
+    }
 
     /* Safety net — if JS fails, don't hide the whole page */
     @media (prefers-reduced-motion: reduce) {
@@ -752,15 +758,24 @@
 
   <!-- Hero -->
   <section class="hero">
-    <p class="hero-eyebrow">Performance Recovery for High-Intensity Minds</p>
+    <p class="hero-eyebrow">A silence app for people carrying hard things</p>
     <h1 class="hero-title">
       The Art of<br>
       <em>Doing Nothing.</em>
     </h1>
     <p class="hero-sub">
-      Scheduled silence. Intentional stillness.
-      Not because you're broken — because you're serious about what comes next.
+      Name what you're carrying. Sit with it in measured silence.<br>
+      Accumulate stillness until you're ready to release it.
     </p>
+    <p style="
+      font-family: 'DM Mono', monospace;
+      font-size: 0.62rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: rgba(232,228,220,0.28);
+      margin-top: 1.2rem;
+      line-height: 1.8;
+    ">Not meditation. Not journaling. Just you and the silence.</p>
     <div class="hero-cta-group">
       <a href="app.html" class="btn-primary">Start a Session</a>
       <a href="#features" class="btn-ghost">See How It Works</a>
@@ -776,10 +791,10 @@
   <!-- Statement -->
   <section class="statement">
     <p class="statement-quote reveal">
-      "Your best decisions aren't made under pressure.
-      They surface in <em>the gaps you never give yourself.</em>"
+      "The stillness after the break — not the storm itself —
+      that's <em>where growth takes place.</em>"
     </p>
-    <p class="statement-attr reveal">The science of cognitive recovery</p>
+    <p class="statement-attr reveal">Catatonica measures that stillness.</p>
   </section>
 
   <div class="section-divider"></div>
@@ -1064,21 +1079,34 @@
     });
 
     // ─── SCROLL REVEAL ───
+    // Only hide elements if JS is running — prevents blank page if JS fails
+    document.body.classList.add('js-loaded');
+
     const revealEls = document.querySelectorAll('.reveal');
 
-    // Fallback: if observer never fires (JS error, browser quirk), show everything after 1s
+    // Immediate: make anything already in viewport visible
+    revealEls.forEach(el => {
+      const rect = el.getBoundingClientRect();
+      if (rect.top < window.innerHeight) {
+        el.classList.add('visible');
+      }
+    });
+
+    // Fallback: show everything after 1.5s no matter what
     const revealFallback = setTimeout(() => {
       revealEls.forEach(el => el.classList.add('visible'));
-    }, 1000);
+    }, 1500);
 
     const observer = new IntersectionObserver((entries) => {
       entries.forEach(e => {
         if (e.isIntersecting) {
           e.target.classList.add('visible');
           observer.unobserve(e.target);
+          // Clear fallback once observer is working
+          clearTimeout(revealFallback);
         }
       });
-    }, { threshold: 0, rootMargin: '0px 0px -40px 0px' });
+    }, { threshold: 0, rootMargin: '0px 0px -20px 0px' });
 
     revealEls.forEach(el => observer.observe(el));
 
