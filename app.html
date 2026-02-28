@@ -582,6 +582,11 @@
       bottom: 0; left: 0; right: 0;
       height: 1px; background: var(--accent-cold);
     }
+    .dur-lock {
+      font-size: 0.45rem; color: var(--gold);
+      opacity: 0.5; margin-left: 0.2rem;
+    }
+    .dur-btn.premium-gate { opacity: 0.45; }
 
     /* Mastery modal */
     .mastery-num {
@@ -758,9 +763,9 @@
       <div class="dur-grid">
         <button class="dur-btn" data-min="5">5m</button>
         <button class="dur-btn active" data-min="10">10m</button>
-        <button class="dur-btn" data-min="15">15m</button>
-        <button class="dur-btn" data-min="20">20m</button>
-        <button class="dur-btn" data-min="30">30m</button>
+        <button class="dur-btn premium-gate" data-min="15">15m <span class="dur-lock">✦</span></button>
+        <button class="dur-btn premium-gate" data-min="20">20m <span class="dur-lock">✦</span></button>
+        <button class="dur-btn premium-gate" data-min="30">30m <span class="dur-lock">✦</span></button>
       </div>
 
       <div class="modal-actions">
@@ -808,6 +813,62 @@
   <!-- ─── TOAST ─── -->
   <div class="toast" id="toast"></div>
 
+  <!-- ─── UPGRADE MODAL ─── -->
+  <div class="overlay" id="upgradeOverlay">
+    <div class="modal" style="max-width:620px">
+      <button class="modal-close" data-close="upgradeOverlay">✕</button>
+      <p class="modal-eyebrow" id="upgradeContext">Go Deeper</p>
+      <h2 class="modal-title">The void <em>has no ceiling.</em></h2>
+      <p style="font-family:'Cormorant Garamond',serif;font-size:0.95rem;font-style:italic;color:var(--text-muted);line-height:1.7;margin-bottom:2rem">
+        Free gives you the full practice. The upgrades are for those who want to go places silence alone can't take you.
+      </p>
+
+      <!-- Tier cards -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border);border:1px solid var(--border);margin-bottom:1.5rem">
+
+        <!-- Deep -->
+        <div style="background:var(--surface2);padding:1.8rem 1.5rem">
+          <p style="font-family:'DM Mono',monospace;font-size:0.5rem;letter-spacing:0.22em;text-transform:uppercase;color:var(--text-dim);margin-bottom:0.6rem">Deep · $9/mo</p>
+          <p style="font-family:'Cormorant Garamond',serif;font-size:1.5rem;color:var(--text-primary);margin-bottom:1rem">Go further in.</p>
+          <ul style="list-style:none;display:flex;flex-direction:column;gap:0.6rem;margin-bottom:1.5rem">
+            <li style="font-family:'DM Mono',monospace;font-size:0.56rem;letter-spacing:0.08em;color:var(--text-muted)">✦ Sessions up to 60 minutes</li>
+            <li style="font-family:'DM Mono',monospace;font-size:0.56rem;letter-spacing:0.08em;color:var(--text-muted)">✦ All session modes unlocked</li>
+            <li style="font-family:'DM Mono',monospace;font-size:0.56rem;letter-spacing:0.08em;color:var(--text-muted)">✦ Session insights over time</li>
+            <li style="font-family:'DM Mono',monospace;font-size:0.56rem;letter-spacing:0.08em;color:var(--text-muted)">✦ Priority access to new features</li>
+          </ul>
+          <a href="" id="stripeDeepBtn" target="_blank"
+            style="display:block;text-align:center;font-family:'DM Mono',monospace;font-size:0.58rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--text-primary);border:1px solid var(--border-hover);padding:0.8rem;text-decoration:none;transition:background 0.3s ease"
+            onmouseover="this.style.background='rgba(255,255,255,0.04)'"
+            onmouseout="this.style.background='none'">
+            Enter Deep →
+          </a>
+        </div>
+
+        <!-- The Order -->
+        <div style="background:var(--surface2);padding:1.8rem 1.5rem;border-left:1px solid var(--border)">
+          <p style="font-family:'DM Mono',monospace;font-size:0.5rem;letter-spacing:0.22em;text-transform:uppercase;color:var(--gold);opacity:0.7;margin-bottom:0.6rem">The Order · $29/mo</p>
+          <p style="font-family:'Cormorant Garamond',serif;font-size:1.5rem;color:var(--gold);margin-bottom:1rem">Join the doctrine.</p>
+          <ul style="list-style:none;display:flex;flex-direction:column;gap:0.6rem;margin-bottom:1.5rem">
+            <li style="font-family:'DM Mono',monospace;font-size:0.56rem;letter-spacing:0.08em;color:var(--gold);opacity:0.8">✦ Everything in Deep</li>
+            <li style="font-family:'DM Mono',monospace;font-size:0.56rem;letter-spacing:0.08em;color:var(--gold);opacity:0.8">✦ The full Still Voice doctrine — in-app</li>
+            <li style="font-family:'DM Mono',monospace;font-size:0.56rem;letter-spacing:0.08em;color:var(--gold);opacity:0.8">✦ Founding member — price locked forever</li>
+            <li style="font-family:'DM Mono',monospace;font-size:0.56rem;letter-spacing:0.08em;color:var(--gold);opacity:0.8">✦ Direct line to the founders</li>
+          </ul>
+          <a href="" id="stripeOrderBtn" target="_blank"
+            style="display:block;text-align:center;font-family:'DM Mono',monospace;font-size:0.58rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold);border:1px solid rgba(196,169,109,0.25);padding:0.8rem;text-decoration:none;transition:background 0.3s ease"
+            onmouseover="this.style.background='rgba(196,169,109,0.06)'"
+            onmouseout="this.style.background='none'">
+            Enter The Order →
+          </a>
+        </div>
+      </div>
+
+      <p style="font-family:'DM Mono',monospace;font-size:0.52rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-dim);text-align:center">
+        Free stays free. Always. No tricks.
+      </p>
+    </div>
+  </div>
+
   <script>
   // ─── SUPABASE ───
   const { createClient } = supabase;
@@ -816,8 +877,14 @@
     'sb_publishable_j0rnqo9byK5ep3UlrGgQDg_4nnm9Pv4'
   );
 
-  const FREE_LIMIT = 5;
+  const FREE_SESSION_MAX = 10; // free users: max 10 min sessions
   const THRESHOLD = 7;
+
+  // Stripe payment links — replace with your actual links from Stripe Dashboard
+  const STRIPE = {
+    deep: 'https://buy.stripe.com/test_4gMbJ0fUZfqvcsvcDz4Rq00',   // $9/mo — Deep
+    order: 'https://buy.stripe.com/test_bJe6oGcIN7Y3fEHfPL4Rq01',  // $29/mo — The Order
+  };
 
   // ─── STATE ───
   let currentUser = null;
@@ -995,8 +1062,8 @@
     // Tier bar
     document.getElementById('tierText').textContent =
       profile.is_premium
-        ? `Premium — ${situations.length} active situations`
-        : `Free tier — ${situations.length} of ${FREE_LIMIT} situations`;
+        ? `${profile.tier === 'order' ? 'The Order' : 'Deep'} — unlimited everything`
+        : `Free — unlimited situations · sessions up to 10 min`;
 
     if (situations.length === 0) {
       lbl.style.display = 'none';
@@ -1098,10 +1165,7 @@
     const name = newInput.value.trim();
     if (!name) return;
 
-    if (!profile.is_premium && situations.length >= FREE_LIMIT) {
-      toast('Free tier limit reached. Upgrade for unlimited situations.');
-      return;
-    }
+    // No situation limit — free users can name everything they carry
 
     const { data, error } = await sb.from('situations').insert({
       user_id: currentUser.id,
@@ -1154,10 +1218,17 @@
 
   document.getElementById('sessionOverlay').querySelectorAll('.dur-btn').forEach(btn => {
     btn.addEventListener('click', () => {
+      const min = parseInt(btn.dataset.min);
+      // Gate longer sessions for free users
+      if (!profile.is_premium && min > FREE_SESSION_MAX) {
+        closeOverlay('sessionOverlay');
+        openUpgradeModal('session');
+        return;
+      }
       document.getElementById('sessionOverlay').querySelectorAll('.dur-btn')
         .forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
-      sessDuration = parseInt(btn.dataset.min);
+      sessDuration = min;
     });
   });
 
@@ -1169,7 +1240,7 @@
       duration: sessDuration,
       userId: currentUser.id,
     }));
-    window.location.href = 'catatonica-session.html';
+    window.location.href = 'session.html';
   });
 
   // ─── OBS MODAL ───
@@ -1355,10 +1426,23 @@
     });
   });
 
+  // ─── UPGRADE MODAL ───
+  function openUpgradeModal(context) {
+    // Set Stripe links
+    document.getElementById('stripeDeepBtn').href = STRIPE.deep;
+    document.getElementById('stripeOrderBtn').href = STRIPE.order;
+
+    // Context-aware headline
+    const ctx = {
+      session: 'Longer sessions are a Deep feature.',
+      general: 'Go Deeper',
+    };
+    document.getElementById('upgradeContext').textContent = ctx[context] || 'Go Deeper';
+    openOverlay('upgradeOverlay');
+  }
+
   // ─── UPGRADE ───
-  document.getElementById('upgradeBtn').addEventListener('click', () => {
-    toast('Premium coming soon — you\'ll be first to know.');
-  });
+  document.getElementById('upgradeBtn').addEventListener('click', () => openUpgradeModal('general'));
 
   // ─── HELPERS ───
   function esc(str) {
