@@ -16,8 +16,8 @@
       --text-primary: #e8e4dc;
       --text-muted: rgba(232, 228, 220, 0.38);
       --text-dim: rgba(232, 228, 220, 0.14);
-      --accent: #a89f8c;
-      --accent-cold: #7a9ea8;
+      --accent: #c8bfad;
+      --accent-cold: #5eb8cc;
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -605,6 +605,8 @@
       document.querySelectorAll('.dur-btn').forEach(b => {
         b.classList.toggle('active', parseInt(b.dataset.min) === state.duration);
       });
+      // Auto-start immediately when launched from app via URL params
+      setTimeout(() => startSession(), 100);
     }
 
     // ─── CURSOR ───
