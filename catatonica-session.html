@@ -574,8 +574,14 @@
   </div>
 
   <script>
-    // ─── SESSION CONTEXT (from app.html) ───
-    const sessionCtx = JSON.parse(sessionStorage.getItem('cat_session') || 'null');
+    // ─── SESSION CONTEXT (from app.html via URL params) ───
+    const urlParams = new URLSearchParams(window.location.search);
+    const sessionCtx = urlParams.has('mode') ? {
+      sitId: urlParams.get('sitId') || null,
+      mode: urlParams.get('mode') || 'silence',
+      duration: parseInt(urlParams.get('duration')) || 10,
+      userId: urlParams.get('userId') || null,
+    } : null;
 
     // ─── STATE ───
     const state = {
@@ -775,7 +781,7 @@
       const completion = elapsed / state.totalSeconds;
       const catatonsEarned = Math.max(1, Math.round(state.duration * completion));
 
-      // Return result to app.html via sessionStorage
+      // Return result to app.html via URL params
       if (state.sitId) {
         sessionStorage.setItem('cat_session_result', JSON.stringify({
           sitId: state.sitId,

@@ -1234,13 +1234,13 @@
 
   document.getElementById('startSessBtn').addEventListener('click', () => {
     closeOverlay('sessionOverlay');
-    sessionStorage.setItem('cat_session', JSON.stringify({
-      sitId: activeSitId,
+    const params = new URLSearchParams({
+      sitId: activeSitId || '',
       mode: sessMode,
       duration: sessDuration,
       userId: currentUser.id,
-    }));
-    window.location.href = 'session.html';
+    });
+    window.location.href = 'session.html?' + params.toString();
   });
 
   // ─── OBS MODAL ───
