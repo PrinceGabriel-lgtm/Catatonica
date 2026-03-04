@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Privacy Policy — Catatonica</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=DM+Mono:wght@300;400&family=Outfit:wght@200;300;400&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --void: #0a0806; --surface: #161310;
+      --border: rgba(196,169,109,0.1);
+      --text: #ede8df; --muted: rgba(237,232,223,0.5);
+      --dim: rgba(237,232,223,0.25); --gold: #c4a96d;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--void); color: var(--text); font-family: 'Outfit', sans-serif; font-weight: 300; padding: 0 0 6rem; }
+    nav { padding: 1.8rem 3rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+    .nav-logo { font-family: 'Cormorant Garamond', serif; font-size: 1rem; letter-spacing: 0.35em; text-transform: uppercase; color: var(--text); text-decoration: none; }
+    .nav-logo em { font-style: italic; color: var(--gold); }
+    .nav-back { font-family: 'DM Mono', monospace; font-size: 0.55rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--dim); text-decoration: none; }
+    .nav-back:hover { color: var(--text); }
+    .wrap { max-width: 720px; margin: 0 auto; padding: 4rem 2rem; }
+    .eyebrow { font-family: 'DM Mono', monospace; font-size: 0.52rem; letter-spacing: 0.28em; text-transform: uppercase; color: var(--gold); opacity: 0.6; margin-bottom: 0.8rem; }
+    h1 { font-family: 'Cormorant Garamond', serif; font-size: 2.2rem; font-weight: 300; margin-bottom: 0.5rem; }
+    h1 em { font-style: italic; color: var(--gold); }
+    .updated { font-family: 'DM Mono', monospace; font-size: 0.52rem; letter-spacing: 0.1em; color: var(--dim); margin-bottom: 3rem; padding-bottom: 2rem; border-bottom: 1px solid var(--border); }
+    h2 { font-family: 'Cormorant Garamond', serif; font-size: 1.2rem; font-weight: 300; color: var(--text); margin: 2.5rem 0 0.8rem; }
+    p { font-size: 0.9rem; color: var(--muted); line-height: 1.8; margin-bottom: 1rem; }
+    ul { padding-left: 1.2rem; margin-bottom: 1rem; }
+    li { font-size: 0.9rem; color: var(--muted); line-height: 1.8; margin-bottom: 0.3rem; }
+    a { color: var(--gold); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+<nav>
+  <a href="index.html" class="nav-logo">Cata<em>tonica</em></a>
+  <a href="index.html" class="nav-back">← Back</a>
+</nav>
+<div class="wrap">
+  <p class="eyebrow">Legal</p>
+  <h1>Privacy <em>Policy</em></h1>
+  <p class="updated">Last updated: March 2026</p>
+
+  <p>This Privacy Policy explains how Catatonica ("we", "us", or "our") collects, uses, and protects your information when you use our Service. We take your privacy seriously — especially given the personal nature of what you share with us.</p>
+
+  <h2>1. What We Collect</h2>
+  <p>We collect only what is necessary to provide the Service:</p>
+  <ul>
+    <li><strong>Account information:</strong> email address and password (hashed, never stored in plain text)</li>
+    <li><strong>Content you create:</strong> situation names, intention texts, session records, genesis reflections</li>
+    <li><strong>Usage data:</strong> session counts, Catatons earned, completion events — used to power your dashboard</li>
+    <li><strong>Payment information:</strong> processed by Paddle. We never see or store your card details.</li>
+    <li><strong>Waitlist email:</strong> if you joined the waitlist before creating an account</li>
+  </ul>
+
+  <h2>2. What We Don't Collect</h2>
+  <ul>
+    <li>We do not collect your location</li>
+    <li>We do not use tracking pixels or advertising cookies</li>
+    <li>We do not sell your data to third parties — ever</li>
+    <li>We do not use your content to train AI models</li>
+  </ul>
+
+  <h2>3. How We Use Your Data</h2>
+  <p>Your data is used solely to:</p>
+  <ul>
+    <li>Provide and maintain the Service</li>
+    <li>Authenticate your account</li>
+    <li>Display your situations, sessions, and Catatons back to you</li>
+    <li>Process subscription payments via Paddle</li>
+    <li>Send essential service emails (account confirmation, password reset)</li>
+  </ul>
+
+  <h2>4. Data Storage</h2>
+  <p>Your data is stored securely in Supabase (PostgreSQL), with Row Level Security enabled — meaning your data is only accessible by you. Supabase infrastructure is hosted on AWS in the US East region.</p>
+
+  <h2>5. Third-Party Services</h2>
+  <ul>
+    <li><strong>Supabase</strong> — authentication and database hosting</li>
+    <li><strong>Paddle</strong> — payment processing and subscription management</li>
+    <li><strong>Cloudflare Pages</strong> — website hosting and content delivery</li>
+  </ul>
+  <p>Each of these services has their own privacy policies governing their data handling.</p>
+
+  <h2>6. Your Rights</h2>
+  <p>You have the right to:</p>
+  <ul>
+    <li>Access all data we hold about you</li>
+    <li>Export your content at any time</li>
+    <li>Delete your account and all associated data</li>
+    <li>Correct inaccurate information</li>
+  </ul>
+  <p>To exercise these rights, contact us at <a href="mailto:hello@catatonica.app">hello@catatonica.app</a></p>
+
+  <h2>7. Data Retention</h2>
+  <p>We retain your data for as long as your account is active. If you delete your account, all personal data is permanently deleted within 30 days.</p>
+
+  <h2>8. Children's Privacy</h2>
+  <p>The Service is not directed at children under 13. We do not knowingly collect data from children under 13.</p>
+
+  <h2>9. Changes to This Policy</h2>
+  <p>We may update this policy from time to time. We will notify you of significant changes by email. Continued use after changes constitutes acceptance.</p>
+
+  <h2>10. Contact</h2>
+  <p>For privacy questions or data requests: <a href="mailto:hello@catatonica.app">hello@catatonica.app</a></p>
+</div>
+</body>
+</html>
