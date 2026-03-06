@@ -1034,13 +1034,19 @@
   async function loadData() {
     const uid = currentUser.id;
 
-    const [profRes, sitRes, arcRes] = await Promise.all([
+    const [profRes, subRes, sitRes, arcRes] = await Promise.all([
       sb.from('profiles').select('*').eq('id', uid).single(),
+      sb.from('subscriptions').select('is_premium, tier').eq('user_id', uid).single(),
       sb.from('situations').select('*').eq('user_id', uid).order('created_at', { ascending: true }),
       sb.from('archive').select('*').eq('user_id', uid).order('completed_at', { ascending: false }),
     ]);
 
+    // Merge subscription data into profile — subscriptions table is the source of truth
     profile = profRes.data || {};
+    const sub = subRes.data || {};
+    profile.is_premium = sub.is_premium ?? false;
+    profile.tier = sub.tier ?? null;
+
     situations = sitRes.data || [];
     archive = arcRes.data || [];
 

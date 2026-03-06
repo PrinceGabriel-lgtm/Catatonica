@@ -573,9 +573,12 @@
     </div>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
     // ─── SESSION CONTEXT (from app.html via URL params) ───
     const urlParams = new URLSearchParams(window.location.search);
+    const FREE_SESSION_MAX = 10; // must match app.html
+
     const sessionCtx = urlParams.has('mode') ? {
       sitId: urlParams.get('sitId') || null,
       mode: urlParams.get('mode') || 'silence',
@@ -583,10 +586,38 @@
       userId: urlParams.get('userId') || null,
     } : null;
 
+    // ─── SERVER-SIDE GATE: verify duration against real subscription ───
+    // Prevents URL param tampering to bypass free tier limits
+    async function verifyAndClampDuration(requestedDuration, userId) {
+      if (!userId) return Math.min(requestedDuration, FREE_SESSION_MAX);
+      if (requestedDuration <= FREE_SESSION_MAX) return requestedDuration;
+
+      try {
+        const sb = supabase.createClient(
+          'YOUR_SUPABASE_URL',       // replace with your project URL
+          'YOUR_SUPABASE_ANON_KEY'   // anon key is safe here (RLS protects data)
+        );
+        const { data, error } = await sb
+          .from('subscriptions')
+          .select('is_premium')
+          .eq('user_id', userId)
+          .single();
+
+        if (error || !data?.is_premium) {
+          console.warn('Duration clamped: user is not premium');
+          return FREE_SESSION_MAX;
+        }
+        return requestedDuration;
+      } catch (err) {
+        console.warn('Could not verify subscription, clamping duration:', err);
+        return FREE_SESSION_MAX;
+      }
+    }
+
     // ─── STATE ───
     const state = {
       mode: sessionCtx?.mode || 'silence',
-      duration: sessionCtx?.duration || 10,
+      duration: sessionCtx?.duration || 10,  // will be verified below
       sitId: sessionCtx?.sitId || null,
       secondsLeft: 0,
       totalSeconds: 0,
@@ -605,8 +636,15 @@
       document.querySelectorAll('.dur-btn').forEach(b => {
         b.classList.toggle('active', parseInt(b.dataset.min) === state.duration);
       });
-      // Auto-start immediately when launched from app via URL params
-      setTimeout(() => startSession(), 100);
+      // Verify duration server-side before auto-starting
+      verifyAndClampDuration(sessionCtx.duration, sessionCtx.userId).then(safeDuration => {
+        state.duration = safeDuration;
+        // Re-sync duration buttons after clamping
+        document.querySelectorAll('.dur-btn').forEach(b => {
+          b.classList.toggle('active', parseInt(b.dataset.min) === state.duration);
+        });
+        setTimeout(() => startSession(), 100);
+      });
     }
 
     // ─── CURSOR ───
