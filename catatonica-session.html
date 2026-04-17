@@ -1,1057 +1,1181 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Catatonica — Enter</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Mono:ital,wght@0,300;0,400;1,300&family=Outfit:wght@200;300;400&display=swap" rel="stylesheet" />
-
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Catatonica — The Void</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;1,300&family=DM+Mono:wght@300&display=swap" rel="stylesheet"/>
   <style>
     :root {
-      --void: #080808;
-      --surface: #141414;
-      --border: rgba(255,255,255,0.06);
-      --text-primary: #e8e4dc;
-      --text-muted: rgba(232, 228, 220, 0.38);
-      --text-dim: rgba(232, 228, 220, 0.14);
-      --accent: #c8bfad;
-      --accent-cold: #5eb8cc;
+      --void: #01060a;
+      --gold: #d4a830;
+      --text: rgba(237,232,223,0.85);
+      --text-dim: rgba(237,232,223,0.18);
     }
-
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html, body { height: 100%; }
+    html, body { width: 100%; height: 100%; overflow: hidden; background: var(--void); }
+    body { cursor: none; }
 
-    body {
-      background: var(--void);
-      color: var(--text-primary);
-      font-family: 'Outfit', sans-serif;
-      font-weight: 300;
-      overflow: hidden;
-      cursor: none;
-      user-select: none;
+    canvas { position: fixed; inset: 0; width: 100%; height: 100%; }
+
+    /* ── ESCAPE TAB ── */
+    .escape-tab { position: fixed; right: 0; top: 50%; transform: translateY(-50%); z-index: 100; }
+    .escape-handle {
+      width: 26px; height: 72px;
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(255,255,255,0.05); border-right: none;
+      display: flex; align-items: center; justify-content: center;
+      cursor: none; transition: background 0.4s, width 0.4s;
+      border-radius: 4px 0 0 4px;
+    }
+    .escape-handle:hover { background: rgba(255,255,255,0.05); width: 34px; }
+    .escape-chevron {
+      font-size: 0.38rem; color: rgba(255,255,255,0.15);
+      letter-spacing: 0.12em; writing-mode: vertical-rl;
+      font-family: 'DM Mono', monospace; text-transform: uppercase;
     }
 
-    /* ─── CURSOR ─── */
-    .cursor {
-      position: fixed; width: 5px; height: 5px;
-      background: var(--accent-cold); border-radius: 50%;
-      pointer-events: none; z-index: 9999;
-      transform: translate(-50%, -50%);
-      transition: transform 0.1s ease, opacity 0.5s ease;
-      opacity: 0.6;
+    /* ── ESCAPE PANEL ── */
+    .escape-panel {
+      position: fixed; right: -280px; top: 50%; transform: translateY(-50%);
+      width: 260px;
+      background: rgba(1,5,9,0.92);
+      border: 1px solid rgba(255,255,255,0.06); border-right: none;
+      padding: 2.5rem 2rem; z-index: 99;
+      transition: right 0.5s cubic-bezier(0.16,1,0.3,1);
+      border-radius: 8px 0 0 8px;
+      backdrop-filter: blur(16px);
     }
-    .cursor-ring {
-      position: fixed; width: 28px; height: 28px;
-      border: 1px solid rgba(122,158,168,0.25); border-radius: 50%;
-      pointer-events: none; z-index: 9998;
-      transform: translate(-50%, -50%);
-      transition: width 0.3s ease, height 0.3s ease;
-      opacity: 0.4;
+    .escape-panel.open { right: 0; }
+    .panel-timer {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 3rem; font-weight: 300;
+      color: rgba(237,232,223,0.45);
+      letter-spacing: 0.05em; text-align: center; margin-bottom: 0.3rem;
     }
-    body.in-session .cursor,
-    body.in-session .cursor-ring { opacity: 0 !important; }
+    .panel-label {
+      font-family: 'DM Mono', monospace; font-size: 0.4rem;
+      letter-spacing: 0.28em; text-transform: uppercase;
+      color: var(--text-dim); text-align: center; margin-bottom: 0.5rem;
+    }
+    .panel-catatons {
+      font-family: 'DM Mono', monospace; font-size: 0.46rem;
+      letter-spacing: 0.2em; text-transform: uppercase;
+      color: rgba(212,168,48,0.45); text-align: center; margin-bottom: 2.5rem;
+    }
+    .progress-ring { display: block; margin: 0 auto 2rem; }
+    .panel-exit {
+      font-family: 'DM Mono', monospace; font-size: 0.48rem;
+      letter-spacing: 0.2em; text-transform: uppercase;
+      color: rgba(237,232,223,0.22); background: transparent;
+      border: 1px solid rgba(255,255,255,0.07);
+      padding: 0.8rem 1rem; width: 100%; cursor: none; transition: all 0.3s;
+    }
+    .panel-exit:hover { color: rgba(237,232,223,0.55); border-color: rgba(255,255,255,0.14); }
 
-    /* ─── GRAIN ─── */
-    body::before {
-      content: '';
-      position: fixed; inset: 0;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
-      pointer-events: none; z-index: 9997; opacity: 0.35;
-    }
-
-    /* ─── SCREENS ─── */
+    /* ── SCREENS ── */
     .screen {
-      position: fixed; inset: 0;
+      position: fixed; inset: 0; z-index: 50;
       display: flex; flex-direction: column;
-      justify-content: center; align-items: center;
-      transition: opacity 0.8s ease;
+      align-items: center; justify-content: center;
+      transition: opacity 0.9s ease;
     }
     .screen.hidden { opacity: 0; pointer-events: none; }
     .screen.gone { display: none; }
 
-    /* ─── SETUP SCREEN ─── */
-    #setupScreen {
-      padding: 3rem;
-      background: var(--void);
-    }
+    /* Session screen: transparent — canvas is the visual */
+    #sessionScreen { background: transparent; pointer-events: none; }
 
-    .setup-nav {
-      position: absolute;
-      top: 2.5rem; left: 3rem;
-      display: flex; align-items: center; gap: 1rem;
-    }
-    .back-link {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.62rem; letter-spacing: 0.2em;
-      text-transform: uppercase; color: var(--text-dim);
-      text-decoration: none; cursor: none;
-      transition: color 0.3s ease;
-    }
-    .back-link:hover { color: var(--text-muted); }
+    /* ── SETUP SCREEN ── */
+    #setupScreen { background: transparent; }
 
-    .setup-logo {
-      position: absolute;
-      top: 2.5rem; right: 3rem;
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 1rem; font-weight: 300;
-      letter-spacing: 0.35em; text-transform: uppercase;
-      color: var(--text-muted); opacity: 0.6;
+    .setup-inner {
+      text-align: center; max-width: 420px; padding: 2.5rem 2.5rem 2.2rem;
+      background: rgba(1,6,10,0.75);
+      border: 1px solid rgba(255,255,255,0.06);
+      backdrop-filter: blur(20px); border-radius: 2px;
     }
-    .setup-logo span { font-style: italic; color: var(--accent); }
-
-    .setup-content {
-      width: 100%; max-width: 640px;
-      animation: fadeUp 0.8s ease forwards;
-    }
-
     .setup-eyebrow {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.6rem; letter-spacing: 0.3em;
-      text-transform: uppercase; color: var(--accent-cold);
-      margin-bottom: 1.5rem; opacity: 0.7;
+      font-family: 'DM Mono', monospace; font-size: 0.44rem;
+      letter-spacing: 0.42em; text-transform: uppercase;
+      color: rgba(212,168,48,0.38); margin-bottom: 1.4rem;
     }
-
     .setup-title {
       font-family: 'Cormorant Garamond', serif;
-      font-size: clamp(2.5rem, 5vw, 4rem);
-      font-weight: 300; color: var(--text-primary);
-      line-height: 1.1; margin-bottom: 3.5rem;
+      font-size: 2.7rem; font-weight: 300;
+      color: rgba(237,232,223,0.85); line-height: 1.1; margin-bottom: 0.5rem;
     }
-    .setup-title em { font-style: italic; color: var(--accent); }
-
-    /* Mode selector */
-    .setup-section-label {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.58rem; letter-spacing: 0.25em;
-      text-transform: uppercase; color: var(--text-dim);
-      margin-bottom: 1rem;
+    .setup-title em { font-style: italic; color: var(--gold); }
+    .setup-sub {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 0.88rem; font-style: italic;
+      color: rgba(237,232,223,0.22); margin-bottom: 2.2rem; line-height: 1.8;
     }
 
     .mode-grid {
-      display: grid; grid-template-columns: repeat(3, 1fr);
-      gap: 1px; background: var(--border);
-      border: 1px solid var(--border);
-      margin-bottom: 3rem;
+      display: grid; grid-template-columns: repeat(3,1fr);
+      gap: 1px; background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.05); margin-bottom: 1.5rem;
     }
-
     .mode-btn {
-      background: var(--void);
-      border: none; padding: 1.6rem 1.4rem;
-      cursor: none; text-align: left;
+      background: rgba(1,6,10,0.85); padding: 1.3rem 0.6rem;
+      border: none; cursor: none; transition: background 0.35s; text-align: center;
       position: relative; overflow: hidden;
-      transition: background 0.3s ease;
     }
-    .mode-btn:hover { background: var(--surface); }
-    .mode-btn.active {
-      background: var(--surface);
+    .mode-btn::after {
+      content: ''; position: absolute; inset: 0;
+      background: rgba(212,168,48,0.07); opacity: 0; transition: opacity 0.35s;
     }
-    .mode-btn.active::after {
-      content: '';
-      position: absolute; bottom: 0; left: 0; right: 0;
-      height: 1px;
-      background: var(--accent-cold);
-    }
-
-    .mode-icon {
-      width: 28px; height: 28px;
-      margin-bottom: 1rem;
-      display: flex; align-items: center; justify-content: center;
-      opacity: 0.5;
-      transition: opacity 0.3s ease;
-    }
-    .mode-btn.active .mode-icon,
-    .mode-btn:hover .mode-icon { opacity: 1; }
-
+    .mode-btn.active::after { opacity: 1; }
+    .mode-btn.active { background: rgba(1,6,10,0.6); }
     .mode-name {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 1.1rem; font-weight: 300;
-      color: var(--text-primary);
-      display: block; margin-bottom: 0.3rem;
+      font-family: 'DM Mono', monospace; font-size: 0.42rem;
+      letter-spacing: 0.2em; text-transform: uppercase;
+      color: rgba(237,232,223,0.22); display: block; margin-bottom: 0.38rem;
+      transition: color 0.3s; position: relative; z-index: 1;
     }
+    .mode-btn.active .mode-name { color: rgba(212,168,48,0.78); }
     .mode-desc {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.58rem; letter-spacing: 0.1em;
-      color: var(--text-muted); text-transform: uppercase;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 0.7rem; font-style: italic;
+      color: rgba(237,232,223,0.14); display: block;
+      position: relative; z-index: 1; transition: color 0.3s;
     }
+    .mode-btn.active .mode-desc { color: rgba(237,232,223,0.28); }
 
-    /* Duration */
-    .duration-row {
+    .dur-row {
       display: flex; gap: 1px;
-      background: var(--border);
-      border: 1px solid var(--border);
-      margin-bottom: 3rem;
+      background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.05);
+      margin-bottom: 1.8rem;
     }
-
     .dur-btn {
-      flex: 1; background: var(--void);
-      border: none; padding: 1rem 0.5rem;
-      cursor: none;
-      font-family: 'DM Mono', monospace;
-      font-size: 0.7rem; letter-spacing: 0.1em;
-      color: var(--text-muted); text-transform: uppercase;
-      transition: background 0.3s ease, color 0.3s ease;
-      text-align: center;
+      flex: 1; background: rgba(1,6,10,0.85); border: none;
+      padding: 0.85rem 0; cursor: none;
+      font-family: 'DM Mono', monospace; font-size: 0.42rem;
+      letter-spacing: 0.14em; text-transform: uppercase;
+      color: rgba(237,232,223,0.18); transition: all 0.3s;
     }
-    .dur-btn:hover { background: var(--surface); color: var(--text-primary); }
-    .dur-btn.active {
-      background: var(--surface);
-      color: var(--text-primary);
-      position: relative;
-    }
-    .dur-btn.active::after {
-      content: '';
-      position: absolute; bottom: 0; left: 0; right: 0;
-      height: 1px; background: var(--accent-cold);
-    }
+    .dur-btn:hover { background: rgba(255,255,255,0.02); color: rgba(237,232,223,0.38); }
+    .dur-btn.active { background: rgba(212,168,48,0.05); color: rgba(212,168,48,0.75); }
 
-    /* Begin button */
     .begin-btn {
-      width: 100%;
-      background: var(--text-primary); color: var(--void);
-      border: none; padding: 1.2rem 2rem;
-      font-family: 'DM Mono', monospace;
-      font-size: 0.75rem; letter-spacing: 0.22em;
-      text-transform: uppercase; cursor: none;
-      transition: background 0.3s ease, transform 0.2s ease;
+      font-family: 'DM Mono', monospace; font-size: 0.5rem;
+      letter-spacing: 0.3em; text-transform: uppercase; cursor: none;
+      background: rgba(237,232,223,0.88); color: #01060a;
+      border: none; padding: 1.1rem 2rem; width: 100%;
+      transition: background 0.3s, transform 0.2s, letter-spacing 0.3s;
     }
-    .begin-btn:hover {
-      background: var(--accent-cold);
-      transform: translateY(-1px);
-    }
+    .begin-btn:hover { background: var(--gold); transform: translateY(-1px); letter-spacing: 0.36em; }
 
-    /* ─── SESSION SCREEN ─── */
-    #sessionScreen {
-      background: #050505;
-      cursor: none;
+    /* Mode label flash at session start */
+    .mode-indicator {
+      position: fixed; bottom: 3.5rem; left: 50%; transform: translateX(-50%);
+      font-family: 'DM Mono', monospace; font-size: 0.36rem;
+      letter-spacing: 0.5em; text-transform: uppercase;
+      color: rgba(237,232,223,0.07); pointer-events: none; z-index: 10;
+      transition: opacity 2s ease;
     }
+    .mode-indicator.visible { opacity: 1; color: rgba(237,232,223,0.12); }
+    .mode-indicator.faded { opacity: 0; }
 
-    /* Mode-specific backgrounds */
-    #sessionScreen.mode-sound {
-      background: #060a0d;
-    }
-    #sessionScreen.mode-visual {
-      background: #060606;
-    }
-
-    /* Exit button — appears on mouse move */
-    .session-exit {
-      position: fixed; top: 2.5rem; right: 3rem;
-      font-family: 'DM Mono', monospace;
-      font-size: 0.58rem; letter-spacing: 0.2em;
-      text-transform: uppercase; color: var(--text-dim);
-      background: none; border: none; cursor: none;
-      opacity: 0;
-      transition: opacity 0.5s ease;
-      z-index: 10;
-    }
-    .session-exit.visible { opacity: 1; }
-    .session-exit:hover { color: var(--text-muted); }
-
-    /* Timer display */
-    .timer-display {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: clamp(5rem, 15vw, 12rem);
-      font-weight: 300;
-      color: var(--text-dim);
-      letter-spacing: -0.02em;
-      line-height: 1;
-      position: relative;
-      z-index: 2;
-      transition: color 1s ease;
-      text-align: center;
-    }
-
-    .session-mode-label {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.58rem; letter-spacing: 0.3em;
-      text-transform: uppercase; color: var(--text-dim);
-      margin-top: 2rem;
-      opacity: 0.5;
-      position: relative; z-index: 2;
-    }
-
-    /* ─── BREATHING VISUAL ─── */
-    .breath-visual {
-      position: absolute; inset: 0;
-      display: flex; align-items: center; justify-content: center;
-      pointer-events: none;
-    }
-
-    .breath-ring {
-      position: absolute; border-radius: 50%;
-      border: 1px solid rgba(168,159,140,0.06);
-    }
-    .breath-ring-1 { width: 300px; height: 300px; animation: breathRing 8s ease-in-out infinite; }
-    .breath-ring-2 { width: 220px; height: 220px; animation: breathRing 8s ease-in-out infinite 0.4s; }
-    .breath-ring-3 { width: 140px; height: 140px; animation: breathRing 8s ease-in-out infinite 0.8s; }
-    .breath-ring-4 {
-      width: 60px; height: 60px;
-      background: radial-gradient(circle, rgba(168,159,140,0.08), transparent 70%);
-      border: none;
-      animation: breathCore 8s ease-in-out infinite;
-    }
-
-    @keyframes breathRing {
-      0%, 100% { transform: scale(0.85); opacity: 0.3; }
-      40% { transform: scale(1.2); opacity: 0.8; }
-      60% { transform: scale(1.2); opacity: 0.8; }
-    }
-
-    @keyframes breathCore {
-      0%, 100% { transform: scale(0.7); opacity: 0.4; }
-      40% { transform: scale(1.4); opacity: 1; }
-      60% { transform: scale(1.4); opacity: 1; }
-    }
-
-    .breath-text {
-      position: absolute;
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 0.85rem; font-style: italic;
-      color: var(--text-dim);
-      top: calc(50% + 180px);
-      text-align: center;
-      letter-spacing: 0.05em;
-      animation: breathLabel 8s ease-in-out infinite;
-    }
-
-    @keyframes breathLabel {
-      0%, 15% { content: 'Breathe in'; opacity: 0.6; }
-      35%, 65% { opacity: 0.4; }
-      80%, 100% { opacity: 0.6; }
-    }
-
-    /* ─── SOUND VISUAL ─── */
-    .sound-visual {
-      position: absolute; inset: 0;
-      display: flex; align-items: center; justify-content: center;
-      pointer-events: none;
-    }
-
-    .sound-orb {
-      position: absolute; border-radius: 50%;
-      background: radial-gradient(circle, rgba(122,158,168,0.06), transparent 70%);
-      animation: soundOrb 7s ease-in-out infinite;
-    }
-    .sound-orb-1 { width: 400px; height: 400px; animation-duration: 9s; }
-    .sound-orb-2 { width: 280px; height: 280px; animation-duration: 7s; animation-delay: -3s; }
-    .sound-orb-3 {
-      width: 180px; height: 180px;
-      background: radial-gradient(circle, rgba(122,158,168,0.04), transparent 70%);
-      animation-duration: 5s; animation-delay: -1s;
-    }
-
-    @keyframes soundOrb {
-      0%, 100% { transform: scale(0.9) translate(0,0); opacity: 0.6; }
-      33% { transform: scale(1.1) translate(15px, -20px); opacity: 1; }
-      66% { transform: scale(0.95) translate(-10px, 10px); opacity: 0.7; }
-    }
-
-    /* ─── COMPLETE SCREEN ─── */
+    /* ── COMPLETE SCREEN ── */
     #completeScreen {
-      background: var(--void);
-      text-align: center; padding: 3rem;
+      background: radial-gradient(ellipse at center, rgba(2,12,18,0.98) 0%, rgba(1,5,9,0.99) 65%);
+    }
+    .complete-inner {
+      text-align: center; max-width: 400px; padding: 2rem;
+      animation: fadeUp 1.4s ease forwards; opacity: 0;
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(28px); }
+      to   { opacity: 1; transform: translateY(0); }
     }
 
-    .complete-content {
-      max-width: 480px;
-      animation: fadeUp 1s ease forwards;
-      opacity: 0;
+    /* Animated star on complete screen */
+    .star-orb {
+      width: 88px; height: 88px; border-radius: 50%;
+      margin: 0 auto 2.8rem; position: relative;
+      display: flex; align-items: center; justify-content: center;
     }
-
-    .complete-icon {
-      width: 48px; height: 1px;
-      background: var(--accent);
-      margin: 0 auto 3rem;
-      opacity: 0.5;
+    .star-ring {
+      position: absolute; border-radius: 50%;
+      border: 1px solid rgba(212,168,48,0.12);
+      animation: ringPulse 4s ease-in-out infinite;
+    }
+    .star-ring:nth-child(1) { width: 100%; height: 100%; animation-delay: 0s; }
+    .star-ring:nth-child(2) { width: 68%; height: 68%; animation-delay: 0.7s; border-color: rgba(212,168,48,0.18); }
+    .star-ring:nth-child(3) { width: 40%; height: 40%; animation-delay: 1.4s; border-color: rgba(212,168,48,0.25); }
+    @keyframes ringPulse {
+      0%,100% { transform: scale(1); opacity: 0.4; }
+      50%      { transform: scale(1.1); opacity: 1; }
+    }
+    .star-core {
+      width: 9px; height: 9px; border-radius: 50%;
+      background: radial-gradient(circle, #fff8e8 0%, var(--gold) 55%, transparent 100%);
+      position: relative; z-index: 2;
+      box-shadow: 0 0 10px 3px rgba(212,168,48,0.45), 0 0 28px 10px rgba(212,168,48,0.12);
+      animation: corePulse 3.5s ease-in-out infinite;
+    }
+    @keyframes corePulse {
+      0%,100% { transform: scale(1); opacity: 0.85; }
+      50%      { transform: scale(1.4); opacity: 1; }
     }
 
     .complete-title {
       font-family: 'Cormorant Garamond', serif;
-      font-size: clamp(2.5rem, 5vw, 4rem);
-      font-weight: 300; color: var(--text-primary);
-      line-height: 1.1; margin-bottom: 1.5rem;
+      font-size: 2.2rem; font-weight: 300;
+      color: rgba(237,232,223,0.85); margin-bottom: 0.5rem;
     }
-    .complete-title em { font-style: italic; color: var(--accent); }
-
-    .complete-duration {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.65rem; letter-spacing: 0.25em;
-      text-transform: uppercase; color: var(--text-muted);
-      margin-bottom: 3.5rem;
+    .complete-title em { font-style: italic; color: var(--gold); }
+    .complete-dur {
+      font-family: 'DM Mono', monospace; font-size: 0.44rem;
+      letter-spacing: 0.24em; text-transform: uppercase;
+      color: rgba(212,168,48,0.48); margin-bottom: 2rem; display: block;
     }
-
     .complete-quote {
       font-family: 'Cormorant Garamond', serif;
       font-size: 1rem; font-style: italic;
-      color: var(--text-muted); line-height: 1.8;
-      margin-bottom: 3.5rem;
-      max-width: 360px; margin-left: auto; margin-right: auto;
+      color: rgba(237,232,223,0.28); line-height: 1.9; margin-bottom: 3rem;
+      border-left: 1px solid rgba(212,168,48,0.18); padding-left: 1.2rem; text-align: left;
     }
+    .complete-actions { display: flex; gap: 1rem; justify-content: center; }
+    .btn-return {
+      font-family: 'DM Mono', monospace; font-size: 0.48rem;
+      letter-spacing: 0.2em; text-transform: uppercase; cursor: none;
+      background: rgba(237,232,223,0.85); color: #01060a;
+      border: none; padding: 0.9rem 2rem;
+      text-decoration: none; display: inline-block; transition: background 0.3s;
+    }
+    .btn-return:hover { background: var(--gold); }
+    .btn-again {
+      font-family: 'DM Mono', monospace; font-size: 0.48rem;
+      letter-spacing: 0.2em; text-transform: uppercase; cursor: none;
+      background: transparent; color: rgba(237,232,223,0.28);
+      border: 1px solid rgba(255,255,255,0.07);
+      padding: 0.9rem 1.6rem; transition: all 0.3s;
+    }
+    .btn-again:hover { color: rgba(237,232,223,0.6); border-color: rgba(255,255,255,0.15); }
 
-    .complete-actions {
-      display: flex; gap: 1rem; justify-content: center;
-      flex-wrap: wrap;
-    }
-
-    .btn-primary {
-      background: var(--text-primary); color: var(--void);
-      border: none; padding: 1rem 2.2rem;
-      font-family: 'DM Mono', monospace;
-      font-size: 0.7rem; letter-spacing: 0.18em;
-      text-transform: uppercase; cursor: none;
-      transition: background 0.3s ease;
-      text-decoration: none; display: inline-block;
-    }
-    .btn-primary:hover { background: var(--accent-cold); }
-
-    .btn-ghost {
-      background: transparent; color: var(--text-muted);
-      border: 1px solid var(--border); padding: 1rem 1.8rem;
-      font-family: 'DM Mono', monospace;
-      font-size: 0.7rem; letter-spacing: 0.18em;
-      text-transform: uppercase; cursor: none;
-      transition: color 0.3s ease, border-color 0.3s ease;
-      text-decoration: none; display: inline-block;
-    }
-    .btn-ghost:hover { color: var(--text-primary); border-color: rgba(255,255,255,0.2); }
-
-    /* ─── ANIMATIONS ─── */
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    /* ─── PROGRESS ARC ─── */
-    .progress-ring {
-      position: fixed;
-      bottom: 3rem; left: 50%;
-      transform: translateX(-50%);
-      z-index: 5;
-      opacity: 0.4;
-    }
-    .progress-ring circle {
-      transition: stroke-dashoffset 1s linear;
-      transform-origin: center;
-      transform: rotate(-90deg);
-    }
-
-    /* ─── MOBILE ─── */
-    @media (max-width: 600px) {
-      .mode-grid { grid-template-columns: 1fr; }
-      .setup-content { max-width: 100%; }
-      .setup-logo { display: none; }
-      .timer-display { font-size: clamp(4rem, 20vw, 8rem); }
-      .breath-ring-1 { width: 220px; height: 220px; }
-      .breath-ring-2 { width: 160px; height: 160px; }
+    /* cursor */
+    .cursor {
+      position: fixed; width: 4px; height: 4px;
+      background: rgba(212,168,48,0.5); border-radius: 50%;
+      pointer-events: none; z-index: 9999; transform: translate(-50%,-50%);
+      transition: width 0.15s, height 0.15s, opacity 0.3s;
     }
   </style>
 </head>
 <body>
 
   <div class="cursor" id="cursor"></div>
-  <div class="cursor-ring" id="cursorRing"></div>
+  <canvas id="voidCanvas"></canvas>
 
-  <!-- ─── SETUP SCREEN ─── -->
-  <div class="screen" id="setupScreen">
-    <div class="setup-nav">
-      <a href="app.html" class="back-link">← Catatonica</a>
+  <div class="mode-indicator" id="modeIndicator"></div>
+
+  <!-- ESCAPE TAB -->
+  <div class="escape-tab">
+    <div class="escape-handle" id="escapeHandle">
+      <span class="escape-chevron">esc</span>
     </div>
-    <div class="setup-logo">Cata<span>tonica</span></div>
+  </div>
 
-    <div class="setup-content">
+  <!-- ESCAPE PANEL -->
+  <div class="escape-panel" id="escapePanel">
+    <svg class="progress-ring" width="70" height="70" viewBox="0 0 70 70">
+      <circle cx="35" cy="35" r="28" fill="none" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+      <circle id="progressRing" cx="35" cy="35" r="28" fill="none"
+        stroke="rgba(212,168,48,0.32)" stroke-width="1"
+        stroke-dasharray="175.9" stroke-dashoffset="175.9"
+        stroke-linecap="round" transform="rotate(-90 35 35)"/>
+    </svg>
+    <div class="panel-timer" id="panelTimer">00:00</div>
+    <div class="panel-label">remaining</div>
+    <div class="panel-catatons" id="panelCatatons">0 Catatons earned</div>
+    <button class="panel-exit" id="exitBtn">End Early →</button>
+  </div>
+
+  <!-- SETUP SCREEN -->
+  <div class="screen" id="setupScreen">
+    <div class="setup-inner">
       <p class="setup-eyebrow">New Session</p>
-      <h1 class="setup-title">
-        Choose your<br><em>silence.</em>
-      </h1>
+      <h1 class="setup-title">Enter the <em>void.</em></h1>
+      <p class="setup-sub">Choose how you want to sit with it.</p>
 
-      <!-- Mode -->
-      <p class="setup-section-label">Mode</p>
       <div class="mode-grid">
         <button class="mode-btn active" data-mode="silence">
-          <div class="mode-icon">
-            <!-- Silence icon: just a dot -->
-            <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-              <circle cx="9" cy="9" r="2" fill="var(--accent)"/>
-            </svg>
-          </div>
-          <span class="mode-name">Silence</span>
-          <span class="mode-desc">Pure void</span>
+          <span class="mode-name">The Void</span>
+          <span class="mode-desc">pure silence</span>
         </button>
         <button class="mode-btn" data-mode="sound">
-          <div class="mode-icon">
-            <!-- Soundwave icon -->
-            <svg width="24" height="18" viewBox="0 0 24 18" fill="none">
-              <rect x="0" y="7" width="2" height="4" rx="1" fill="var(--accent-cold)" opacity="0.8"/>
-              <rect x="4" y="4" width="2" height="10" rx="1" fill="var(--accent-cold)"/>
-              <rect x="8" y="1" width="2" height="16" rx="1" fill="var(--accent-cold)" opacity="0.7"/>
-              <rect x="12" y="4" width="2" height="10" rx="1" fill="var(--accent-cold)"/>
-              <rect x="16" y="6" width="2" height="6" rx="1" fill="var(--accent-cold)" opacity="0.6"/>
-              <rect x="20" y="8" width="2" height="2" rx="1" fill="var(--accent-cold)" opacity="0.4"/>
-            </svg>
-          </div>
-          <span class="mode-name">Soundscape</span>
-          <span class="mode-desc">Ambient tones</span>
+          <span class="mode-name">Threshold</span>
+          <span class="mode-desc">birthing pressure</span>
         </button>
         <button class="mode-btn" data-mode="visual">
-          <div class="mode-icon">
-            <!-- Breath circle icon -->
-            <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
-              <circle cx="11" cy="11" r="9" stroke="var(--accent)" stroke-width="0.8" opacity="0.6"/>
-              <circle cx="11" cy="11" r="5" stroke="var(--accent)" stroke-width="0.8" opacity="0.4"/>
-              <circle cx="11" cy="11" r="1.5" fill="var(--accent)" opacity="0.8"/>
-            </svg>
-          </div>
-          <span class="mode-name">Breathing</span>
-          <span class="mode-desc">Visual guide</span>
+          <span class="mode-name">Ignition</span>
+          <span class="mode-desc">the big bang</span>
         </button>
       </div>
 
-      <!-- Duration -->
-      <p class="setup-section-label">Duration</p>
-      <div class="duration-row">
-        <button class="dur-btn" data-min="5">5 min</button>
-        <button class="dur-btn active" data-min="10">10 min</button>
-        <button class="dur-btn" data-min="15">15 min</button>
-        <button class="dur-btn" data-min="20">20 min</button>
-        <button class="dur-btn" data-min="30">30 min</button>
+      <div class="dur-row">
+        <button class="dur-btn" data-min="5">5m</button>
+        <button class="dur-btn active" data-min="10">10m</button>
+        <button class="dur-btn" data-min="15">15m</button>
+        <button class="dur-btn" data-min="20">20m</button>
+        <button class="dur-btn" data-min="30">30m</button>
       </div>
 
-      <button class="begin-btn" id="beginBtn">Begin Session</button>
+      <button class="begin-btn" id="beginBtn">Enter the Void →</button>
     </div>
   </div>
 
-  <!-- ─── SESSION SCREEN ─── -->
-  <div class="screen hidden gone" id="sessionScreen">
+  <!-- SESSION SCREEN (transparent — canvas is the session) -->
+  <div class="screen hidden gone" id="sessionScreen"></div>
 
-    <button class="session-exit" id="exitBtn">End Early</button>
-
-    <!-- Breathing visual (shown in visual mode) -->
-    <div class="breath-visual" id="breathVisual" style="display:none">
-      <div class="breath-ring breath-ring-1"></div>
-      <div class="breath-ring breath-ring-2"></div>
-      <div class="breath-ring breath-ring-3"></div>
-      <div class="breath-ring breath-ring-4"></div>
-      <div class="breath-text" id="breathText">Breathe in</div>
-    </div>
-
-    <!-- Sound visual (shown in sound mode) -->
-    <div class="sound-visual" id="soundVisual" style="display:none">
-      <div class="sound-orb sound-orb-1"></div>
-      <div class="sound-orb sound-orb-2"></div>
-      <div class="sound-orb sound-orb-3"></div>
-    </div>
-
-    <!-- Timer -->
-    <div class="timer-display" id="timerDisplay">00:00</div>
-    <div class="session-mode-label" id="sessionModeLabel"></div>
-
-    <!-- Progress ring at bottom -->
-    <svg class="progress-ring" width="48" height="48" viewBox="0 0 48 48">
-      <circle cx="24" cy="24" r="20" fill="none" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
-      <circle id="progressCircle" cx="24" cy="24" r="20" fill="none"
-        stroke="var(--accent-cold)" stroke-width="1"
-        stroke-dasharray="125.6" stroke-dashoffset="125.6"
-        stroke-linecap="round"/>
-    </svg>
-  </div>
-
-  <!-- ─── COMPLETE SCREEN ─── -->
+  <!-- COMPLETE SCREEN -->
   <div class="screen hidden gone" id="completeScreen">
-    <div class="complete-content">
-      <div class="complete-icon"></div>
-      <h2 class="complete-title">
-        Well<br><em>done.</em>
-      </h2>
-      <p class="complete-duration" id="completeDuration"></p>
+    <div class="complete-inner">
+      <div class="star-orb">
+        <div class="star-ring"></div>
+        <div class="star-ring"></div>
+        <div class="star-ring"></div>
+        <div class="star-core"></div>
+      </div>
+      <h2 class="complete-title">You <em>stayed.</em></h2>
+      <span class="complete-dur" id="completeDuration"></span>
       <p class="complete-quote" id="completeQuote"></p>
       <div class="complete-actions">
-        <button class="btn-primary" id="goAgainBtn">Another Session</button>
-        <a href="app.html" class="btn-ghost">Return</a>
+        <a href="app.html" class="btn-return">Return →</a>
+        <button class="btn-again" id="goAgainBtn">Again</button>
       </div>
     </div>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
-    // ─── SESSION CONTEXT (from app.html via URL params) ───
-    const urlParams = new URLSearchParams(window.location.search);
-    const FREE_SESSION_MAX = 10; // must match app.html
+  // ── URL PARAMS ──
+  const urlParams = new URLSearchParams(window.location.search);
+  const sessionCtx = urlParams.has('mode') ? {
+    sitId:    urlParams.get('sitId') || null,
+    mode:     urlParams.get('mode') || 'silence',
+    duration: parseInt(urlParams.get('duration')) || 10,
+    userId:   urlParams.get('userId') || null,
+    catatons: parseInt(urlParams.get('catatons')) || 0,
+  } : null;
 
-    const sessionCtx = urlParams.has('mode') ? {
-      sitId: urlParams.get('sitId') || null,
-      mode: urlParams.get('mode') || 'silence',
-      duration: parseInt(urlParams.get('duration')) || 10,
-      userId: urlParams.get('userId') || null,
-    } : null;
+  // ── STATE ──
+  const state = {
+    mode:         sessionCtx?.mode || 'silence',
+    duration:     sessionCtx?.duration || 10,
+    sitId:        sessionCtx?.sitId || null,
+    catatons:     sessionCtx?.catatons || 0,
+    secondsLeft:  0,
+    totalSeconds: 0,
+    timer:        null,
+    audioCtx:     null,
+    soundNodes:   [],
+    breathPhase:  'in',
+    breathTimer:  null,
+    running:      false,
+  };
 
-    // ─── SERVER-SIDE GATE: verify duration against real subscription ───
-    // Prevents URL param tampering to bypass free tier limits
-    async function verifyAndClampDuration(requestedDuration, userId) {
-      if (!userId) return Math.min(requestedDuration, FREE_SESSION_MAX);
-      if (requestedDuration <= FREE_SESSION_MAX) return requestedDuration;
+  if (sessionCtx) {
+    document.querySelectorAll('.mode-btn').forEach(b =>
+      b.classList.toggle('active', b.dataset.mode === state.mode));
+    document.querySelectorAll('.dur-btn').forEach(b =>
+      b.classList.toggle('active', parseInt(b.dataset.min) === state.duration));
+    setTimeout(() => startSession(), 120);
+  }
 
-      try {
-        const sb = supabase.createClient(
-          'YOUR_SUPABASE_URL',       // replace with your project URL
-          'YOUR_SUPABASE_ANON_KEY'   // anon key is safe here (RLS protects data)
-        );
-        const { data, error } = await sb
-          .from('subscriptions')
-          .select('is_premium')
-          .eq('user_id', userId)
-          .single();
+  // ── CURSOR ──
+  const cursorEl = document.getElementById('cursor');
+  let mx = 0, my = 0;
+  document.addEventListener('mousemove', e => {
+    mx = e.clientX; my = e.clientY;
+    cursorEl.style.left = mx + 'px'; cursorEl.style.top = my + 'px';
+  });
+  document.querySelectorAll('button, a').forEach(el => {
+    el.addEventListener('mouseenter', () => { cursorEl.style.width='8px'; cursorEl.style.height='8px'; });
+    el.addEventListener('mouseleave', () => { cursorEl.style.width='4px'; cursorEl.style.height='4px'; });
+  });
 
-        if (error || !data?.is_premium) {
-          console.warn('Duration clamped: user is not premium');
-          return FREE_SESSION_MAX;
-        }
-        return requestedDuration;
-      } catch (err) {
-        console.warn('Could not verify subscription, clamping duration:', err);
-        return FREE_SESSION_MAX;
-      }
-    }
+  // ── ESCAPE PANEL ──
+  const panel = document.getElementById('escapePanel');
+  let panelOpen = false;
+  document.getElementById('escapeHandle').addEventListener('click', () => {
+    panelOpen = !panelOpen;
+    panel.classList.toggle('open', panelOpen);
+  });
 
-    // ─── STATE ───
-    const state = {
-      mode: sessionCtx?.mode || 'silence',
-      duration: sessionCtx?.duration || 10,  // will be verified below
-      sitId: sessionCtx?.sitId || null,
-      secondsLeft: 0,
-      totalSeconds: 0,
-      timer: null,
-      audioCtx: null,
-      soundNodes: [],
-      breathPhase: 'in',
-      breathTimer: null,
-    };
-
-    // Pre-select mode and duration from context
-    if (sessionCtx) {
-      document.querySelectorAll('.mode-btn').forEach(b => {
-        b.classList.toggle('active', b.dataset.mode === state.mode);
-      });
-      document.querySelectorAll('.dur-btn').forEach(b => {
-        b.classList.toggle('active', parseInt(b.dataset.min) === state.duration);
-      });
-      // Verify duration server-side before auto-starting
-      verifyAndClampDuration(sessionCtx.duration, sessionCtx.userId).then(safeDuration => {
-        state.duration = safeDuration;
-        // Re-sync duration buttons after clamping
-        document.querySelectorAll('.dur-btn').forEach(b => {
-          b.classList.toggle('active', parseInt(b.dataset.min) === state.duration);
-        });
-        setTimeout(() => startSession(), 100);
-      });
-    }
-
-    // ─── CURSOR ───
-    const cursor = document.getElementById('cursor');
-    const ring = document.getElementById('cursorRing');
-    let mx = 0, my = 0, rx = 0, ry = 0;
-
-    document.addEventListener('mousemove', e => {
-      mx = e.clientX; my = e.clientY;
-      cursor.style.left = mx + 'px';
-      cursor.style.top = my + 'px';
+  // ── MODE & DURATION SELECTION ──
+  document.querySelectorAll('.mode-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      state.mode = btn.dataset.mode;
     });
-
-    (function animateRing() {
-      rx += (mx - rx) * 0.12; ry += (my - ry) * 0.12;
-      ring.style.left = rx + 'px'; ring.style.top = ry + 'px';
-      requestAnimationFrame(animateRing);
-    })();
-
-    document.querySelectorAll('button, a').forEach(el => {
-      el.addEventListener('mouseenter', () => {
-        cursor.style.transform = 'translate(-50%,-50%) scale(2.5)';
-        ring.style.width = '44px'; ring.style.height = '44px';
-      });
-      el.addEventListener('mouseleave', () => {
-        cursor.style.transform = 'translate(-50%,-50%) scale(1)';
-        ring.style.width = '28px'; ring.style.height = '28px';
-      });
+  });
+  document.querySelectorAll('.dur-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.dur-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      state.duration = parseInt(btn.dataset.min);
     });
+  });
 
-    // ─── SETUP: MODE BUTTONS ───
-    document.querySelectorAll('.mode-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        state.mode = btn.dataset.mode;
-      });
+  // ── SCREEN TRANSITIONS ──
+  function showScreen(id) {
+    document.querySelectorAll('.screen').forEach(s => {
+      s.classList.add('hidden');
+      if (s.id !== id) setTimeout(() => s.classList.add('gone'), 900);
     });
+    const target = document.getElementById(id);
+    if (!target) return;
+    target.classList.remove('gone');
+    requestAnimationFrame(() => requestAnimationFrame(() => target.classList.remove('hidden')));
+  }
 
-    // ─── SETUP: DURATION BUTTONS ───
-    document.querySelectorAll('.dur-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        document.querySelectorAll('.dur-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        state.duration = parseInt(btn.dataset.min);
-      });
-    });
+  // ── BEGIN ──
+  document.getElementById('beginBtn').addEventListener('click', startSession);
 
-    // ─── SCREEN TRANSITIONS ───
-    function showScreen(id) {
-      document.querySelectorAll('.screen').forEach(s => {
-        s.classList.add('hidden');
-        setTimeout(() => {
-          if (!s.classList.contains('hidden') || s.id !== id) return;
-        }, 800);
-      });
+  function startSession() {
+    state.secondsLeft  = state.duration * 60;
+    state.totalSeconds = state.duration * 60;
+    state.running      = true;
 
-      const target = document.getElementById(id);
-      target.classList.remove('gone');
+    showScreen('sessionScreen');
 
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => target.classList.remove('hidden'));
-      });
+    // Mode label flash
+    const ind = document.getElementById('modeIndicator');
+    const modeNames = { silence: 'The Void', sound: 'The Threshold', visual: 'The Ignition' };
+    ind.textContent = modeNames[state.mode] || '';
+    ind.classList.add('visible');
+    setTimeout(() => ind.classList.add('faded'), 3000);
 
-      // Hide others after fade
-      document.querySelectorAll('.screen').forEach(s => {
-        if (s.id !== id) {
-          setTimeout(() => s.classList.add('gone'), 900);
-        }
-      });
-    }
+    if (state.mode === 'sound')  startAmbientSound();
+    if (state.mode === 'visual') startBreathCycle();
 
-    // ─── BEGIN SESSION ───
-    document.getElementById('beginBtn').addEventListener('click', startSession);
+    updatePanel();
+    state.timer = setInterval(tick, 1000);
+    voidEngine.start(state.mode, state.catatons);
+  }
 
-    function startSession() {
-      state.secondsLeft = state.duration * 60;
-      state.totalSeconds = state.duration * 60;
-
-      showScreen('sessionScreen');
-
-      // Set mode class and visuals
-      const ss = document.getElementById('sessionScreen');
-      ss.className = 'screen';
-      ss.classList.add(`mode-${state.mode}`);
-
-      const modeLabels = {
-        silence: 'Pure Silence',
-        sound: 'Soundscape',
-        visual: 'Breathing Visual'
-      };
-      document.getElementById('sessionModeLabel').textContent = modeLabels[state.mode];
-
-      // Show/hide mode visuals
-      document.getElementById('breathVisual').style.display = state.mode === 'visual' ? 'flex' : 'none';
-      document.getElementById('soundVisual').style.display = state.mode === 'sound' ? 'flex' : 'none';
-
-      // Hide timer in visual mode (timer is peripheral)
-      const timerEl = document.getElementById('timerDisplay');
-      timerEl.style.opacity = state.mode === 'visual' ? '0.15' : '1';
-
-      // Start audio if sound mode
-      if (state.mode === 'sound') startAmbientSound();
-
-      // Start breath cycle if visual mode
-      if (state.mode === 'visual') startBreathCycle();
-
-      // Hide cursor in session
-      document.body.classList.add('in-session');
-
-      // Show exit button on mouse move (debounced)
-      let moveTimeout;
-      const exitBtn = document.getElementById('exitBtn');
-      const sessionMouseHandler = () => {
-        exitBtn.classList.add('visible');
-        document.body.classList.remove('in-session');
-        clearTimeout(moveTimeout);
-        moveTimeout = setTimeout(() => {
-          exitBtn.classList.remove('visible');
-          document.body.classList.add('in-session');
-        }, 2500);
-      };
-      document.addEventListener('mousemove', sessionMouseHandler);
-      state._sessionMouseHandler = sessionMouseHandler;
-
-      // Tick
-      updateTimer();
-      state.timer = setInterval(tick, 1000);
-    }
-
-    // ─── TIMER ───
-    function tick() {
-      state.secondsLeft--;
-      if (state.secondsLeft <= 0) {
-        clearInterval(state.timer);
-        endSession();
-      } else {
-        updateTimer();
-      }
-    }
-
-    function updateTimer() {
-      const m = Math.floor(state.secondsLeft / 60);
-      const s = state.secondsLeft % 60;
-      document.getElementById('timerDisplay').textContent =
-        String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
-
-      // Progress ring
-      const progress = 1 - (state.secondsLeft / state.totalSeconds);
-      const circumference = 125.6;
-      const offset = circumference - (progress * circumference);
-      document.getElementById('progressCircle').style.strokeDashoffset = offset;
-
-      // Dim timer slightly as session progresses (going into the void)
-      if (state.mode === 'silence') {
-        const opacity = 0.18 + (0.5 * (state.secondsLeft / state.totalSeconds));
-        document.getElementById('timerDisplay').style.color = `rgba(232,228,220,${opacity})`;
-      }
-    }
-
-    // ─── END SESSION ───
-    function endSession(early = false) {
+  // ── TIMER ──
+  function tick() {
+    state.secondsLeft--;
+    if (state.secondsLeft <= 0) {
       clearInterval(state.timer);
-      stopAmbientSound();
-      stopBreathCycle();
-      document.removeEventListener('mousemove', state._sessionMouseHandler);
-      document.body.classList.remove('in-session');
+      endSession(false);
+    } else {
+      updatePanel();
+    }
+  }
 
-      // Play completion bell
-      playBell();
+  function updatePanel() {
+    const m = Math.floor(state.secondsLeft / 60);
+    const s = state.secondsLeft % 60;
+    document.getElementById('panelTimer').textContent =
+      String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
+    const progress = 1 - (state.secondsLeft / state.totalSeconds);
+    document.getElementById('progressRing').style.strokeDashoffset =
+      175.9 - progress * 175.9;
+    const earned = Math.max(0, Math.floor((state.totalSeconds - state.secondsLeft) / 60));
+    document.getElementById('panelCatatons').textContent =
+      earned + (earned === 1 ? ' Cataton earned' : ' Catatons earned');
+  }
 
-      // Catatons earned — based on % of session completed
-      const elapsed = state.totalSeconds - state.secondsLeft;
-      const completion = elapsed / state.totalSeconds;
-      const catatonsEarned = Math.max(1, Math.round(state.duration * completion));
+  // ── END ──
+  function endSession(early = false) {
+    clearInterval(state.timer);
+    stopAmbientSound();
+    stopBreathCycle();
+    state.running = false;
+    panel.classList.remove('open');
+    panelOpen = false;
 
-      // Return result to app.html via URL params
-      if (state.sitId) {
-        sessionStorage.setItem('cat_session_result', JSON.stringify({
-          sitId: state.sitId,
-          catatonsEarned,
-          completed: !early,
-        }));
-      }
+    voidEngine.triggerStar();
+    playBell();
 
-      // Show complete screen after brief pause
-      setTimeout(() => {
-        const elapsedMin = Math.floor(elapsed / 60);
-        const elapsedSec = elapsed % 60;
+    const elapsed = state.totalSeconds - state.secondsLeft;
+    const catatonsEarned = Math.max(1, Math.round(state.duration * (elapsed / state.totalSeconds)));
 
-        const durText = early
-          ? `${elapsedMin}m ${elapsedSec}s completed`
-          : `${state.duration} minutes of silence`;
-
-        document.getElementById('completeDuration').textContent =
-          durText + ` · +${catatonsEarned} Catatons`;
-
-        const quotes = [
-          'The mind that rests, decides better.',
-          'You gave yourself permission to stop. That takes more courage than you think.',
-          'What surfaces in silence is more honest than anything the noise told you.',
-          'The gaps you protect are where the next version of you is built.',
-          'Stillness is not the absence of thought — it is the condition for better ones.',
-        ];
-        document.getElementById('completeQuote').textContent =
-          quotes[Math.floor(Math.random() * quotes.length)];
-
-        showScreen('completeScreen');
-      }, early ? 300 : 1200);
+    if (state.sitId) {
+      sessionStorage.setItem('cat_session_result', JSON.stringify({
+        sitId: state.sitId, catatonsEarned, completed: !early,
+      }));
     }
 
-    // Exit early
-    document.getElementById('exitBtn').addEventListener('click', () => endSession(true));
+    setTimeout(() => {
+      voidEngine.stop();
+      const elapsedMin = Math.floor(elapsed / 60);
+      const elapsedSec = elapsed % 60;
+      document.getElementById('completeDuration').textContent = early
+        ? `${elapsedMin}m ${elapsedSec}s · +${catatonsEarned} Catatons`
+        : `${state.duration} minutes · +${catatonsEarned} Catatons`;
 
-    // ─── GO AGAIN ───
-    document.getElementById('goAgainBtn').addEventListener('click', () => {
-      if (state.sitId) {
-        window.location.href = 'app.html';
-      } else {
-        showScreen('setupScreen');
-      }
-    });
+      const quotes = [
+        'The mind that rests, decides better.',
+        'You gave yourself permission to stop. That takes more courage than you think.',
+        'What surfaces in silence is more honest than anything the noise told you.',
+        'The gaps you protect are where the next version of you is built.',
+        'Stillness is not the absence of thought — it is the condition for better ones.',
+        'You stayed. That is enough.',
+        'Something in you just became more real.',
+        'Nothing you carry is meant to be carried forever.',
+      ];
+      document.getElementById('completeQuote').textContent =
+        quotes[Math.floor(Math.random() * quotes.length)];
+      showScreen('completeScreen');
+    }, early ? 900 : 2200);
+  }
 
-    // ─── WEB AUDIO: AMBIENT SOUNDSCAPE ───
-    function startAmbientSound() {
-      try {
-        state.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        const ctx = state.audioCtx;
-        const master = ctx.createGain();
-        master.gain.setValueAtTime(0, ctx.currentTime);
-        master.gain.linearRampToValueAtTime(0.18, ctx.currentTime + 4);
-        master.connect(ctx.destination);
-        state.soundNodes.push(master);
+  document.getElementById('exitBtn').addEventListener('click', () => endSession(true));
+  document.getElementById('goAgainBtn').addEventListener('click', () => {
+    window.location.href = state.sitId ? 'app.html' : 'catatonica-session.html';
+  });
 
-        // Deep brown noise base
-        createNoiseLayer(ctx, master, 'brown', 0.4);
+  // ── BELL ──
+  function playBell() {
+    try {
+      const ac = new AudioContext();
+      [[432, 0.28, 0], [864, 0.12, 0.06], [1296, 0.06, 0.12]].forEach(([freq, vol, delay]) => {
+        const o = ac.createOscillator(), g = ac.createGain();
+        o.connect(g); g.connect(ac.destination);
+        o.frequency.value = freq; o.type = 'sine';
+        const t0 = ac.currentTime + delay;
+        g.gain.setValueAtTime(0, t0);
+        g.gain.linearRampToValueAtTime(vol, t0 + 0.05);
+        g.gain.exponentialRampToValueAtTime(0.001, t0 + 5);
+        o.start(t0); o.stop(t0 + 5);
+      });
+    } catch(e) {}
+  }
 
-        // Soft low tone ~60hz
-        createTone(ctx, master, 60, 'sine', 0.08);
+  // ── AMBIENT SOUND (Threshold: pressurized, wave-based) ──
+  function startAmbientSound() {
+    try {
+      const ac = new AudioContext();
+      state.audioCtx = ac;
+      state.soundNodes = [];
 
-        // Higher shimmer ~432hz
-        createTone(ctx, master, 432, 'sine', 0.025);
-
-        // Subtle flutter ~8hz binaural-adjacent
-        createTone(ctx, master, 200, 'sine', 0.015);
-        createTone(ctx, master, 208, 'sine', 0.015);
-
-      } catch(e) {
-        console.info('Web Audio not available:', e);
-      }
-    }
-
-    function createNoiseLayer(ctx, destination, type, gain) {
-      const bufferSize = ctx.sampleRate * 4;
-      const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
-      const data = buffer.getChannelData(0);
-
-      // Generate brown noise
-      let lastOut = 0;
-      for (let i = 0; i < bufferSize; i++) {
-        const white = Math.random() * 2 - 1;
-        if (type === 'brown') {
-          data[i] = (lastOut + (0.02 * white)) / 1.02;
-          lastOut = data[i];
-          data[i] *= 3.5;
-        } else {
-          data[i] = white;
+      // Brown noise base
+      const bufSize = ac.sampleRate * 8;
+      const buf = ac.createBuffer(2, bufSize, ac.sampleRate);
+      for (let ch = 0; ch < 2; ch++) {
+        const d = buf.getChannelData(ch);
+        let last = 0;
+        for (let i = 0; i < bufSize; i++) {
+          const w = Math.random() * 2 - 1;
+          last = (last + 0.02 * w) / 1.02;
+          d[i] = last * 3.5;
         }
       }
+      const noise = ac.createBufferSource();
+      noise.buffer = buf; noise.loop = true;
 
-      const source = ctx.createBufferSource();
-      source.buffer = buffer;
-      source.loop = true;
+      const lp = ac.createBiquadFilter();
+      lp.type = 'lowpass'; lp.frequency.value = 110;
 
-      const gainNode = ctx.createGain();
-      gainNode.gain.value = gain;
+      const master = ac.createGain();
+      master.gain.setValueAtTime(0, ac.currentTime);
+      master.gain.linearRampToValueAtTime(0.1, ac.currentTime + 4);
 
-      // Low-pass filter to keep it soft
-      const filter = ctx.createBiquadFilter();
-      filter.type = 'lowpass';
-      filter.frequency.value = 400;
+      noise.connect(lp); lp.connect(master); master.connect(ac.destination);
+      noise.start();
+      state.soundNodes.push(noise, master);
 
-      source.connect(filter);
-      filter.connect(gainNode);
-      gainNode.connect(destination);
-      source.start();
-
-      state.soundNodes.push(source, gainNode, filter);
-    }
-
-    function createTone(ctx, destination, freq, type, gain) {
-      const osc = ctx.createOscillator();
-      const gainNode = ctx.createGain();
-
-      osc.type = type;
-      osc.frequency.value = freq;
-      gainNode.gain.value = gain;
-
-      // Add very slow frequency drift for organic feel
-      const lfo = ctx.createOscillator();
-      const lfoGain = ctx.createGain();
-      lfo.frequency.value = 0.04;
-      lfoGain.gain.value = freq * 0.003;
-      lfo.connect(lfoGain);
-      lfoGain.connect(osc.frequency);
+      // Slow pressure wave on gain
+      const lfo = ac.createOscillator();
+      const lfoG = ac.createGain();
+      lfo.frequency.value = 0.055; lfoG.gain.value = 0.05;
+      lfo.connect(lfoG); lfoG.connect(master.gain);
       lfo.start();
+      state.soundNodes.push(lfo);
 
-      osc.connect(gainNode);
-      gainNode.connect(destination);
-      osc.start();
+      // Sub tones
+      [58, 87].forEach((freq, i) => {
+        const osc = ac.createOscillator(), g = ac.createGain();
+        osc.frequency.value = freq; osc.type = 'sine'; g.gain.value = 0.035;
+        const tl = ac.createOscillator(), tlg = ac.createGain();
+        tl.frequency.value = 0.04 + i * 0.02; tlg.gain.value = 0.018;
+        tl.connect(tlg); tlg.connect(g.gain); tl.start();
+        osc.connect(g); g.connect(ac.destination); osc.start();
+        state.soundNodes.push(osc, g, tl);
+      });
+    } catch(e) {}
+  }
 
-      state.soundNodes.push(osc, gainNode, lfo, lfoGain);
+  function stopAmbientSound() {
+    try {
+      const master = state.soundNodes[1];
+      if (master?.gain && state.audioCtx) {
+        master.gain.linearRampToValueAtTime(0, state.audioCtx.currentTime + 1.5);
+      }
+      setTimeout(() => {
+        state.soundNodes.forEach(n => { try { n.stop?.(); } catch(e){} });
+        state.audioCtx?.close(); state.audioCtx = null; state.soundNodes = [];
+      }, 1600);
+    } catch(e) {}
+  }
+
+  // ── BREATH CYCLE ──
+  function startBreathCycle() {
+    state.breathPhase = 'in';
+    runBreath();
+  }
+  function runBreath() {
+    const dur = state.breathPhase === 'in' ? 4000 :
+                state.breathPhase === 'hold' ? 2000 : 5000;
+    state.breathTimer = setTimeout(() => {
+      const prev = state.breathPhase;
+      if (prev === 'in')   state.breathPhase = 'hold';
+      else if (prev === 'hold') state.breathPhase = 'out';
+      else state.breathPhase = 'in';
+      // Fire shockwave at the moment exhale begins
+      if (state.breathPhase === 'out') voidEngine.addShockwave();
+      if (state.running) runBreath();
+    }, dur);
+  }
+  function stopBreathCycle() { clearTimeout(state.breathTimer); }
+
+  // ═══════════════════════════════════════════════════════════════
+  // ── THE VOID ENGINE — Cosmological particle system
+  //
+  // The void begins broken. Particles are fragments: cold, dim,
+  // scattered. As session progresses, gravity strengthens. Particles
+  // clump, warm from teal → violet → amber → gold. A star is born.
+  // ═══════════════════════════════════════════════════════════════
+  const voidEngine = (() => {
+    const canvas = document.getElementById('voidCanvas');
+    const ctx    = canvas.getContext('2d');
+
+    let W = 0, H = 0, CX = 0, CY = 0;
+    let particles  = [];   // main cosmological particles
+    let dust       = [];   // background micro-dust (depth)
+    let shockwaves = [];   // Ignition: breath-exhale rings
+    let waveRings  = [];   // Threshold: pressure wave rings
+    let starFlash  = 0;    // 0→1, completion star burst intensity
+    let t          = 0;    // global tick
+    let sessionProgress = 0; // 0→1 over session duration
+    let mode       = 'silence';
+    let userCatatons = 0;
+    let isSession  = false;
+    let running    = false;
+    let animId     = null;
+
+    function getStage(c) {
+      if (c < 10) return 0; // broken void
+      if (c < 30) return 1; // first light
+      if (c < 70) return 2; // proto-star
+      return 3;             // galaxy
     }
 
-    function stopAmbientSound() {
-      if (!state.audioCtx) return;
-      try {
-        // Fade out
-        const master = state.soundNodes[0];
-        if (master && master.gain) {
-          master.gain.linearRampToValueAtTime(0, state.audioCtx.currentTime + 1.5);
+    function resizeCanvas() {
+      const oldW = W || window.innerWidth;
+      const oldH = H || window.innerHeight;
+      W = canvas.width  = window.innerWidth;
+      H = canvas.height = window.innerHeight;
+      CX = W / 2; CY = H / 2;
+      // Rescale particle positions proportionally
+      if (particles.length && oldW) {
+        const sx = W / oldW, sy = H / oldH;
+        const ocx = oldW / 2, ocy = oldH / 2;
+        particles.forEach(p => {
+          p.x = CX + (p.x - ocx) * sx;
+          p.y = CY + (p.y - ocy) * sy;
+        });
+        dust.forEach(d => { d.x *= sx; d.y *= sy; });
+      }
+    }
+
+    // ── PARTICLE FACTORY ──
+    function makeParticle(stage) {
+      const angle = Math.random() * Math.PI * 2;
+      const maxR  = Math.min(W, H) * 0.42;
+      const minR  = 55;
+      // Higher stage = tighter initial scatter (proto-formation)
+      const scatter = [1.0, 0.78, 0.58, 0.42][stage];
+      const dist    = (minR + Math.random() * (maxR - minR)) * scatter;
+      const isFragment = Math.random() < [0.58, 0.32, 0.12, 0.04][stage];
+
+      return {
+        x:  CX + Math.cos(angle) * dist,
+        y:  CY + Math.sin(angle) * dist,
+        vx: (Math.random() - 0.5) * 0.45,
+        vy: (Math.random() - 0.5) * 0.45,
+        mass:  0.5 + Math.random() * 1.8,
+        size:  0.3 + Math.random() * 1.8,
+        hue:   182 + Math.random() * 22,
+        sat:   22  + Math.random() * 32,
+        lit:   5   + Math.random() * 16,
+        alpha: 0.05 + Math.random() * 0.32,
+        orbit: 0.00012 + Math.random() * 0.00028,
+        fragment:  isFragment,
+        fragAngle: Math.random() * Math.PI * 2,
+        fragSpin:  (Math.random() - 0.5) * 0.018,
+        shimmer:   Math.random() * Math.PI * 2,
+        sSpeed:    0.008 + Math.random() * 0.018,
+      };
+    }
+
+    // ── MICRO-DUST FACTORY ──
+    function makeDust() {
+      return {
+        x:       Math.random() * W,
+        y:       Math.random() * H,
+        vx:      (Math.random() - 0.5) * 0.06,
+        vy:      (Math.random() - 0.5) * 0.06,
+        size:    0.15 + Math.random() * 0.35,
+        alpha:   0.02 + Math.random() * 0.05,
+        hue:     180 + Math.random() * 50,
+        twinkle: Math.random() * Math.PI * 2,
+      };
+    }
+
+    function initParticles() {
+      const stage = getStage(userCatatons);
+      const count = [280, 325, 370, 415][stage];
+      particles = [];
+      dust      = [];
+      for (let i = 0; i < count; i++) particles.push(makeParticle(stage));
+      for (let i = 0; i < 140; i++)   dust.push(makeDust());
+      shockwaves = []; waveRings = [];
+      t = 0; sessionProgress = 0;
+    }
+
+    // ── PHYSICS ──
+    function update() {
+      const stage    = getStage(userCatatons);
+      const gravity  = isSession ? 0.00005 + sessionProgress * 0.00030 : 0.000006;
+      const maxSpeed = isSession ? 0.55 + sessionProgress * 0.9 : 0.22;
+
+      particles.forEach(p => {
+        const dx   = CX - p.x;
+        const dy   = CY - p.y;
+        const dist = Math.sqrt(dx * dx + dy * dy) || 1;
+
+        // ── Central gravity (grows stronger through session) ──
+        p.vx += (dx / dist) * gravity * p.mass;
+        p.vy += (dy / dist) * gravity * p.mass;
+
+        // ── Mode-specific forces ──
+        if (mode === 'silence') {
+          // Orbital tendency: particles naturally want to orbit the center
+          // The universe expands and contracts — meditative, slow
+          const orbStr = p.orbit * (1 - sessionProgress * 0.55);
+          p.vx += (-dy / dist) * orbStr;
+          p.vy += ( dx / dist) * orbStr;
+          // Cosmic breath: whole field gently expands/contracts
+          const breathe = Math.sin(t * 0.00045) * 0.000022;
+          p.vx += (p.x - CX) * breathe;
+          p.vy += (p.y - CY) * breathe;
+
+        } else if (mode === 'sound') {
+          // Pressure waves from center — labor, something being born
+          const waveAng = t * 0.0022 + dist * 0.009;
+          const wavePush = Math.sin(waveAng) * 0.00032 * (1 + sessionProgress * 1.2);
+          p.vx += (dx / dist) * wavePush;
+          p.vy += (dy / dist) * wavePush;
+          // Turbulence — pressure, not peace
+          if (Math.random() < 0.25) {
+            p.vx += (Math.random() - 0.5) * 0.016;
+            p.vy += (Math.random() - 0.5) * 0.016;
+          }
+          // Chaotic orbital
+          p.vx += (-dy / dist) * p.orbit * 0.4 * (Math.random() > 0.5 ? 1 : -1);
+          p.vy += ( dx / dist) * p.orbit * 0.4 * (Math.random() > 0.5 ? 1 : -1);
+
+        } else if (mode === 'visual') {
+          // Breath-synchronized cosmology
+          // Inhale: drawn toward center (compression)
+          // Hold: gentle orbit at equilibrium
+          // Exhale: pushed outward — a small Big Bang
+          const bForce = state.breathPhase === 'in'   ?  0.00068 :
+                         state.breathPhase === 'hold'  ?  0.000045 : -0.00048;
+          p.vx += (dx / dist) * bForce;
+          p.vy += (dy / dist) * bForce;
+          if (state.breathPhase === 'hold') {
+            p.vx += (-dy / dist) * p.orbit;
+            p.vy += ( dx / dist) * p.orbit;
+          }
         }
-        setTimeout(() => {
-          state.soundNodes.forEach(n => {
-            try { if (n.stop) n.stop(); } catch(e) {}
-          });
-          state.audioCtx.close();
-          state.audioCtx = null;
-          state.soundNodes = [];
-        }, 1600);
-      } catch(e) {}
-    }
 
-    // ─── BELL ───
-    function playBell() {
-      try {
-        const ctx = new (window.AudioContext || window.webkitAudioContext)();
-        const frequencies = [528, 1056, 1584]; // gentle harmonic series
-
-        frequencies.forEach((freq, i) => {
-          const osc = ctx.createOscillator();
-          const gain = ctx.createGain();
-          const t = ctx.currentTime + (i * 0.02);
-
-          osc.type = 'sine';
-          osc.frequency.value = freq;
-
-          gain.gain.setValueAtTime(0, t);
-          gain.gain.linearRampToValueAtTime(0.12 / (i + 1), t + 0.01);
-          gain.gain.exponentialRampToValueAtTime(0.001, t + 4);
-
-          osc.connect(gain);
-          gain.connect(ctx.destination);
-          osc.start(t);
-          osc.stop(t + 4);
+        // ── Shockwave interaction (Ignition exhale rings) ──
+        shockwaves.forEach(sw => {
+          const pdx = p.x - CX, pdy = p.y - CY;
+          const pd  = Math.sqrt(pdx * pdx + pdy * pdy) || 1;
+          const diff = Math.abs(pd - sw.r);
+          if (diff < 38) {
+            const force = (1 - diff / 38) * sw.force;
+            p.vx += (pdx / pd) * force;
+            p.vy += (pdy / pd) * force;
+          }
         });
 
-        setTimeout(() => ctx.close(), 5000);
-      } catch(e) {}
-    }
+        // Friction
+        p.vx *= 0.983;
+        p.vy *= 0.983;
 
-    // ─── BREATH CYCLE ───
-    const breathPhases = [
-      { label: 'Breathe in', duration: 4000 },
-      { label: 'Hold', duration: 4000 },
-      { label: 'Breathe out', duration: 4000 },
-      { label: '', duration: 2000 },
-    ];
-    let breathIndex = 0;
+        // Speed cap
+        const speed = Math.sqrt(p.vx * p.vx + p.vy * p.vy);
+        if (speed > maxSpeed) { p.vx *= maxSpeed / speed; p.vy *= maxSpeed / speed; }
 
-    function startBreathCycle() {
-      runBreathPhase();
-    }
+        p.x += p.vx;
+        p.y += p.vy;
 
-    function runBreathPhase() {
-      const phase = breathPhases[breathIndex];
-      const textEl = document.getElementById('breathText');
-      if (textEl) textEl.textContent = phase.label;
+        // Soft boundary (no hard wrap — particles drift back from edge)
+        const boundary = Math.min(W, H) * 0.54;
+        if (dist > boundary) {
+          p.vx += (dx / dist) * 0.0025;
+          p.vy += (dy / dist) * 0.0025;
+        }
 
-      state.breathTimer = setTimeout(() => {
-        breathIndex = (breathIndex + 1) % breathPhases.length;
-        runBreathPhase();
-      }, phase.duration);
-    }
+        // Fragment rotation
+        if (p.fragment) p.fragAngle += p.fragSpin;
 
-    function stopBreathCycle() {
-      clearTimeout(state.breathTimer);
-    }
+        // Shimmer
+        p.shimmer += p.sSpeed;
 
-    // ─── KEYBOARD SHORTCUTS ───
-    document.addEventListener('keydown', e => {
-      // Escape to end session early
-      if (e.key === 'Escape' && !document.getElementById('sessionScreen').classList.contains('gone')) {
-        endSession(true);
+        // ── COLOR EVOLUTION ──
+        // Proximity to core + session progress = warmth
+        // Cold teal (182°) → blue-violet (260°) → amber (38°) → warm white
+        const coreDist = Math.sqrt((p.x - CX) ** 2 + (p.y - CY) ** 2);
+        const coreProx = Math.max(0, 1 - coreDist / (Math.min(W, H) * 0.30));
+        const warmth   = isSession ? sessionProgress * (0.18 + coreProx * 0.82) : 0;
+
+        if (warmth < 0.28) {
+          const w = warmth / 0.28;
+          p.hue = 182 + w * 78;   // teal → violet
+          p.sat = 22  + w * 48;
+          p.lit = 5   + w * 18 + coreProx * 12;
+        } else if (warmth < 0.62) {
+          const w = (warmth - 0.28) / 0.34;
+          p.hue = 260 - w * 222;  // violet → amber/gold
+          p.sat = 70  + w * 12;
+          p.lit = 23  + w * 34 + coreProx * 22;
+        } else {
+          const w = (warmth - 0.62) / 0.38;
+          p.hue = 38  + w * 18;   // gold → warm white
+          p.sat = 82  - w * 68;
+          p.lit = 57  + w * 38;
+        }
+
+        const shimVal = Math.sin(p.shimmer) * 0.055;
+        p.alpha = 0.05
+          + coreProx * (isSession ? sessionProgress * 0.78 : 0.08)
+          + (isSession ? Math.min(1, sessionProgress * 1.8) * 0.07 : 0)
+          + shimVal;
+        p.alpha = Math.max(0.03, Math.min(0.98, p.alpha));
+      });
+
+      // Dust drift (slow, never attracted to center)
+      dust.forEach(d => {
+        d.x += d.vx; d.y += d.vy;
+        d.twinkle += 0.007;
+        if (d.x < 0) d.x = W; if (d.x > W) d.x = 0;
+        if (d.y < 0) d.y = H; if (d.y > H) d.y = 0;
+      });
+
+      // Update shockwave rings
+      shockwaves = shockwaves.filter(sw => sw.r < sw.maxR);
+      shockwaves.forEach(sw => {
+        sw.r     += sw.speed;
+        sw.alpha *= 0.972;
+        sw.force *= 0.94;
+      });
+
+      // Generate Threshold pressure rings on interval
+      if (mode === 'sound' && isSession && t % 72 === 0) {
+        waveRings.push({ r: 6, maxR: Math.min(W, H) * 0.52, alpha: 0.16 * (0.4 + sessionProgress * 0.6) });
       }
-      // Space or Enter to begin from setup
-      if ((e.key === ' ' || e.key === 'Enter') && !document.getElementById('setupScreen').classList.contains('gone')) {
-        e.preventDefault();
-        startSession();
-      }
-    });
-  </script>
+      waveRings = waveRings.filter(r => r.r < r.maxR);
+      waveRings.forEach(r => { r.r += 2.0; r.alpha *= 0.990; });
 
-  <script>
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/sw.js').catch(() => {});
+      // Star flash decay
+      if (starFlash > 0) starFlash *= 0.93;
     }
+
+    // ── RENDER ──
+    function render() {
+      // ─────────────────────────────────────────────────────────
+      // TRAIL EFFECT: fade instead of clearRect.
+      // This is what makes particles feel alive — comet tails,
+      // motion arcs, the sense that something moved through space.
+      // Lower alpha = longer trails (more ghostly history).
+      // ─────────────────────────────────────────────────────────
+      const trailAlpha = isSession
+        ? 0.11 + (1 - sessionProgress) * 0.07
+        : 0.22;
+      ctx.fillStyle = `rgba(1,6,10,${trailAlpha})`;
+      ctx.fillRect(0, 0, W, H);
+
+      // ── NEBULA BACKGROUND ──
+      // Primary nebula — expands, warms, intensifies as session progresses
+      const nebR   = isSession ? 70 + sessionProgress * Math.min(W, H) * 0.38 : 55;
+      const nebHue = 182 + (isSession ? sessionProgress * 78 : 0);
+      const nebA   = isSession ? 0.1 + sessionProgress * 0.28 : 0.07;
+
+      const neb = ctx.createRadialGradient(CX, CY, 0, CX, CY, nebR);
+      neb.addColorStop(0,   `hsla(${nebHue},45%,${isSession ? 4 + sessionProgress*8 : 3}%,${nebA})`);
+      neb.addColorStop(0.5, `hsla(${nebHue},30%,2%,${nebA * 0.45})`);
+      neb.addColorStop(1,   'rgba(0,0,0,0)');
+      ctx.fillStyle = neb;
+      ctx.fillRect(0, 0, W, H);
+
+      // Secondary offset nebula for depth and asymmetry
+      if (isSession && sessionProgress > 0.08) {
+        const ox = CX + Math.sin(t * 0.00035) * 45;
+        const oy = CY + Math.cos(t * 0.00028) * 32;
+        const neb2 = ctx.createRadialGradient(ox, oy, 0, ox, oy, nebR * 0.55);
+        neb2.addColorStop(0, `hsla(${nebHue + 40},50%,${3 + sessionProgress*5}%,${nebA * 0.28})`);
+        neb2.addColorStop(1, 'rgba(0,0,0,0)');
+        ctx.fillStyle = neb2;
+        ctx.fillRect(0, 0, W, H);
+      }
+
+      // ── STAGE 3: Galaxy spiral arm hints ──
+      if (getStage(userCatatons) === 3 && isSession && sessionProgress > 0.28) {
+        const armA = Math.min(0.10, (sessionProgress - 0.28) * 0.16);
+        ctx.save();
+        ctx.globalAlpha = armA;
+        for (let arm = 0; arm < 2; arm++) {
+          ctx.beginPath();
+          const base = arm * Math.PI + t * 0.000065;
+          for (let r = 14; r < Math.min(W, H) * 0.44; r += 1.2) {
+            const a  = base + r * 0.019;
+            const px = CX + Math.cos(a) * r;
+            const py = CY + Math.sin(a) * r;
+            r === 14 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+          }
+          ctx.strokeStyle = 'rgba(212,168,48,0.9)';
+          ctx.lineWidth   = 0.6;
+          ctx.stroke();
+        }
+        ctx.restore();
+      }
+
+      // ── THRESHOLD: Pressure wave rings emanating from center ──
+      waveRings.forEach(r => {
+        ctx.beginPath();
+        ctx.arc(CX, CY, r.r, 0, Math.PI * 2);
+        ctx.strokeStyle = `rgba(94,184,204,${r.alpha})`;
+        ctx.lineWidth   = 0.7;
+        ctx.stroke();
+      });
+
+      // ── IGNITION: Exhale shockwave rings ──
+      shockwaves.forEach(sw => {
+        const p = sw.r / sw.maxR;
+        ctx.beginPath();
+        ctx.arc(CX, CY, sw.r, 0, Math.PI * 2);
+        ctx.strokeStyle = `rgba(212,168,48,${sw.alpha})`;
+        ctx.lineWidth   = 2 * (1 - p);
+        ctx.stroke();
+        // Inner echo ring
+        if (sw.r > 20) {
+          ctx.beginPath();
+          ctx.arc(CX, CY, sw.r * 0.65, 0, Math.PI * 2);
+          ctx.strokeStyle = `rgba(237,232,223,${sw.alpha * 0.22})`;
+          ctx.lineWidth   = 0.5;
+          ctx.stroke();
+        }
+      });
+
+      // ── BACKGROUND DUST ──
+      dust.forEach(d => {
+        const tw = 0.45 + 0.55 * Math.sin(d.twinkle);
+        ctx.beginPath();
+        ctx.arc(d.x, d.y, d.size, 0, Math.PI * 2);
+        ctx.fillStyle = `hsla(${d.hue},18%,55%,${d.alpha * tw})`;
+        ctx.fill();
+      });
+
+      // ── MAIN PARTICLES ──
+      particles.forEach(p => {
+        ctx.save();
+        ctx.translate(p.x, p.y);
+
+        const fragFade = sessionProgress / 0.52; // fragments fully resolve by 52% session
+
+        if (p.fragment && sessionProgress < 0.52) {
+          // Rotating broken shard — the void's debris
+          const len = p.size * (2.8 - fragFade * 1.8);
+          ctx.rotate(p.fragAngle);
+          ctx.beginPath();
+          ctx.moveTo(-len, 0);
+          ctx.lineTo( len, 0);
+          ctx.strokeStyle = `hsla(${p.hue},${p.sat}%,${p.lit}%,${p.alpha * (1 - fragFade * 0.45)})`;
+          ctx.lineWidth = Math.max(0.3, p.size * 0.55);
+          ctx.stroke();
+          // Perpendicular cross on heavier fragments
+          if (p.mass > 1.3 && fragFade < 0.7) {
+            ctx.beginPath();
+            ctx.moveTo(0, -len * 0.55);
+            ctx.lineTo(0,  len * 0.55);
+            ctx.stroke();
+          }
+        } else {
+          // Particle — grows in size as session progresses
+          const r = Math.max(0.25, p.size * (0.4 + (isSession ? sessionProgress * 1.0 : 0.08)));
+          ctx.beginPath();
+          ctx.arc(0, 0, r, 0, Math.PI * 2);
+          ctx.fillStyle = `hsla(${p.hue},${p.sat}%,${p.lit}%,${p.alpha})`;
+          ctx.fill();
+
+          // Glow halo for hot particles near the forming core
+          if (p.lit > 32 && isSession) {
+            ctx.beginPath();
+            ctx.arc(0, 0, r * 4, 0, Math.PI * 2);
+            ctx.fillStyle = `hsla(${p.hue},${p.sat}%,${p.lit}%,${p.alpha * 0.1})`;
+            ctx.fill();
+          }
+        }
+        ctx.restore();
+      });
+
+      // ── CORE FORMATION ──
+      // Emerges at 12% session progress — the star nucleus forming
+      if (isSession && sessionProgress > 0.12) {
+        const cp = Math.min(1, (sessionProgress - 0.12) / 0.52);
+
+        // Outer halo glow
+        const haloR = 45 + cp * 90;
+        const halo  = ctx.createRadialGradient(CX, CY, 0, CX, CY, haloR);
+        halo.addColorStop(0,   `rgba(212,168,48,${cp * 0.20})`);
+        halo.addColorStop(0.45,`rgba(180,120,30,${cp * 0.07})`);
+        halo.addColorStop(1,   'rgba(0,0,0,0)');
+        ctx.fillStyle = halo;
+        ctx.fillRect(0, 0, W, H);
+
+        // Pulsating emission rings (3 staggered rings emanating from core)
+        for (let i = 0; i < 3; i++) {
+          const pulse = ((t * 0.007 + i * 0.333) % 1);
+          const pR = cp * (12 + pulse * 68);
+          const pA = cp * 0.30 * (1 - pulse) * (1 - pulse);
+          ctx.beginPath();
+          ctx.arc(CX, CY, pR, 0, Math.PI * 2);
+          ctx.strokeStyle = `rgba(212,168,48,${pA})`;
+          ctx.lineWidth   = 1.8 * (1 - pulse);
+          ctx.stroke();
+        }
+
+        // Inner stellar nucleus
+        const coreR = 1.8 + cp * 9 + Math.sin(t * 0.022) * cp * 2.2;
+        const core  = ctx.createRadialGradient(CX, CY, 0, CX, CY, coreR * 5);
+        const cA    = cp * 0.92;
+        core.addColorStop(0,   `rgba(255,248,210,${cA})`);
+        core.addColorStop(0.25,`rgba(240,200,80,${cA * 0.65})`);
+        core.addColorStop(0.6, `rgba(190,130,35,${cA * 0.22})`);
+        core.addColorStop(1,   'rgba(0,0,0,0)');
+        ctx.fillStyle = core;
+        ctx.fillRect(0, 0, W, H);
+      }
+
+      // ── IGNITION: Breath ring (visual feedback layer) ──
+      if (mode === 'visual') {
+        const phase = state.breathPhase;
+        const cycleLen = phase === 'in' ? 4000 : phase === 'hold' ? 2000 : 5000;
+        const cycleP   = (t % cycleLen) / cycleLen;
+        const bR = phase === 'in'   ? 18 + cycleP * 110 :
+                   phase === 'hold' ? 128 :
+                                      128 - cycleP * 90;
+        const bA = phase === 'hold' ? 0.055 : 0.035 + cycleP * 0.045;
+        ctx.beginPath();
+        ctx.arc(CX, CY, Math.max(1, bR), 0, Math.PI * 2);
+        ctx.strokeStyle = `rgba(212,168,48,${bA * (isSession ? 1 : 0.25)})`;
+        ctx.lineWidth = 1.2;
+        ctx.stroke();
+        // Second ring at 1.7x
+        ctx.beginPath();
+        ctx.arc(CX, CY, Math.max(1, bR * 1.7), 0, Math.PI * 2);
+        ctx.strokeStyle = `rgba(212,168,48,${bA * 0.35 * (isSession ? 1 : 0.25)})`;
+        ctx.lineWidth = 0.5;
+        ctx.stroke();
+      }
+
+      // ── STAR BIRTH FLASH (on session completion) ──
+      if (starFlash > 0.01) {
+        const sf  = ctx.createRadialGradient(CX, CY, 0, CX, CY, Math.min(W, H) * 0.6 * Math.min(1, starFlash * 1.2));
+        sf.addColorStop(0,   `rgba(255,255,255,${starFlash * 0.92})`);
+        sf.addColorStop(0.08,`rgba(255,235,150,${starFlash * 0.65})`);
+        sf.addColorStop(0.3, `rgba(212,168,48,${starFlash * 0.22})`);
+        sf.addColorStop(0.7, `rgba(94,60,10,${starFlash * 0.06})`);
+        sf.addColorStop(1,   'rgba(0,0,0,0)');
+        ctx.fillStyle = sf;
+        ctx.fillRect(0, 0, W, H);
+      }
+    }
+
+    // ── MAIN LOOP ──
+    function loop() {
+      t++;
+      if (isSession && state.totalSeconds > 0) {
+        sessionProgress = Math.max(0, Math.min(1, 1 - (state.secondsLeft / state.totalSeconds)));
+      }
+      update();
+      render();
+      if (running) animId = requestAnimationFrame(loop);
+    }
+
+    return {
+      start(m, catatons) {
+        mode         = m;
+        userCatatons = catatons;
+        isSession    = true;
+        // Don't re-init — idle void transitions seamlessly into session
+      },
+
+      stop() {
+        running   = false;
+        isSession = false;
+        if (animId) { cancelAnimationFrame(animId); animId = null; }
+      },
+
+      addShockwave() {
+        shockwaves.push({
+          r: 10, maxR: Math.min(W, H) * 0.58,
+          alpha: 0.55, force: 0.42, speed: 3.8,
+        });
+      },
+
+      triggerStar() {
+        starFlash = 1.0;
+      },
+
+      // Boot the idle void (runs on setup screen before session starts)
+      initIdle(catatons) {
+        userCatatons = catatons || 0;
+        resizeCanvas();
+        initParticles();
+        if (!running) {
+          running = true;
+          loop();
+        }
+      },
+
+      resize() {
+        resizeCanvas();
+      },
+    };
+  })();
+
+  // ── RESIZE ──
+  window.addEventListener('resize', () => voidEngine.resize());
+
+  // ── BOOT ── idle void starts immediately on page load
+  voidEngine.initIdle(state.catatons);
+
+  // ── KEYBOARD ──
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') {
+      panelOpen = !panelOpen;
+      panel.classList.toggle('open', panelOpen);
+    }
+  });
+
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js').catch(() => {});
+  }
   </script>
 </body>
 </html>
