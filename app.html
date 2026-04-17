@@ -25,9 +25,9 @@
       --text-primary: #e8e4dc;
       --text-muted: rgba(232,228,220,0.38);
       --text-dim: rgba(232,228,220,0.16);
-      --accent: #c8bfad;
-      --accent-cold: #5eb8cc;
-      --gold: #d4a830;
+      --accent: #a89f8c;
+      --accent-cold: #7a9ea8;
+      --gold: #c4a96d;
       --gold-dim: rgba(196,169,109,0.15);
       --danger: rgba(200,80,80,0.7);
     }
@@ -82,6 +82,112 @@
     }
     @keyframes pulse {
       0%,100% { opacity: 0.3; } 50% { opacity: 0.8; }
+    }
+
+    /* ─── ONBOARDING ─── */
+    #onboardScreen {
+      display: flex; align-items: center; justify-content: center;
+      min-height: 100vh; padding: 2rem;
+      background: var(--void);
+    }
+    .onboard-wrap {
+      width: 100%; max-width: 520px;
+      position: relative;
+    }
+    .onboard-step {
+      display: none; flex-direction: column;
+      animation: fadeUp 0.6s ease forwards;
+    }
+    .onboard-step.active { display: flex; }
+
+    .onboard-mark {
+      margin-bottom: 2rem;
+      opacity: 0.8;
+    }
+    .onboard-eyebrow {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.55rem; letter-spacing: 0.28em;
+      text-transform: uppercase; color: var(--gold);
+      opacity: 0.6; margin-bottom: 1rem;
+    }
+    .onboard-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(2.2rem, 6vw, 3.5rem);
+      font-weight: 300; color: var(--text);
+      line-height: 1.05; margin-bottom: 1.8rem;
+    }
+    .onboard-title em { font-style: italic; color: var(--gold); }
+    .onboard-body {
+      font-size: 0.92rem; color: var(--muted);
+      line-height: 1.8; margin-bottom: 1rem;
+      max-width: 440px;
+    }
+    .onboard-input-wrap { margin: 1.5rem 0; }
+    .onboard-input {
+      width: 100%; background: var(--surface);
+      border: 1px solid var(--border); border-radius: 0;
+      padding: 1.1rem 1.4rem; outline: none;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.2rem; font-weight: 300;
+      color: var(--text); transition: border-color 0.3s ease;
+    }
+    .onboard-input::placeholder { color: var(--text-dim); font-style: italic; }
+    .onboard-input:focus { border-color: rgba(196,169,109,0.3); }
+    .onboard-input-hint {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.5rem; letter-spacing: 0.12em;
+      color: var(--text-dim); margin-top: 0.6rem;
+      text-transform: uppercase;
+    }
+    .onboard-btn {
+      background: var(--text); color: var(--void);
+      border: none; padding: 1rem 2rem;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.68rem; letter-spacing: 0.18em;
+      text-transform: uppercase; cursor: pointer;
+      margin-top: 1.5rem; align-self: flex-start;
+      transition: background 0.3s ease;
+    }
+    .onboard-btn:hover { background: var(--gold); }
+    .onboard-skip {
+      background: none; border: none;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.55rem; letter-spacing: 0.12em;
+      text-transform: uppercase; color: var(--text-dim);
+      cursor: pointer; margin-top: 1rem;
+      padding: 0; align-self: flex-start;
+      transition: color 0.3s ease;
+    }
+    .onboard-skip:hover { color: var(--muted); }
+    .onboard-modes {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 1px; background: var(--border);
+      border: 1px solid var(--border);
+      margin: 1.5rem 0;
+    }
+    .onboard-mode {
+      background: var(--void); padding: 1.2rem 1rem;
+      text-align: center; cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    .onboard-mode:hover, .onboard-mode.active {
+      background: var(--surface);
+    }
+    .onboard-mode.active { position: relative; }
+    .onboard-mode.active::after {
+      content: ''; position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 1px; background: var(--gold);
+    }
+    .onboard-mode-name {
+      display: block;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1rem; color: var(--text); margin-bottom: 0.2rem;
+    }
+    .onboard-mode-desc {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.5rem; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--text-dim);
     }
 
     /* ─── AUTH SCREEN ─── */
@@ -659,6 +765,73 @@
     <p class="loading-logo">Cata<em style="font-style:italic;color:#a89f8c">tonica</em></p>
   </div>
 
+  <!-- ─── ONBOARDING ─── -->
+  <div class="screen" id="onboardScreen">
+    <div class="onboard-wrap">
+
+      <!-- Step 1: Welcome -->
+      <div class="onboard-step active" id="onboardStep1">
+        <div class="onboard-mark">
+          <svg width="48" height="48" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+            <path d="M 295.26 255.00 A 110 110 0 1 0 295.26 145.00"
+              fill="none" stroke="#c4a96d" stroke-width="10" stroke-linecap="round"/>
+            <circle cx="200" cy="200" r="8" fill="#c4a96d"/>
+          </svg>
+        </div>
+        <p class="onboard-eyebrow">Welcome</p>
+        <h1 class="onboard-title">You found<br><em>the void.</em></h1>
+        <p class="onboard-body">Catatonica is a stillness practice for the things you're not ready to let go of yet. A loss. A transition. A decision you keep circling. Name it. Sit with it. Release it when you're ready.</p>
+        <p class="onboard-body">No advice. No AI suggestions. No streaks. Just you and the thing you're carrying.</p>
+        <button class="onboard-btn" id="onboardNext1">I'm ready →</button>
+      </div>
+
+      <!-- Step 2: Name your first situation -->
+      <div class="onboard-step" id="onboardStep2">
+        <p class="onboard-eyebrow">Step 01</p>
+        <h2 class="onboard-title">What are you<br><em>sitting with?</em></h2>
+        <p class="onboard-body">Name it plainly. One sentence is enough. This becomes your first situation — the thing you'll accumulate Catatons on.</p>
+        <div class="onboard-input-wrap">
+          <input
+            type="text"
+            id="onboardSitInput"
+            class="onboard-input"
+            placeholder="A transition I haven't processed…"
+            maxlength="120"
+            autocomplete="off"
+          />
+          <p class="onboard-input-hint">Press Enter or tap the button when ready.</p>
+        </div>
+        <button class="onboard-btn" id="onboardNext2">Name it →</button>
+        <button class="onboard-skip" id="onboardSkip">Skip for now — I'll add it myself</button>
+      </div>
+
+      <!-- Step 3: Begin first session -->
+      <div class="onboard-step" id="onboardStep3">
+        <p class="onboard-eyebrow">Step 02</p>
+        <h2 class="onboard-title">Your first<br><em>session.</em></h2>
+        <p class="onboard-body">A session is a timed block of silence where you sit with your situation. Nothing to do. Nothing to solve. Just presence.</p>
+        <p class="onboard-body">Start with 5 or 10 minutes. You'll earn your first Catatons when you finish.</p>
+        <div class="onboard-modes">
+          <div class="onboard-mode active" data-mode="silence">
+            <span class="onboard-mode-name">Silence</span>
+            <span class="onboard-mode-desc">Pure void</span>
+          </div>
+          <div class="onboard-mode" data-mode="sound">
+            <span class="onboard-mode-name">Sound</span>
+            <span class="onboard-mode-desc">Ambient tones</span>
+          </div>
+          <div class="onboard-mode" data-mode="visual">
+            <span class="onboard-mode-name">Breathing</span>
+            <span class="onboard-mode-desc">Visual guide</span>
+          </div>
+        </div>
+        <button class="onboard-btn" id="onboardBegin">Begin my first session →</button>
+        <button class="onboard-skip" id="onboardSkip2">Go to dashboard instead</button>
+      </div>
+
+    </div>
+  </div>
+
   <!-- ─── AUTH ─── -->
   <div class="screen" id="authScreen">
     <div class="auth-box">
@@ -691,13 +864,7 @@
   <!-- ─── MAIN APP ─── -->
   <div class="screen" id="appScreen">
     <nav>
-      <a href="index.html" class="nav-logo" style="display:flex;align-items:center;gap:0.7rem;text-decoration:none;">
-        <svg width="22" height="22" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M 85 50 A 38 38 0 1 1 84.5 44" stroke="#c4a455" stroke-width="2.5" stroke-linecap="round" fill="none" opacity="0.85"/>
-          <circle cx="50" cy="50" r="3" fill="#c4a455" opacity="0.75"/>
-        </svg>
-        <span style="font-family:'Cormorant Garamond',serif;font-size:0.95rem;font-weight:300;letter-spacing:0.35em;text-transform:uppercase;color:var(--text-primary);">Cata<em style="font-style:italic;color:#c4a455;">tonica</em></span>
-      </a>
+      <a href="index.html" class="nav-logo">Cata<span>tonica</span></a>
       <div class="nav-right">
         <div class="total-catatons">
           <span class="tc-num" id="totalCatons">0</span>
@@ -951,11 +1118,98 @@
     if (session?.user) {
       currentUser = session.user;
       await loadData();
-      showScreen('appScreen');
+      const needsOnboarding = await checkOnboarding();
+      if (!needsOnboarding) {
+        showScreen('appScreen');
+      }
     } else {
       showScreen('authScreen');
     }
   }
+
+  // ─── ONBOARDING ───
+  let onboardMode = 'silence';
+  let onboardSitId = null;
+
+  async function checkOnboarding() {
+    // Show onboarding only for brand new users (0 situations, never onboarded)
+    const onboarded = localStorage.getItem(`cat_onboarded_${currentUser.id}`);
+    if (!onboarded && situations.length === 0) {
+      showScreen('onboardScreen');
+      return true;
+    }
+    return false;
+  }
+
+  // Step 1 → Step 2
+  document.getElementById('onboardNext1').addEventListener('click', () => {
+    document.getElementById('onboardStep1').classList.remove('active');
+    document.getElementById('onboardStep2').classList.add('active');
+    setTimeout(() => document.getElementById('onboardSitInput').focus(), 100);
+  });
+
+  // Step 2: name situation → Step 3
+  document.getElementById('onboardSitInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter') document.getElementById('onboardNext2').click();
+  });
+
+  document.getElementById('onboardNext2').addEventListener('click', async () => {
+    const name = document.getElementById('onboardSitInput').value.trim();
+    if (!name) {
+      document.getElementById('onboardSitInput').focus();
+      return;
+    }
+    // Save situation
+    const { data, error } = await sb.from('situations').insert({
+      user_id: currentUser.id,
+      name,
+      sessions: 0,
+      catatons: 0,
+      manifesto: '',
+    }).select().single();
+
+    if (!error && data) {
+      onboardSitId = data.id;
+      await loadData();
+    }
+    document.getElementById('onboardStep2').classList.remove('active');
+    document.getElementById('onboardStep3').classList.add('active');
+  });
+
+  // Skip step 2
+  document.getElementById('onboardSkip').addEventListener('click', () => {
+    localStorage.setItem(`cat_onboarded_${currentUser.id}`, '1');
+    showScreen('appScreen');
+    render();
+  });
+
+  // Mode selection in onboarding
+  document.querySelectorAll('.onboard-mode').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.onboard-mode').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      onboardMode = btn.dataset.mode;
+    });
+  });
+
+  // Begin first session from onboarding
+  document.getElementById('onboardBegin').addEventListener('click', () => {
+    localStorage.setItem(`cat_onboarded_${currentUser.id}`, '1');
+    const params = new URLSearchParams({
+      sitId: onboardSitId || '',
+      mode: onboardMode,
+      duration: 10,
+      userId: currentUser.id,
+    });
+    window.location.href = 'session.html?' + params.toString();
+  });
+
+  // Skip step 3 → dashboard
+  document.getElementById('onboardSkip2').addEventListener('click', () => {
+    localStorage.setItem(`cat_onboarded_${currentUser.id}`, '1');
+    showScreen('appScreen');
+    render();
+  });
 
   // ─── AUTH MODE TOGGLE ───
   let authMode = 'signin';
@@ -1005,7 +1259,8 @@
       else {
         currentUser = data.user;
         await loadData();
-        showScreen('appScreen');
+        const needsOnboarding = await checkOnboarding();
+        if (!needsOnboarding) showScreen('appScreen');
       }
     }
 
@@ -1034,19 +1289,13 @@
   async function loadData() {
     const uid = currentUser.id;
 
-    const [profRes, subRes, sitRes, arcRes] = await Promise.all([
+    const [profRes, sitRes, arcRes] = await Promise.all([
       sb.from('profiles').select('*').eq('id', uid).single(),
-      sb.from('subscriptions').select('is_premium, tier').eq('user_id', uid).single(),
       sb.from('situations').select('*').eq('user_id', uid).order('created_at', { ascending: true }),
       sb.from('archive').select('*').eq('user_id', uid).order('completed_at', { ascending: false }),
     ]);
 
-    // Merge subscription data into profile — subscriptions table is the source of truth
     profile = profRes.data || {};
-    const sub = subRes.data || {};
-    profile.is_premium = sub.is_premium ?? false;
-    profile.tier = sub.tier ?? null;
-
     situations = sitRes.data || [];
     archive = arcRes.data || [];
 
@@ -1173,15 +1422,32 @@
   newInput.addEventListener('keydown', e => { if (e.key === 'Enter') addSituation(); });
   enterBtn.addEventListener('click', addSituation);
 
+  // Debounce guard — prevents double-submit
+  let _addingLock = false;
+
   async function addSituation() {
+    if (_addingLock) return;
     const name = newInput.value.trim();
     if (!name) return;
+
+    // Length validation
+    if (name.length > 120) {
+      toast('Keep it under 120 characters.');
+      return;
+    }
+
+    // Sanitize: strip any HTML tags just in case
+    const safeName = name.replace(/<[^>]*>/g, '').trim();
+    if (!safeName) return;
+
+    _addingLock = true;
+    setTimeout(() => { _addingLock = false; }, 2000);
 
     // No situation limit — free users can name everything they carry
 
     const { data, error } = await sb.from('situations').insert({
       user_id: currentUser.id,
-      name,
+      name: safeName,
     }).select().single();
 
     if (error) { toast('Error adding situation.'); return; }
@@ -1252,7 +1518,7 @@
       duration: sessDuration,
       userId: currentUser.id,
     });
-    window.location.href = 'catatonica-session.html?' + params.toString();
+    window.location.href = 'session.html?' + params.toString();
   });
 
   // ─── OBS MODAL ───
@@ -1345,7 +1611,9 @@
     const sit = situations.find(s => s.id === activeSitId);
     if (!sit) return;
 
-    const genesis = document.getElementById('masteryText').value.trim();
+    const genesisRaw = document.getElementById('masteryText').value.trim();
+    // Cap genesis text at 1000 chars
+    const genesis = genesisRaw.slice(0, 1000).replace(/<[^>]*>/g, '').trim();
 
     // Move to archive
     const { error } = await sb.from('archive').insert({
@@ -1386,14 +1654,30 @@
     if (!result) return;
     sessionStorage.removeItem('cat_session_result');
 
-    const { sitId, catatonsEarned } = JSON.parse(result);
+    let parsed;
+    try { parsed = JSON.parse(result); } catch { return; }
+    const { sitId, catatonsEarned } = parsed;
+
+    // Sanity check — prevent tampered values
+    if (!sitId || typeof catatonsEarned !== 'number') return;
+    const safeCatatons = Math.min(Math.max(0, Math.round(catatonsEarned)), 60); // max 60 per session
+
     const sit = situations.find(s => s.id === sitId);
     if (!sit) return;
 
+    // Rate limit: no more than 1 session result processed per 60 seconds client-side
+    const lastSession = parseInt(localStorage.getItem('cat_last_session') || '0');
+    const now = Date.now();
+    if (now - lastSession < 60000) {
+      toast('Slow down. Let the silence settle.');
+      return;
+    }
+    localStorage.setItem('cat_last_session', String(now));
+
     // Update in Supabase
-    const newCatatons = sit.catatons + catatonsEarned;
+    const newCatatons = sit.catatons + safeCatatons;
     const newSessions = sit.sessions + 1;
-    const newTotal = (profile.total_catatons || 0) + catatonsEarned;
+    const newTotal = (profile.total_catatons || 0) + safeCatatons;
 
     await Promise.all([
       sb.from('situations').update({ catatons: newCatatons, sessions: newSessions }).eq('id', sitId),
@@ -1404,7 +1688,7 @@
         situation_name: sit.name,
         mode: sessMode,
         duration_minutes: sessDuration,
-        catatons_earned: catatonsEarned,
+        catatons_earned: safeCatatons,
         completed: true,
       }),
     ]);
@@ -1421,7 +1705,7 @@
       if (el) { el.classList.add('pop'); setTimeout(() => el.classList.remove('pop'), 600); }
     }, 300);
 
-    toast(`+${catatonsEarned} Catatons accumulated.`);
+    toast(`+${safeCatatons} Catatons accumulated.`);
   }
 
   // ─── OVERLAY HELPERS ───
@@ -1474,15 +1758,5 @@
   // ─── BOOT ───
   init();
   </script>
-
-  <footer style="border-top:1px solid rgba(255,255,255,0.055);padding:2rem 2.5rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;margin-top:auto;">
-    <span style="font-family:'Cormorant Garamond',serif;font-size:0.85rem;font-weight:300;letter-spacing:0.3em;text-transform:uppercase;color:rgba(237,232,223,0.18);">Catatonica</span>
-    <div style="display:flex;align-items:center;gap:2rem;flex-wrap:wrap;">
-      <a href="terms.html" style="font-family:'DM Mono',monospace;font-size:0.44rem;letter-spacing:0.14em;text-transform:uppercase;color:rgba(237,232,223,0.18);text-decoration:none;">Terms</a>
-      <a href="privacy.html" style="font-family:'DM Mono',monospace;font-size:0.44rem;letter-spacing:0.14em;text-transform:uppercase;color:rgba(237,232,223,0.18);text-decoration:none;">Privacy</a>
-      <a href="refund.html" style="font-family:'DM Mono',monospace;font-size:0.44rem;letter-spacing:0.14em;text-transform:uppercase;color:rgba(237,232,223,0.18);text-decoration:none;">Refunds</a>
-      <span style="font-family:'DM Mono',monospace;font-size:0.44rem;letter-spacing:0.14em;text-transform:uppercase;color:rgba(237,232,223,0.18);">© 2026 Catatonica</span>
-    </div>
-  </footer>
 </body>
 </html>
