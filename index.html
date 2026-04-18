@@ -399,5 +399,18 @@
       btn.textContent = 'Enter →'; btn.disabled = false;
     });
   </script>
+
+  <canvas id="voidAmbientCanvas" style="position:fixed;inset:0;width:100vw;height:100vh;z-index:-1;pointer-events:none;"></canvas>
+  <script src="/void-ambient.js"></script>
+  <script>
+    VoidAmbient.init({
+      canvas: document.getElementById('voidAmbientCanvas'),
+      density: 'low',
+      temperature: 'cold',
+      catatons: 0,
+      responsive: true
+    });
+    VoidAmbient.start();
+  </script>
 </body>
 </html>

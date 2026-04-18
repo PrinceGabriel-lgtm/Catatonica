@@ -25,9 +25,9 @@
       --text-primary: #e8e4dc;
       --text-muted: rgba(232,228,220,0.38);
       --text-dim: rgba(232,228,220,0.16);
-      --accent: #a89f8c;
-      --accent-cold: #7a9ea8;
-      --gold: #c4a96d;
+      --accent: #c8bfad;
+      --accent-cold: #5eb8cc;
+      --gold: #d4a830;
       --gold-dim: rgba(196,169,109,0.15);
       --danger: rgba(200,80,80,0.7);
     }
@@ -864,7 +864,13 @@
   <!-- ─── MAIN APP ─── -->
   <div class="screen" id="appScreen">
     <nav>
-      <a href="index.html" class="nav-logo">Cata<span>tonica</span></a>
+      <a href="index.html" class="nav-logo" style="display:flex;align-items:center;gap:0.7rem;text-decoration:none;">
+        <svg width="22" height="22" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M 85 50 A 38 38 0 1 1 84.5 44" stroke="#c4a455" stroke-width="2.5" stroke-linecap="round" fill="none" opacity="0.85"/>
+          <circle cx="50" cy="50" r="3" fill="#c4a455" opacity="0.75"/>
+        </svg>
+        <span style="font-family:'Cormorant Garamond',serif;font-size:0.95rem;font-weight:300;letter-spacing:0.35em;text-transform:uppercase;color:var(--text-primary);">Cata<em style="font-style:italic;color:#c4a455;">tonica</em></span>
+      </a>
       <div class="nav-right">
         <div class="total-catatons">
           <span class="tc-num" id="totalCatons">0</span>
@@ -1121,6 +1127,8 @@
       const needsOnboarding = await checkOnboarding();
       if (!needsOnboarding) {
         showScreen('appScreen');
+        // Pulse on return to acknowledge the user
+        if (typeof VoidAmbient !== 'undefined') VoidAmbient.pulse();
       }
     } else {
       showScreen('authScreen');
@@ -1260,7 +1268,11 @@
         currentUser = data.user;
         await loadData();
         const needsOnboarding = await checkOnboarding();
-        if (!needsOnboarding) showScreen('appScreen');
+        if (!needsOnboarding) {
+          showScreen('appScreen');
+          // The universe acknowledges the user entering
+          if (typeof VoidAmbient !== 'undefined') VoidAmbient.pulse();
+        }
       }
     }
 
@@ -1298,6 +1310,11 @@
     profile = profRes.data || {};
     situations = sitRes.data || [];
     archive = arcRes.data || [];
+
+    // Update ambient void with user's lifetime catatons for stage awareness
+    if (typeof VoidAmbient !== 'undefined') {
+      VoidAmbient.setCatatons(profile.total_catatons || 0);
+    }
 
     render();
     checkSessionReturn();
@@ -1697,6 +1714,11 @@
     sit.sessions = newSessions;
     profile.total_catatons = newTotal;
 
+    // Update ambient void stage awareness
+    if (typeof VoidAmbient !== 'undefined') {
+      VoidAmbient.setCatatons(newTotal);
+    }
+
     render();
 
     // Animate
@@ -1757,6 +1779,20 @@
 
   // ─── BOOT ───
   init();
+  </script>
+
+  <canvas id="voidAmbientCanvas" style="position:fixed;inset:0;width:100vw;height:100vh;z-index:-1;pointer-events:none;"></canvas>
+  <script src="/void-ambient.js"></script>
+  <script>
+    // Initialize ambient void field for dashboard
+    VoidAmbient.init({
+      canvas: document.getElementById('voidAmbientCanvas'),
+      density: 'medium',
+      temperature: 'warm',
+      catatons: 0,
+      responsive: true
+    });
+    VoidAmbient.start();
   </script>
 </body>
 </html>
