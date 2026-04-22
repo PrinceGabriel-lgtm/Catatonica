@@ -8,19 +8,37 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Mono:ital,wght@0,300;0,400;1,300&family=Outfit:wght@200;300;400&display=swap" rel="stylesheet" />
   <style>
+    /* ─────────────────────────────────────────────────────────────
+       THE ABYSS
+
+       A deep that represents the abyss we're too fearful to enter
+       and stare into. Not knowing it's our world, we seek to be
+       washed away by the shores, rather than calm them and command
+       them to our behest.
+
+       — Immanuel Gabriel, founder's note
+       ───────────────────────────────────────────────────────────── */
     :root {
-      --void: #090806;
-      --deep: #0e0c09;
-      --surface: #141210;
+      --void: #0d1b2a;
+      --void-deep: #050f1e;
+      --deep: #0a1624;
+      --surface: #0a1624;
+      --surface2: #132235;
       --border: rgba(255,255,255,0.05);
       --border-hover: rgba(255,255,255,0.1);
-      --text-primary: #e4dfd6;
-      --text-muted: rgba(228,223,214,0.38);
-      --text-dim: rgba(228,223,214,0.13);
+      --text-primary: #d4c5a1;
+      --text-muted: rgba(212,197,161,0.7);
+      --text-dim: rgba(212,197,161,0.55);
       --gold: #c9a84c;
       --gold-dim: rgba(201,168,76,0.08);
       --teal: #6ba3b0;
       --ash: rgba(160,138,110,0.22);
+      --text-display:  clamp(2.5rem, 5vw, 4.5rem);
+      --text-heading:  clamp(1.8rem, 3vw, 2.8rem);
+      --text-subhead:  1.25rem;
+      --text-body:     1rem;
+      --text-meta:     0.85rem;
+      --text-micro:    0.75rem;
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -65,7 +83,7 @@
       border-bottom: 1px solid var(--border);
       padding: 1.5rem 3rem;
       display: flex; justify-content: space-between; align-items: center;
-      background: rgba(9,8,6,0.94);
+      background: rgba(13,27,42,0.94);
       backdrop-filter: blur(12px);
       z-index: 100;
     }
@@ -87,12 +105,12 @@
     }
     .nav-total-label {
       font-family: 'DM Mono', monospace;
-      font-size: 0.5rem; letter-spacing: 0.2em;
+      font-size: var(--text-micro); letter-spacing: 0.2em;
       text-transform: uppercase; color: var(--text-dim);
     }
     .nav-back {
       font-family: 'DM Mono', monospace;
-      font-size: 0.58rem; letter-spacing: 0.2em;
+      font-size: var(--text-micro); letter-spacing: 0.2em;
       text-transform: uppercase; color: var(--text-dim);
       text-decoration: none; cursor: none;
       transition: color 0.3s ease;
@@ -113,7 +131,7 @@
     }
     .page-eyebrow {
       font-family: 'DM Mono', monospace;
-      font-size: 0.58rem; letter-spacing: 0.32em;
+      font-size: var(--text-micro); letter-spacing: 0.32em;
       text-transform: uppercase; color: var(--ash);
       margin-bottom: 1rem;
     }
@@ -150,7 +168,7 @@
     }
     .stat-label {
       font-family: 'DM Mono', monospace;
-      font-size: 0.5rem; letter-spacing: 0.2em;
+      font-size: var(--text-micro); letter-spacing: 0.2em;
       text-transform: uppercase; color: var(--text-dim);
     }
 
@@ -168,7 +186,7 @@
     }
     .stage-progress-label {
       font-family: 'DM Mono', monospace;
-      font-size: 0.52rem; letter-spacing: 0.25em;
+      font-size: var(--text-micro); letter-spacing: 0.25em;
       text-transform: uppercase; color: var(--ash);
       margin-bottom: 0.6rem;
     }
@@ -179,7 +197,7 @@
     }
     .stage-next {
       font-family: 'DM Mono', monospace;
-      font-size: 0.5rem; letter-spacing: 0.15em;
+      font-size: var(--text-micro); letter-spacing: 0.15em;
       text-transform: uppercase; color: var(--text-dim);
     }
     .stage-next em { color: var(--gold); font-style: normal; }
@@ -194,7 +212,7 @@
       border: none; padding: 0.8rem;
       cursor: none; text-align: center;
       font-family: 'DM Mono', monospace;
-      font-size: 0.55rem; letter-spacing: 0.12em;
+      font-size: var(--text-micro); letter-spacing: 0.12em;
       text-transform: uppercase; color: var(--text-dim);
       transition: background 0.3s ease, color 0.3s ease;
       position: relative;
@@ -242,12 +260,12 @@
     }
     .entry-date {
       font-family: 'DM Mono', monospace;
-      font-size: 0.52rem; letter-spacing: 0.18em;
+      font-size: var(--text-micro); letter-spacing: 0.18em;
       text-transform: uppercase; color: var(--text-dim);
     }
     .entry-mode-tag {
       font-family: 'DM Mono', monospace;
-      font-size: 0.48rem; letter-spacing: 0.15em;
+      font-size: var(--text-micro); letter-spacing: 0.15em;
       text-transform: uppercase;
       padding: 0.2rem 0.55rem;
       border: 1px solid var(--border);
@@ -259,7 +277,7 @@
 
     .entry-stage-tag {
       font-family: 'DM Mono', monospace;
-      font-size: 0.45rem; letter-spacing: 0.12em;
+      font-size: var(--text-micro); letter-spacing: 0.12em;
       text-transform: uppercase; color: var(--ash);
     }
 
@@ -270,7 +288,7 @@
     }
     .echo-key {
       font-family: 'DM Mono', monospace;
-      font-size: 0.46rem; letter-spacing: 0.15em;
+      font-size: var(--text-micro); letter-spacing: 0.15em;
       text-transform: uppercase; color: var(--text-dim);
       flex-shrink: 0; width: 72px;
     }
@@ -291,18 +309,18 @@
     }
     .entry-catatons-label {
       font-family: 'DM Mono', monospace;
-      font-size: 0.48rem; letter-spacing: 0.18em;
+      font-size: var(--text-micro); letter-spacing: 0.18em;
       text-transform: uppercase; color: var(--text-dim);
       display: block; margin-bottom: 0.6rem;
     }
     .entry-duration {
       font-family: 'DM Mono', monospace;
-      font-size: 0.5rem; letter-spacing: 0.12em;
+      font-size: var(--text-micro); letter-spacing: 0.12em;
       text-transform: uppercase; color: var(--text-dim);
     }
     .entry-incomplete {
       font-family: 'DM Mono', monospace;
-      font-size: 0.44rem; letter-spacing: 0.12em;
+      font-size: var(--text-micro); letter-spacing: 0.12em;
       text-transform: uppercase; color: rgba(107,163,176,0.4);
       display: block; margin-top: 0.3rem;
     }
@@ -319,7 +337,7 @@
     }
     .empty-sub {
       font-family: 'DM Mono', monospace;
-      font-size: 0.58rem; letter-spacing: 0.15em;
+      font-size: var(--text-micro); letter-spacing: 0.15em;
       text-transform: uppercase; color: var(--text-dim);
       margin-bottom: 2.5rem;
     }
@@ -327,7 +345,7 @@
       background: var(--text-primary); color: var(--void);
       border: none; padding: 1rem 2.5rem;
       font-family: 'DM Mono', monospace;
-      font-size: 0.65rem; letter-spacing: 0.2em;
+      font-size: var(--text-micro); letter-spacing: 0.2em;
       text-transform: uppercase; cursor: none;
       text-decoration: none; display: inline-block;
       transition: background 0.3s ease;
@@ -345,6 +363,19 @@
       .stats-row { grid-template-columns: repeat(2, 1fr); }
       .entry-main { grid-template-columns: 1fr; gap: 1rem; }
       .entry-right { text-align: left; }
+    }
+    @media (hover: none), (pointer: coarse) {
+      html, body, a, button, input, textarea { cursor: auto !important; }
+      .cursor, .cursor-ring { display: none !important; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+      .cat-loader-dot { animation: none; opacity: 0.7; }
     }
   </style>
 </head>
@@ -416,9 +447,12 @@
     // CURSOR
     const cursor = document.getElementById('cursor');
     const ring = document.getElementById('cursorRing');
-    let mx=0,my=0,rx=0,ry=0;
-    document.addEventListener('mousemove', e => { mx=e.clientX; my=e.clientY; cursor.style.left=mx+'px'; cursor.style.top=my+'px'; });
-    (function animRing(){ rx+=(mx-rx)*0.1; ry+=(my-ry)*0.1; ring.style.left=rx+'px'; ring.style.top=ry+'px'; requestAnimationFrame(animRing); })();
+    const hasHover = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+    if (hasHover) {
+      let mx=0,my=0,rx=0,ry=0;
+      document.addEventListener('mousemove', e => { mx=e.clientX; my=e.clientY; cursor.style.left=mx+'px'; cursor.style.top=my+'px'; });
+      (function animRing(){ rx+=(mx-rx)*0.1; ry+=(my-ry)*0.1; if(ring){ring.style.left=rx+'px'; ring.style.top=ry+'px';} requestAnimationFrame(animRing); })();
+    }
 
     // STAGE SYSTEM
     const STAGES = [

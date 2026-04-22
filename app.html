@@ -15,6 +15,16 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
+    /* ─────────────────────────────────────────────────────────────
+       THE ABYSS
+
+       A deep that represents the abyss we're too fearful to enter
+       and stare into. Not knowing it's our world, we seek to be
+       washed away by the shores, rather than calm them and command
+       them to our behest.
+
+       — Immanuel Gabriel, founder's note
+       ───────────────────────────────────────────────────────────── */
     :root {
       --void: #0d1b2a;
       --void-deep: #050f1e;
@@ -23,14 +33,20 @@
       --surface2: #132235;
       --border: rgba(255,255,255,0.06);
       --border-hover: rgba(255,255,255,0.12);
-      --text-primary: #e8e4dc;
-      --text-muted: rgba(232,228,220,0.38);
-      --text-dim: rgba(232,228,220,0.55);
+      --text-primary: #d4c5a1;
+      --text-muted: rgba(212,197,161,0.7);
+      --text-dim: rgba(212,197,161,0.55);
       --accent: #c8bfad;
       --accent-cold: #5eb8cc;
       --gold: #d4a830;
       --gold-dim: rgba(196,169,109,0.15);
       --danger: rgba(200,80,80,0.7);
+      --text-display:  clamp(2.5rem, 5vw, 4.5rem);
+      --text-heading:  clamp(1.8rem, 3vw, 2.8rem);
+      --text-subhead:  1.25rem;
+      --text-body:     1rem;
+      --text-meta:     0.85rem;
+      --text-micro:    0.75rem;
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -46,7 +62,7 @@
     }
 
     /* ─── CURSOR (desktop only) ─── */
-    @media (hover: hover) {
+    @media (hover: hover) and (pointer: fine) {
       body { cursor: none; }
       .cursor {
         position: fixed; width: 5px; height: 5px;
@@ -84,6 +100,34 @@
     @keyframes pulse {
       0%,100% { opacity: 0.3; } 50% { opacity: 0.8; }
     }
+    .cat-loader {
+      position: fixed; inset: 0;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      background: var(--void);
+      z-index: 9999;
+      transition: opacity 0.6s ease;
+    }
+    .cat-loader.hidden { opacity: 0; pointer-events: none; }
+    .cat-loader-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--gold);
+      animation: cat-pulse 2.4s ease-in-out infinite;
+    }
+    .cat-loader-text {
+      font-family: 'DM Mono', monospace;
+      font-size: var(--text-micro);
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      margin-top: 2rem;
+      opacity: 0;
+      animation: cat-fade-in 0.6s ease 2s forwards;
+    }
+    @keyframes cat-pulse {
+      0%, 100% { opacity: 0.3; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.2); }
+    }
+    @keyframes cat-fade-in { to { opacity: 1; } }
 
     /* ─── ONBOARDING ─── */
     #onboardScreen {
@@ -107,7 +151,7 @@
     }
     .onboard-eyebrow {
       font-family: 'DM Mono', monospace;
-      font-size: 0.55rem; letter-spacing: 0.28em;
+      font-size: var(--text-micro); letter-spacing: 0.28em;
       text-transform: uppercase; color: var(--gold);
       opacity: 0.6; margin-bottom: 1rem;
     }
@@ -146,7 +190,7 @@
       border: 1px solid rgba(196,164,85,0.5);
       padding: 1rem 2rem;
       font-family: 'DM Mono', monospace;
-      font-size: 0.68rem; font-weight: 400; letter-spacing: 0.18em;
+      font-size: var(--text-micro); font-weight: 400; letter-spacing: 0.18em;
       text-transform: uppercase; cursor: pointer;
       margin-top: 1.5rem; align-self: flex-start;
       transition: background 0.3s ease, color 0.3s ease;
@@ -155,7 +199,7 @@
     .onboard-skip {
       background: none; border: none;
       font-family: 'DM Mono', monospace;
-      font-size: 0.55rem; letter-spacing: 0.12em;
+      font-size: var(--text-micro); letter-spacing: 0.12em;
       text-transform: uppercase; color: var(--text-dim);
       cursor: pointer; margin-top: 1rem;
       padding: 0; align-self: flex-start;
@@ -189,7 +233,7 @@
     }
     .onboard-mode-desc {
       font-family: 'DM Mono', monospace;
-      font-size: 0.5rem; letter-spacing: 0.1em;
+      font-size: var(--text-micro); letter-spacing: 0.1em;
       text-transform: uppercase; color: var(--text-dim);
     }
 
@@ -216,7 +260,7 @@
 
     .auth-tagline {
       font-family: 'DM Mono', monospace;
-      font-size: 0.55rem; letter-spacing: 0.2em;
+      font-size: var(--text-micro); letter-spacing: 0.2em;
       text-transform: uppercase; color: var(--text-dim);
       margin-bottom: 2.5rem;
     }
@@ -236,7 +280,7 @@
     .field { margin-bottom: 1rem; }
     .field label {
       font-family: 'DM Mono', monospace;
-      font-size: 0.55rem; letter-spacing: 0.2em;
+      font-size: var(--text-micro); letter-spacing: 0.2em;
       text-transform: uppercase; color: var(--text-dim);
       display: block; margin-bottom: 0.5rem;
     }
@@ -257,7 +301,7 @@
       background: var(--text-primary); color: var(--void);
       border: none; cursor: pointer;
       font-family: 'DM Mono', monospace;
-      font-size: 0.65rem; letter-spacing: 0.2em;
+      font-size: var(--text-micro); letter-spacing: 0.2em;
       text-transform: uppercase;
       transition: background 0.3s ease;
       margin-top: 0.5rem;
@@ -267,7 +311,7 @@
 
     .auth-switch {
       font-family: 'DM Mono', monospace;
-      font-size: 0.6rem; letter-spacing: 0.1em;
+      font-size: var(--text-micro); letter-spacing: 0.1em;
       color: var(--text-dim); margin-top: 1.5rem;
       text-align: center;
     }
@@ -275,14 +319,14 @@
       background: none; border: none; cursor: pointer;
       color: var(--accent-cold);
       font-family: 'DM Mono', monospace;
-      font-size: 0.6rem; letter-spacing: 0.1em;
+      font-size: var(--text-micro); letter-spacing: 0.1em;
       transition: color 0.3s ease;
     }
     .auth-switch button:hover { color: var(--text-primary); }
 
     .auth-message {
       font-family: 'DM Mono', monospace;
-      font-size: 0.6rem; letter-spacing: 0.1em;
+      font-size: var(--text-micro); letter-spacing: 0.1em;
       margin-top: 1rem; padding: 0.7rem 1rem;
       border: 1px solid var(--border);
       color: var(--text-muted);
@@ -323,14 +367,14 @@
     }
     .tc-label {
       font-family: 'DM Mono', monospace;
-      font-size: 0.5rem; letter-spacing: 0.18em;
+      font-size: var(--text-micro); letter-spacing: 0.18em;
       text-transform: uppercase; color: var(--text-dim);
       line-height: 1.4;
     }
 
     .nav-btn {
       font-family: 'DM Mono', monospace;
-      font-size: 0.58rem; letter-spacing: 0.18em;
+      font-size: var(--text-micro); letter-spacing: 0.18em;
       text-transform: uppercase; color: var(--text-muted);
       background: none; border: none; cursor: pointer;
       transition: color 0.3s ease; padding: 0;
@@ -349,7 +393,7 @@
     .page-header { margin-bottom: 3rem; }
     .page-eyebrow {
       font-family: 'DM Mono', monospace;
-      font-size: 0.55rem; letter-spacing: 0.28em;
+      font-size: var(--text-micro); letter-spacing: 0.28em;
       text-transform: uppercase; color: var(--accent-cold);
       margin-bottom: 0.8rem; opacity: 0.7;
     }
@@ -395,7 +439,7 @@
 
     .add-enter {
       font-family: 'DM Mono', monospace;
-      font-size: 0.58rem; letter-spacing: 0.15em;
+      font-size: var(--text-micro); letter-spacing: 0.15em;
       text-transform: uppercase; color: var(--text-dim);
       background: none; border: none; cursor: pointer;
       transition: color 0.3s ease;
@@ -407,7 +451,7 @@
     /* ─── TIER BAR ─── */
     .tier-bar {
       font-family: 'DM Mono', monospace;
-      font-size: 0.55rem; letter-spacing: 0.13em;
+      font-size: var(--text-micro); letter-spacing: 0.13em;
       text-transform: uppercase; color: var(--text-dim);
       padding: 0.7rem 2rem;
       border: 1px solid var(--border); border-top: none;
@@ -417,7 +461,7 @@
     .upgrade-link {
       color: var(--accent-cold); background: none; border: none;
       cursor: pointer; font-family: 'DM Mono', monospace;
-      font-size: 0.55rem; letter-spacing: 0.13em;
+      font-size: var(--text-micro); letter-spacing: 0.13em;
       text-transform: uppercase;
       transition: color 0.3s ease;
     }
@@ -426,7 +470,7 @@
     /* ─── SECTION LABEL ─── */
     .section-lbl {
       font-family: 'DM Mono', monospace;
-      font-size: 0.55rem; letter-spacing: 0.26em;
+      font-size: var(--text-micro); letter-spacing: 0.26em;
       text-transform: uppercase; color: var(--text-dim);
       margin-bottom: 1px;
     }
@@ -468,12 +512,12 @@
     }
     .sit-sessions {
       font-family: 'DM Mono', monospace;
-      font-size: 0.55rem; letter-spacing: 0.1em;
+      font-size: var(--text-micro); letter-spacing: 0.1em;
       text-transform: uppercase; color: var(--text-dim);
     }
     .threshold-badge {
       font-family: 'DM Mono', monospace;
-      font-size: 0.52rem; letter-spacing: 0.1em;
+      font-size: var(--text-micro); letter-spacing: 0.1em;
       text-transform: uppercase; color: var(--gold);
       border: 1px solid rgba(196,169,109,0.25);
       padding: 0.2rem 0.5rem;
@@ -491,7 +535,7 @@
     }
     .cat-unit {
       font-family: 'DM Mono', monospace;
-      font-size: 0.48rem; letter-spacing: 0.18em;
+      font-size: var(--text-micro); letter-spacing: 0.18em;
       text-transform: uppercase; color: var(--text-dim);
     }
 
@@ -499,7 +543,7 @@
 
     .s-btn {
       font-family: 'DM Mono', monospace;
-      font-size: 0.55rem; letter-spacing: 0.13em;
+      font-size: var(--text-micro); letter-spacing: 0.13em;
       text-transform: uppercase; cursor: pointer;
       background: none; border: 1px solid var(--border);
       color: var(--text-muted); padding: 0.35rem 0.7rem;
@@ -526,7 +570,7 @@
     }
     .empty-sub {
       font-family: 'DM Mono', monospace;
-      font-size: 0.58rem; letter-spacing: 0.13em;
+      font-size: var(--text-micro); letter-spacing: 0.13em;
       text-transform: uppercase; color: var(--text-dim);
     }
 
@@ -548,7 +592,7 @@
     }
     .arc-meta {
       font-family: 'DM Mono', monospace;
-      font-size: 0.53rem; letter-spacing: 0.1em;
+      font-size: var(--text-micro); letter-spacing: 0.1em;
       text-transform: uppercase; color: var(--text-dim);
       margin-top: 0.3rem;
     }
@@ -590,7 +634,7 @@
 
     .modal-eyebrow {
       font-family: 'DM Mono', monospace;
-      font-size: 0.55rem; letter-spacing: 0.24em;
+      font-size: var(--text-micro); letter-spacing: 0.24em;
       text-transform: uppercase; color: var(--accent-cold);
       margin-bottom: 1.2rem; opacity: 0.7;
     }
@@ -610,7 +654,7 @@
     .modal-close {
       position: absolute; top: 1.2rem; right: 1.2rem;
       font-family: 'DM Mono', monospace;
-      font-size: 0.58rem; letter-spacing: 0.13em;
+      font-size: var(--text-micro); letter-spacing: 0.13em;
       text-transform: uppercase; color: var(--text-dim);
       background: none; border: none; cursor: pointer;
       transition: color 0.3s ease;
@@ -667,7 +711,7 @@
     }
     .mode-desc {
       font-family: 'DM Mono', monospace;
-      font-size: 0.5rem; letter-spacing: 0.1em;
+      font-size: var(--text-micro); letter-spacing: 0.1em;
       text-transform: uppercase; color: var(--text-dim);
     }
 
@@ -680,7 +724,7 @@
       flex: 1; background: var(--void); border: none;
       padding: 0.7rem; cursor: pointer;
       font-family: 'DM Mono', monospace;
-      font-size: 0.6rem; letter-spacing: 0.08em;
+      font-size: var(--text-micro); letter-spacing: 0.08em;
       text-transform: uppercase; color: var(--text-muted);
       transition: background 0.3s ease, color 0.3s ease;
       position: relative;
@@ -706,7 +750,7 @@
     }
     .mastery-num-lbl {
       font-family: 'DM Mono', monospace;
-      font-size: 0.52rem; letter-spacing: 0.22em;
+      font-size: var(--text-micro); letter-spacing: 0.22em;
       text-transform: uppercase; color: var(--text-dim);
       text-align: center; display: block; margin-bottom: 1.5rem;
     }
@@ -725,7 +769,7 @@
       background: var(--surface2); border: 1px solid var(--border);
       padding: 0.8rem 1.5rem;
       font-family: 'DM Mono', monospace;
-      font-size: 0.6rem; letter-spacing: 0.15em;
+      font-size: var(--text-micro); letter-spacing: 0.15em;
       text-transform: uppercase; color: var(--text-muted);
       z-index: 9999;
       transition: transform 0.4s ease;
@@ -756,6 +800,19 @@
       .mode-grid { grid-template-columns: 1fr; }
       .modal { padding: 2rem 1.5rem; }
     }
+    @media (hover: none), (pointer: coarse) {
+      html, body, a, button, input, textarea { cursor: auto !important; }
+      .cursor, .cursor-ring { display: none !important; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+      .cat-loader-dot { animation: none; opacity: 0.7; }
+    }
   </style>
 </head>
 <body>
@@ -765,7 +822,8 @@
 
   <!-- ─── LOADING ─── -->
   <div class="screen active" id="loadingScreen">
-    <p class="loading-logo">Cata<em style="font-style:italic;color:#a89f8c">tonica</em></p>
+    <div class="cat-loader-dot"></div>
+    <p class="cat-loader-text" id="loaderText">Still loading…</p>
   </div>
 
   <!-- ─── ONBOARDING ─── -->
@@ -1010,16 +1068,16 @@
 
         <!-- Deep -->
         <div style="background:var(--surface2);padding:1.8rem 1.5rem">
-          <p style="font-family:'DM Mono',monospace;font-size:0.5rem;letter-spacing:0.22em;text-transform:uppercase;color:var(--text-dim);margin-bottom:0.6rem">Deep · $9/mo</p>
+          <p style="font-family:'DM Mono',monospace;font-size:var(--text-micro);letter-spacing:0.22em;text-transform:uppercase;color:var(--text-dim);margin-bottom:0.6rem">Deep · $9/mo</p>
           <p style="font-family:'Cormorant Garamond',serif;font-size:1.5rem;color:var(--text-primary);margin-bottom:1rem">Go further in.</p>
           <ul style="list-style:none;display:flex;flex-direction:column;gap:0.6rem;margin-bottom:1.5rem">
-            <li style="font-family:'DM Mono',monospace;font-size:0.56rem;letter-spacing:0.08em;color:var(--text-muted)">✦ Sessions up to 60 minutes</li>
-            <li style="font-family:'DM Mono',monospace;font-size:0.56rem;letter-spacing:0.08em;color:var(--text-muted)">✦ All session modes unlocked</li>
-            <li style="font-family:'DM Mono',monospace;font-size:0.56rem;letter-spacing:0.08em;color:var(--text-muted)">✦ Session insights over time</li>
-            <li style="font-family:'DM Mono',monospace;font-size:0.56rem;letter-spacing:0.08em;color:var(--text-muted)">✦ Priority access to new features</li>
+            <li style="font-family:'DM Mono',monospace;font-size:var(--text-micro);letter-spacing:0.08em;color:var(--text-muted)">✦ Sessions up to 60 minutes</li>
+            <li style="font-family:'DM Mono',monospace;font-size:var(--text-micro);letter-spacing:0.08em;color:var(--text-muted)">✦ All session modes unlocked</li>
+            <li style="font-family:'DM Mono',monospace;font-size:var(--text-micro);letter-spacing:0.08em;color:var(--text-muted)">✦ Session insights over time</li>
+            <li style="font-family:'DM Mono',monospace;font-size:var(--text-micro);letter-spacing:0.08em;color:var(--text-muted)">✦ Priority access to new features</li>
           </ul>
           <a href="" id="stripeDeepBtn" target="_blank"
-            style="display:block;text-align:center;font-family:'DM Mono',monospace;font-size:0.58rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--text-primary);border:1px solid var(--border-hover);padding:0.8rem;text-decoration:none;transition:background 0.3s ease"
+            style="display:block;text-align:center;font-family:'DM Mono',monospace;font-size:var(--text-micro);letter-spacing:0.15em;text-transform:uppercase;color:var(--text-primary);border:1px solid var(--border-hover);padding:0.8rem;text-decoration:none;transition:background 0.3s ease"
             onmouseover="this.style.background='rgba(255,255,255,0.04)'"
             onmouseout="this.style.background='none'">
             Enter Deep →
@@ -1028,16 +1086,16 @@
 
         <!-- The Order -->
         <div style="background:var(--surface2);padding:1.8rem 1.5rem;border-left:1px solid var(--border)">
-          <p style="font-family:'DM Mono',monospace;font-size:0.5rem;letter-spacing:0.22em;text-transform:uppercase;color:var(--gold);opacity:0.7;margin-bottom:0.6rem">The Order · $29/mo</p>
+          <p style="font-family:'DM Mono',monospace;font-size:var(--text-micro);letter-spacing:0.22em;text-transform:uppercase;color:var(--gold);opacity:0.7;margin-bottom:0.6rem">The Order · $29/mo</p>
           <p style="font-family:'Cormorant Garamond',serif;font-size:1.5rem;color:var(--gold);margin-bottom:1rem">Join the doctrine.</p>
           <ul style="list-style:none;display:flex;flex-direction:column;gap:0.6rem;margin-bottom:1.5rem">
-            <li style="font-family:'DM Mono',monospace;font-size:0.56rem;letter-spacing:0.08em;color:var(--gold);opacity:0.8">✦ Everything in Deep</li>
-            <li style="font-family:'DM Mono',monospace;font-size:0.56rem;letter-spacing:0.08em;color:var(--gold);opacity:0.8">✦ The full Still Voice doctrine — in-app</li>
-            <li style="font-family:'DM Mono',monospace;font-size:0.56rem;letter-spacing:0.08em;color:var(--gold);opacity:0.8">✦ Founding member — price locked forever</li>
-            <li style="font-family:'DM Mono',monospace;font-size:0.56rem;letter-spacing:0.08em;color:var(--gold);opacity:0.8">✦ Direct line to the founders</li>
+            <li style="font-family:'DM Mono',monospace;font-size:var(--text-micro);letter-spacing:0.08em;color:var(--gold);opacity:0.8">✦ Everything in Deep</li>
+            <li style="font-family:'DM Mono',monospace;font-size:var(--text-micro);letter-spacing:0.08em;color:var(--gold);opacity:0.8">✦ The full Still Voice doctrine — in-app</li>
+            <li style="font-family:'DM Mono',monospace;font-size:var(--text-micro);letter-spacing:0.08em;color:var(--gold);opacity:0.8">✦ Founding member — price locked forever</li>
+            <li style="font-family:'DM Mono',monospace;font-size:var(--text-micro);letter-spacing:0.08em;color:var(--gold);opacity:0.8">✦ Direct line to the founders</li>
           </ul>
           <a href="" id="stripeOrderBtn" target="_blank"
-            style="display:block;text-align:center;font-family:'DM Mono',monospace;font-size:0.58rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold);border:1px solid rgba(196,169,109,0.25);padding:0.8rem;text-decoration:none;transition:background 0.3s ease"
+            style="display:block;text-align:center;font-family:'DM Mono',monospace;font-size:var(--text-micro);letter-spacing:0.15em;text-transform:uppercase;color:var(--gold);border:1px solid rgba(196,169,109,0.25);padding:0.8rem;text-decoration:none;transition:background 0.3s ease"
             onmouseover="this.style.background='rgba(196,169,109,0.06)'"
             onmouseout="this.style.background='none'">
             Enter The Order →
@@ -1045,7 +1103,7 @@
         </div>
       </div>
 
-      <p style="font-family:'DM Mono',monospace;font-size:0.52rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-dim);text-align:center">
+      <p style="font-family:'DM Mono',monospace;font-size:var(--text-micro);letter-spacing:0.1em;text-transform:uppercase;color:var(--text-dim);text-align:center">
         Free stays free. Always. No tricks.
       </p>
     </div>
@@ -1082,7 +1140,8 @@
   // ─── CURSOR ───
   const cursorEl = document.getElementById('cursor');
   const ringEl = document.getElementById('cursorRing');
-  if (cursorEl) {
+  const hasHover = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+  if (cursorEl && hasHover) {
     let mx=0,my=0,rx=0,ry=0;
     document.addEventListener('mousemove', e => {
       mx=e.clientX; my=e.clientY;
@@ -1123,6 +1182,11 @@
 
   // ─── AUTH INIT ───
   async function init() {
+    // If we're returning from a magic link, Supabase leaves access_token in the URL hash.
+    const loaderText = document.getElementById('loaderText');
+    if (loaderText && /access_token=|type=magiclink|type=recovery/.test(window.location.hash)) {
+      loaderText.textContent = 'Entering…';
+    }
     const { data: { session } } = await sb.auth.getSession();
     if (session?.user) {
       currentUser = session.user;

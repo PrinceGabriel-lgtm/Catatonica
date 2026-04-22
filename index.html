@@ -10,6 +10,16 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Mono:ital,wght@0,300;0,400;1,300&family=Outfit:wght@200;300;400&display=swap" rel="stylesheet" />
   <style>
+    /* ─────────────────────────────────────────────────────────────
+       THE ABYSS
+
+       A deep that represents the abyss we're too fearful to enter
+       and stare into. Not knowing it's our world, we seek to be
+       washed away by the shores, rather than calm them and command
+       them to our behest.
+
+       — Immanuel Gabriel, founder's note
+       ───────────────────────────────────────────────────────────── */
     :root {
       --void: #0d1b2a;
       --void-deep: #050f1e;
@@ -18,14 +28,20 @@
       --surface2: #132235;
       --border: rgba(255,255,255,0.055);
       --border-hover: rgba(255,255,255,0.11);
-      --text-primary: #ede8df;
-      --text-muted: rgba(237,232,223,0.42);
-      --text-dim: rgba(237,232,223,0.55);
+      --text-primary: #d4c5a1;
+      --text-muted: rgba(212,197,161,0.7);
+      --text-dim: rgba(212,197,161,0.55);
       --accent: #c8bfad;
       --accent-cold: #5eb8cc;
       --gold: #d4a830;
       --gold-dim: rgba(196,164,85,0.12);
       --gold-glow: rgba(196,164,85,0.06);
+      --text-display:  clamp(2.5rem, 5vw, 4.5rem);
+      --text-heading:  clamp(1.8rem, 3vw, 2.8rem);
+      --text-subhead:  1.25rem;
+      --text-body:     1rem;
+      --text-meta:     0.85rem;
+      --text-micro:    0.75rem;
     }
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
@@ -37,23 +53,23 @@
     .nav-logo { font-family: 'Cormorant Garamond', serif; font-size: 0.95rem; font-weight: 300; letter-spacing: 0.4em; text-transform: uppercase; color: var(--text-primary); text-decoration: none; cursor: none; }
     .nav-logo em { font-style: italic; color: var(--gold); }
     .nav-links { display: flex; align-items: center; gap: 2.5rem; }
-    .nav-links a { font-family: 'DM Mono', monospace; font-size: 0.52rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--text-dim); text-decoration: none; cursor: none; transition: color 0.3s; }
+    .nav-links a { font-family: 'DM Mono', monospace; font-size: var(--text-micro); letter-spacing: 0.22em; text-transform: uppercase; color: var(--text-dim); text-decoration: none; cursor: none; transition: color 0.3s; }
     .nav-links a:hover { color: var(--text-muted); }
     .nav-enter { border: 1px solid rgba(196,164,85,0.3); color: var(--gold) !important; padding: 0.55rem 1.2rem; background: transparent !important; }
     .nav-enter:hover { background: var(--gold-dim) !important; border-color: rgba(196,164,85,0.5); }
     .hero { min-height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: flex-start; padding: 12rem 4rem 6rem; position: relative; max-width: 1100px; margin: 0 auto; }
-    .hero-eyebrow { font-family: 'DM Mono', monospace; font-size: 0.52rem; letter-spacing: 0.38em; text-transform: uppercase; color: rgba(196,164,85,0.55); margin-bottom: 2.5rem; opacity: 0; animation: fadeUp 1s ease 0.2s forwards; }
+    .hero-eyebrow { font-family: 'DM Mono', monospace; font-size: var(--text-micro); letter-spacing: 0.38em; text-transform: uppercase; color: rgba(196,164,85,0.55); margin-bottom: 2.5rem; opacity: 0; animation: fadeUp 1s ease 0.2s forwards; }
     .hero-title { font-family: 'Cormorant Garamond', serif; font-size: clamp(3.5rem, 8vw, 7rem); font-weight: 300; line-height: 1.0; color: var(--text-primary); opacity: 0; animation: fadeUp 1s ease 0.4s forwards; }
     .hero-title em { font-style: italic; color: var(--gold); display: block; }
     .hero-sub { font-family: 'Cormorant Garamond', serif; font-size: clamp(1.1rem, 2vw, 1.4rem); font-weight: 300; font-style: italic; color: var(--text-muted); line-height: 1.7; max-width: 520px; margin-top: 2.5rem; opacity: 0; animation: fadeUp 1s ease 0.6s forwards; }
     .hero-actions { display: flex; gap: 1rem; margin-top: 3.5rem; flex-wrap: wrap; opacity: 0; animation: fadeUp 1s ease 0.8s forwards; }
-    .btn-primary { font-family: 'DM Mono', monospace; font-size: 0.6rem; letter-spacing: 0.22em; text-transform: uppercase; cursor: none; background: var(--text-primary); color: var(--void); border: none; padding: 1rem 2rem; text-decoration: none; display: inline-block; transition: background 0.3s; }
+    .btn-primary { font-family: 'DM Mono', monospace; font-size: var(--text-micro); letter-spacing: 0.22em; text-transform: uppercase; cursor: none; background: var(--text-primary); color: var(--void); border: none; padding: 1rem 2rem; text-decoration: none; display: inline-block; transition: background 0.3s; }
     .btn-primary:hover { background: var(--gold); }
-    .btn-ghost { font-family: 'DM Mono', monospace; font-size: 0.6rem; letter-spacing: 0.22em; text-transform: uppercase; cursor: none; background: transparent; color: var(--text-muted); border: 1px solid var(--border); padding: 1rem 2rem; text-decoration: none; display: inline-block; transition: all 0.3s; }
+    .btn-ghost { font-family: 'DM Mono', monospace; font-size: var(--text-micro); letter-spacing: 0.22em; text-transform: uppercase; cursor: none; background: transparent; color: var(--text-muted); border: 1px solid var(--border); padding: 1rem 2rem; text-decoration: none; display: inline-block; transition: all 0.3s; }
     .btn-ghost:hover { color: var(--text-primary); border-color: var(--border-hover); }
     .hero-stat-row { display: flex; gap: 3rem; margin-top: 6rem; padding-top: 3rem; border-top: 1px solid var(--border); width: 100%; opacity: 0; animation: fadeUp 1s ease 1s forwards; }
     .hero-stat-num { font-family: 'Cormorant Garamond', serif; font-size: 2.2rem; font-weight: 300; color: var(--gold); line-height: 1; display: block; }
-    .hero-stat-label { font-family: 'DM Mono', monospace; font-size: 0.46rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-dim); margin-top: 0.3rem; display: block; }
+    .hero-stat-label { font-family: 'DM Mono', monospace; font-size: var(--text-micro); letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-dim); margin-top: 0.3rem; display: block; }
     .hero-orb { position: absolute; right: 4rem; top: 50%; transform: translateY(-50%); width: 320px; height: 320px; border-radius: 50%; border: 1px solid rgba(196,164,85,0.08); display: flex; align-items: center; justify-content: center; opacity: 0; animation: fadeIn 2s ease 1.2s forwards; }
     .hero-orb::before { content: ''; position: absolute; inset: 20px; border-radius: 50%; border: 1px solid rgba(196,164,85,0.06); animation: breathe 6s ease-in-out infinite; }
     .hero-orb::after { content: ''; position: absolute; inset: 60px; border-radius: 50%; border: 1px solid rgba(196,164,85,0.04); animation: breathe 6s ease-in-out 2s infinite; }
@@ -62,7 +78,7 @@
     @keyframes pulse { 0%, 100% { opacity: 0.2; transform: scale(1); } 50% { opacity: 0.7; transform: scale(1.5); } }
     .divider { height: 1px; background: var(--border); max-width: 1100px; margin: 0 auto; }
     .doctrine { max-width: 1100px; margin: 0 auto; padding: 8rem 4rem; }
-    .section-eyebrow { font-family: 'DM Mono', monospace; font-size: 0.5rem; letter-spacing: 0.35em; text-transform: uppercase; color: rgba(196,164,85,0.45); margin-bottom: 3rem; }
+    .section-eyebrow { font-family: 'DM Mono', monospace; font-size: var(--text-micro); letter-spacing: 0.35em; text-transform: uppercase; color: rgba(196,164,85,0.45); margin-bottom: 3rem; }
     .doctrine-body { display: grid; grid-template-columns: 1fr 1fr; gap: 6rem; align-items: start; }
     .doctrine-statement { font-family: 'Cormorant Garamond', serif; font-size: clamp(1.8rem, 3vw, 2.6rem); font-weight: 300; line-height: 1.2; color: var(--text-primary); }
     .doctrine-statement em { font-style: italic; color: var(--gold); }
@@ -88,9 +104,9 @@
     .stage-row { background: var(--void); padding: 1.4rem 2rem; display: grid; grid-template-columns: 1fr auto auto; gap: 1.5rem; align-items: center; transition: background 0.3s; }
     .stage-row:hover { background: var(--surface); }
     .stage-name { font-family: 'Cormorant Garamond', serif; font-size: 1rem; font-style: italic; color: var(--text-muted); }
-    .stage-range { font-family: 'DM Mono', monospace; font-size: 0.46rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-dim); }
-    .stage-unlock { font-family: 'DM Mono', monospace; font-size: 0.44rem; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(122,158,168,0.5); }
-    .stage-label { font-family: 'DM Mono', monospace; font-size: 0.44rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-dim); padding: 1rem 2rem; background: var(--surface); border-bottom: 1px solid var(--border); }
+    .stage-range { font-family: 'DM Mono', monospace; font-size: var(--text-micro); letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-dim); }
+    .stage-unlock { font-family: 'DM Mono', monospace; font-size: var(--text-micro); letter-spacing: 0.1em; text-transform: uppercase; color: rgba(122,158,168,0.5); }
+    .stage-label { font-family: 'DM Mono', monospace; font-size: var(--text-micro); letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-dim); padding: 1rem 2rem; background: var(--surface); border-bottom: 1px solid var(--border); }
     .obsolescence { max-width: 1100px; margin: 0 auto; padding: 8rem 4rem; }
     .obs-inner { display: grid; grid-template-columns: 1fr 1fr; gap: 6rem; align-items: start; }
     .obs-title { font-family: 'Cormorant Garamond', serif; font-size: clamp(2rem, 3.5vw, 3rem); font-weight: 300; line-height: 1.1; color: var(--text-primary); margin-bottom: 2rem; }
@@ -98,11 +114,11 @@
     .obs-desc { font-family: 'Cormorant Garamond', serif; font-size: 1.05rem; font-weight: 300; color: var(--text-muted); line-height: 1.9; margin-bottom: 1.2rem; }
     .obs-desc strong { color: var(--text-primary); font-weight: 400; }
     .obs-card { border: 1px solid var(--border); background: var(--surface); padding: 2.5rem; }
-    .obs-card-eye { font-family: 'DM Mono', monospace; font-size: 0.46rem; letter-spacing: 0.25em; text-transform: uppercase; color: rgba(196,164,85,0.45); margin-bottom: 1.2rem; }
+    .obs-card-eye { font-family: 'DM Mono', monospace; font-size: var(--text-micro); letter-spacing: 0.25em; text-transform: uppercase; color: rgba(196,164,85,0.45); margin-bottom: 1.2rem; }
     .obs-card-title { font-family: 'Cormorant Garamond', serif; font-size: 1.6rem; font-weight: 300; color: var(--text-primary); line-height: 1.1; margin-bottom: 2rem; }
     .obs-card-title em { font-style: italic; color: var(--gold); }
     .obs-card-body { font-family: 'Cormorant Garamond', serif; font-size: 0.98rem; font-weight: 300; font-style: italic; color: var(--text-muted); line-height: 1.85; border-left: 1px solid rgba(196,164,85,0.2); padding-left: 1.5rem; margin-bottom: 2rem; }
-    .obs-card-action { font-family: 'DM Mono', monospace; font-size: 0.52rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--gold); opacity: 0.5; }
+    .obs-card-action { font-family: 'DM Mono', monospace; font-size: var(--text-micro); letter-spacing: 0.18em; text-transform: uppercase; color: var(--gold); opacity: 0.5; }
     .pricing { max-width: 1100px; margin: 0 auto; padding: 8rem 4rem; }
     .pricing-title { font-family: 'Cormorant Garamond', serif; font-size: clamp(1.8rem, 3vw, 2.6rem); font-weight: 300; color: var(--text-primary); margin-bottom: 4rem; line-height: 1.1; }
     .pricing-title em { font-style: italic; color: var(--gold); }
@@ -110,12 +126,12 @@
     .pricing-card { background: var(--void); padding: 3rem 2.5rem; position: relative; display: flex; flex-direction: column; }
     .pricing-card.featured { background: var(--surface); }
     .pricing-card.featured::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: var(--gold); }
-    .pricing-badge { font-family: 'DM Mono', monospace; font-size: 0.44rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--text-dim); display: block; margin-bottom: 1.5rem; }
+    .pricing-badge { font-family: 'DM Mono', monospace; font-size: var(--text-micro); letter-spacing: 0.2em; text-transform: uppercase; color: var(--text-dim); display: block; margin-bottom: 1.5rem; }
     .pricing-card.featured .pricing-badge { color: rgba(196,164,85,0.6); }
     .pricing-name { font-family: 'Cormorant Garamond', serif; font-size: 1.8rem; font-weight: 300; color: var(--text-primary); margin-bottom: 0.5rem; }
     .pricing-price { font-family: 'Cormorant Garamond', serif; font-size: 3.5rem; font-weight: 300; color: var(--gold); line-height: 1; margin-bottom: 0.3rem; }
     .pricing-price sup { font-size: 1.4rem; vertical-align: super; }
-    .pricing-freq { font-family: 'DM Mono', monospace; font-size: 0.46rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-dim); margin-bottom: 2.5rem; display: block; }
+    .pricing-freq { font-family: 'DM Mono', monospace; font-size: var(--text-micro); letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-dim); margin-bottom: 2.5rem; display: block; }
     .pricing-features { list-style: none; margin-bottom: 2.5rem; display: flex; flex-direction: column; gap: 0.9rem; flex: 1; }
     .pricing-features li { font-family: 'Outfit', sans-serif; font-size: 0.86rem; font-weight: 300; color: var(--text-dim); padding-left: 1.2rem; position: relative; }
     .pricing-features li::before { content: '—'; position: absolute; left: 0; color: var(--text-dim); }
@@ -124,7 +140,7 @@
     .waitlist { max-width: 1100px; margin: 0 auto; padding: 4rem 4rem 10rem; }
     .waitlist-inner { border: 1px solid var(--border); padding: 5rem; text-align: center; background: var(--surface); position: relative; overflow: hidden; }
     .waitlist-inner::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(to right, transparent, var(--gold), transparent); }
-    .waitlist-eyebrow { font-family: 'DM Mono', monospace; font-size: 0.5rem; letter-spacing: 0.35em; text-transform: uppercase; color: rgba(196,164,85,0.45); margin-bottom: 1.5rem; }
+    .waitlist-eyebrow { font-family: 'DM Mono', monospace; font-size: var(--text-micro); letter-spacing: 0.35em; text-transform: uppercase; color: rgba(196,164,85,0.45); margin-bottom: 1.5rem; }
     .waitlist-title { font-family: 'Cormorant Garamond', serif; font-size: clamp(2rem, 4vw, 3.2rem); font-weight: 300; line-height: 1.1; color: var(--text-primary); margin-bottom: 1rem; }
     .waitlist-title em { font-style: italic; color: var(--gold); }
     .waitlist-sub { font-family: 'Cormorant Garamond', serif; font-size: 1rem; font-style: italic; color: var(--text-muted); margin-bottom: 3rem; }
@@ -132,7 +148,7 @@
     .waitlist-input { flex: 1; background: var(--void); border: 1px solid var(--border); border-right: none; padding: 1rem 1.5rem; outline: none; font-family: 'Outfit', sans-serif; font-size: 0.9rem; font-weight: 300; color: var(--text-primary); cursor: none; transition: border-color 0.3s; }
     .waitlist-input::placeholder { color: var(--text-dim); }
     .waitlist-input:focus { border-color: rgba(196,164,85,0.2); }
-    .waitlist-btn { font-family: 'DM Mono', monospace; font-size: 0.55rem; letter-spacing: 0.18em; text-transform: uppercase; cursor: none; background: var(--text-primary); color: var(--void); border: none; padding: 1rem 1.8rem; white-space: nowrap; transition: background 0.3s; }
+    .waitlist-btn { font-family: 'DM Mono', monospace; font-size: var(--text-micro); letter-spacing: 0.18em; text-transform: uppercase; cursor: none; background: var(--text-primary); color: var(--void); border: none; padding: 1rem 1.8rem; white-space: nowrap; transition: background 0.3s; }
     .waitlist-btn:hover { background: var(--gold); }
     .waitlist-note { font-family: 'DM Mono', monospace; font-size: 0.75rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-dim); margin-top: 1.5rem; }
     footer { border-top: 1px solid var(--border); padding: 2.5rem 4rem; display: flex; justify-content: space-between; align-items: center; }
@@ -151,6 +167,19 @@
       .waitlist-input { border-right: 1px solid var(--border); border-bottom: none; }
       .hero-stat-row { gap: 2rem; flex-wrap: wrap; } footer { flex-direction: column; gap: 1rem; padding: 2rem; }
       .nav-links a:not(.nav-enter) { display: none; }
+    }
+    @media (hover: none), (pointer: coarse) {
+      html, body, a, button, input, textarea { cursor: auto !important; }
+      .cursor, .cursor-ring { display: none !important; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+      .cat-loader-dot { animation: none; opacity: 0.7; }
     }
   </style>
 </head>
@@ -372,11 +401,14 @@
   <script>
     const cursor = document.getElementById('cursor');
     const ring = document.getElementById('cursorRing');
-    let mx=0,my=0,rx=0,ry=0;
-    document.addEventListener('mousemove', e => { mx=e.clientX; my=e.clientY; cursor.style.left=mx+'px'; cursor.style.top=my+'px'; });
-    (function animRing(){ rx+=(mx-rx)*0.1; ry+=(my-ry)*0.1; ring.style.left=rx+'px'; ring.style.top=ry+'px'; requestAnimationFrame(animRing); })();
-    document.addEventListener('mouseover', e => { if(e.target.matches('button,a,input,textarea')) { cursor.style.transform='translate(-50%,-50%) scale(2.5)'; ring.style.width='42px'; ring.style.height='42px'; } });
-    document.addEventListener('mouseout', e => { if(e.target.matches('button,a,input,textarea')) { cursor.style.transform='translate(-50%,-50%) scale(1)'; ring.style.width='26px'; ring.style.height='26px'; } });
+    const hasHover = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+    if (hasHover) {
+      let mx=0,my=0,rx=0,ry=0;
+      document.addEventListener('mousemove', e => { mx=e.clientX; my=e.clientY; cursor.style.left=mx+'px'; cursor.style.top=my+'px'; });
+      (function animRing(){ rx+=(mx-rx)*0.1; ry+=(my-ry)*0.1; ring.style.left=rx+'px'; ring.style.top=ry+'px'; requestAnimationFrame(animRing); })();
+      document.addEventListener('mouseover', e => { if(e.target.matches('button,a,input,textarea')) { cursor.style.transform='translate(-50%,-50%) scale(2.5)'; ring.style.width='42px'; ring.style.height='42px'; } });
+      document.addEventListener('mouseout', e => { if(e.target.matches('button,a,input,textarea')) { cursor.style.transform='translate(-50%,-50%) scale(1)'; ring.style.width='26px'; ring.style.height='26px'; } });
+    }
 
     const observer = new IntersectionObserver(entries => {
       entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); } });

@@ -8,11 +8,27 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;1,300&family=DM+Mono:wght@300&display=swap" rel="stylesheet"/>
   <style>
+    /* ─────────────────────────────────────────────────────────────
+       THE ABYSS
+
+       A deep that represents the abyss we're too fearful to enter
+       and stare into. Not knowing it's our world, we seek to be
+       washed away by the shores, rather than calm them and command
+       them to our behest.
+
+       — Immanuel Gabriel, founder's note
+       ───────────────────────────────────────────────────────────── */
     :root {
       --void: #01060a;
       --gold: #d4a830;
-      --text: rgba(237,232,223,0.85);
-      --text-dim: rgba(237,232,223,0.18);
+      --text: rgba(212,197,161,0.85);
+      --text-dim: rgba(212,197,161,0.55);
+      --text-display:  clamp(2.5rem, 5vw, 4.5rem);
+      --text-heading:  clamp(1.8rem, 3vw, 2.8rem);
+      --text-subhead:  1.25rem;
+      --text-body:     1rem;
+      --text-meta:     0.85rem;
+      --text-micro:    0.75rem;
     }
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html, body { width: 100%; height: 100%; overflow: hidden; background: var(--void); }
@@ -32,7 +48,7 @@
     }
     .escape-handle:hover { background: rgba(255,255,255,0.05); width: 34px; }
     .escape-chevron {
-      font-size: 0.38rem; color: rgba(255,255,255,0.15);
+      font-size: var(--text-micro); color: rgba(255,255,255,0.15);
       letter-spacing: 0.12em; writing-mode: vertical-rl;
       font-family: 'DM Mono', monospace; text-transform: uppercase;
     }
@@ -52,28 +68,28 @@
     .panel-timer {
       font-family: 'Cormorant Garamond', serif;
       font-size: 3rem; font-weight: 300;
-      color: rgba(237,232,223,0.45);
+      color: rgba(212,197,161,0.45);
       letter-spacing: 0.05em; text-align: center; margin-bottom: 0.3rem;
     }
     .panel-label {
-      font-family: 'DM Mono', monospace; font-size: 0.4rem;
+      font-family: 'DM Mono', monospace; font-size: var(--text-micro);
       letter-spacing: 0.28em; text-transform: uppercase;
       color: var(--text-dim); text-align: center; margin-bottom: 0.5rem;
     }
     .panel-catatons {
-      font-family: 'DM Mono', monospace; font-size: 0.46rem;
+      font-family: 'DM Mono', monospace; font-size: var(--text-micro);
       letter-spacing: 0.2em; text-transform: uppercase;
       color: rgba(212,168,48,0.45); text-align: center; margin-bottom: 2.5rem;
     }
     .progress-ring { display: block; margin: 0 auto 2rem; }
     .panel-exit {
-      font-family: 'DM Mono', monospace; font-size: 0.48rem;
+      font-family: 'DM Mono', monospace; font-size: var(--text-micro);
       letter-spacing: 0.2em; text-transform: uppercase;
-      color: rgba(237,232,223,0.22); background: transparent;
+      color: rgba(212,197,161,0.22); background: transparent;
       border: 1px solid rgba(255,255,255,0.07);
       padding: 0.8rem 1rem; width: 100%; cursor: none; transition: all 0.3s;
     }
-    .panel-exit:hover { color: rgba(237,232,223,0.55); border-color: rgba(255,255,255,0.14); }
+    .panel-exit:hover { color: rgba(212,197,161,0.55); border-color: rgba(255,255,255,0.14); }
 
     /* ── SCREENS ── */
     .screen {
@@ -98,20 +114,20 @@
       backdrop-filter: blur(20px); border-radius: 2px;
     }
     .setup-eyebrow {
-      font-family: 'DM Mono', monospace; font-size: 0.44rem;
+      font-family: 'DM Mono', monospace; font-size: var(--text-micro);
       letter-spacing: 0.42em; text-transform: uppercase;
       color: rgba(212,168,48,0.38); margin-bottom: 1.4rem;
     }
     .setup-title {
       font-family: 'Cormorant Garamond', serif;
       font-size: 2.7rem; font-weight: 300;
-      color: rgba(237,232,223,0.85); line-height: 1.1; margin-bottom: 0.5rem;
+      color: rgba(212,197,161,0.85); line-height: 1.1; margin-bottom: 0.5rem;
     }
     .setup-title em { font-style: italic; color: var(--gold); }
     .setup-sub {
       font-family: 'Cormorant Garamond', serif;
       font-size: 0.88rem; font-style: italic;
-      color: rgba(237,232,223,0.22); margin-bottom: 2.2rem; line-height: 1.8;
+      color: rgba(212,197,161,0.22); margin-bottom: 2.2rem; line-height: 1.8;
     }
 
     .mode-grid {
@@ -131,19 +147,19 @@
     .mode-btn.active::after { opacity: 1; }
     .mode-btn.active { background: rgba(1,6,10,0.6); }
     .mode-name {
-      font-family: 'DM Mono', monospace; font-size: 0.42rem;
+      font-family: 'DM Mono', monospace; font-size: var(--text-micro);
       letter-spacing: 0.2em; text-transform: uppercase;
-      color: rgba(237,232,223,0.22); display: block; margin-bottom: 0.38rem;
+      color: rgba(212,197,161,0.22); display: block; margin-bottom: 0.38rem;
       transition: color 0.3s; position: relative; z-index: 1;
     }
     .mode-btn.active .mode-name { color: rgba(212,168,48,0.78); }
     .mode-desc {
       font-family: 'Cormorant Garamond', serif;
       font-size: 0.7rem; font-style: italic;
-      color: rgba(237,232,223,0.14); display: block;
+      color: rgba(212,197,161,0.14); display: block;
       position: relative; z-index: 1; transition: color 0.3s;
     }
-    .mode-btn.active .mode-desc { color: rgba(237,232,223,0.28); }
+    .mode-btn.active .mode-desc { color: rgba(212,197,161,0.28); }
 
     .dur-row {
       display: flex; gap: 1px;
@@ -153,17 +169,17 @@
     .dur-btn {
       flex: 1; background: rgba(1,6,10,0.85); border: none;
       padding: 0.85rem 0; cursor: none;
-      font-family: 'DM Mono', monospace; font-size: 0.42rem;
+      font-family: 'DM Mono', monospace; font-size: var(--text-micro);
       letter-spacing: 0.14em; text-transform: uppercase;
-      color: rgba(237,232,223,0.18); transition: all 0.3s;
+      color: rgba(212,197,161,0.18); transition: all 0.3s;
     }
-    .dur-btn:hover { background: rgba(255,255,255,0.02); color: rgba(237,232,223,0.38); }
+    .dur-btn:hover { background: rgba(255,255,255,0.02); color: rgba(212,197,161,0.38); }
     .dur-btn.active { background: rgba(212,168,48,0.05); color: rgba(212,168,48,0.75); }
 
     .begin-btn {
-      font-family: 'DM Mono', monospace; font-size: 0.5rem;
+      font-family: 'DM Mono', monospace; font-size: var(--text-micro);
       letter-spacing: 0.3em; text-transform: uppercase; cursor: none;
-      background: rgba(237,232,223,0.88); color: #01060a;
+      background: rgba(212,197,161,0.88); color: #01060a;
       border: none; padding: 1.1rem 2rem; width: 100%;
       transition: background 0.3s, transform 0.2s, letter-spacing 0.3s;
     }
@@ -172,12 +188,12 @@
     /* Mode label flash at session start */
     .mode-indicator {
       position: fixed; bottom: 3.5rem; left: 50%; transform: translateX(-50%);
-      font-family: 'DM Mono', monospace; font-size: 0.36rem;
+      font-family: 'DM Mono', monospace; font-size: var(--text-micro);
       letter-spacing: 0.5em; text-transform: uppercase;
-      color: rgba(237,232,223,0.07); pointer-events: none; z-index: 10;
+      color: rgba(212,197,161,0.07); pointer-events: none; z-index: 10;
       transition: opacity 2s ease;
     }
-    .mode-indicator.visible { opacity: 1; color: rgba(237,232,223,0.12); }
+    .mode-indicator.visible { opacity: 1; color: rgba(212,197,161,0.12); }
     .mode-indicator.faded { opacity: 0; }
 
     /* ── COMPLETE SCREEN ── */
@@ -223,40 +239,88 @@
       50%      { transform: scale(1.4); opacity: 1; }
     }
 
+    .complete-mark {
+      position: relative;
+      width: 120px;
+      height: 120px;
+      margin: 0 auto 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .complete-mark-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--gold);
+      box-shadow: 0 0 12px rgba(212,168,48,0.6);
+      z-index: 2;
+      position: relative;
+    }
+    .complete-mark-ring {
+      position: absolute;
+      border: 1px solid rgba(212,168,48,0.15);
+      border-radius: 50%;
+      animation: complete-rotate 40s linear infinite;
+    }
+    .complete-mark-ring.r1 { width: 40px; height: 40px; }
+    .complete-mark-ring.r2 { width: 70px; height: 70px; animation-duration: 60s; animation-direction: reverse; }
+    .complete-mark-ring.r3 { width: 100px; height: 100px; animation-duration: 80s; }
+    .complete-mark-ring.r4 { width: 130px; height: 130px; animation-duration: 100s; animation-direction: reverse; }
+    .complete-mark-arm {
+      position: absolute;
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      border: 1px solid transparent;
+      border-top-color: rgba(212,168,48,0.12);
+      border-right-color: rgba(212,168,48,0.08);
+      animation: complete-rotate 50s linear infinite;
+    }
+    .complete-mark-arm.a2 {
+      width: 130px; height: 130px;
+      animation-direction: reverse;
+      animation-duration: 70s;
+    }
+    @keyframes complete-rotate {
+      from { transform: rotate(0deg); }
+      to   { transform: rotate(360deg); }
+    }
+
     .complete-title {
       font-family: 'Cormorant Garamond', serif;
       font-size: 2.2rem; font-weight: 300;
-      color: rgba(237,232,223,0.85); margin-bottom: 0.5rem;
+      color: rgba(212,197,161,0.85); margin-bottom: 0.5rem;
     }
     .complete-title em { font-style: italic; color: var(--gold); }
     .complete-dur {
-      font-family: 'DM Mono', monospace; font-size: 0.44rem;
+      font-family: 'DM Mono', monospace; font-size: var(--text-micro);
       letter-spacing: 0.24em; text-transform: uppercase;
       color: rgba(212,168,48,0.48); margin-bottom: 2rem; display: block;
     }
     .complete-quote {
       font-family: 'Cormorant Garamond', serif;
       font-size: 1rem; font-style: italic;
-      color: rgba(237,232,223,0.28); line-height: 1.9; margin-bottom: 3rem;
+      color: rgba(212,197,161,0.28); line-height: 1.9; margin-bottom: 3rem;
       border-left: 1px solid rgba(212,168,48,0.18); padding-left: 1.2rem; text-align: left;
     }
     .complete-actions { display: flex; gap: 1rem; justify-content: center; }
     .btn-return {
-      font-family: 'DM Mono', monospace; font-size: 0.48rem;
+      font-family: 'DM Mono', monospace; font-size: var(--text-micro);
       letter-spacing: 0.2em; text-transform: uppercase; cursor: none;
-      background: rgba(237,232,223,0.85); color: #01060a;
+      background: rgba(212,197,161,0.85); color: #01060a;
       border: none; padding: 0.9rem 2rem;
       text-decoration: none; display: inline-block; transition: background 0.3s;
     }
     .btn-return:hover { background: var(--gold); }
     .btn-again {
-      font-family: 'DM Mono', monospace; font-size: 0.48rem;
+      font-family: 'DM Mono', monospace; font-size: var(--text-micro);
       letter-spacing: 0.2em; text-transform: uppercase; cursor: none;
-      background: transparent; color: rgba(237,232,223,0.28);
+      background: transparent; color: rgba(212,197,161,0.28);
       border: 1px solid rgba(255,255,255,0.07);
       padding: 0.9rem 1.6rem; transition: all 0.3s;
     }
-    .btn-again:hover { color: rgba(237,232,223,0.6); border-color: rgba(255,255,255,0.15); }
+    .btn-again:hover { color: rgba(212,197,161,0.6); border-color: rgba(255,255,255,0.15); }
 
     /* cursor */
     .cursor {
@@ -265,11 +329,57 @@
       pointer-events: none; z-index: 9999; transform: translate(-50%,-50%);
       transition: width 0.15s, height 0.15s, opacity 0.3s;
     }
+    /* loader overlay */
+    .cat-loader {
+      position: fixed; inset: 0;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      background: var(--void);
+      z-index: 9999;
+      transition: opacity 0.6s ease;
+    }
+    .cat-loader.hidden { opacity: 0; pointer-events: none; }
+    .cat-loader-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--gold);
+      animation: cat-pulse 2.4s ease-in-out infinite;
+    }
+    .cat-loader-text {
+      font-family: 'DM Mono', monospace;
+      font-size: var(--text-micro);
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      margin-top: 2rem;
+      opacity: 0;
+      animation: cat-fade-in 0.6s ease 2s forwards;
+    }
+    @keyframes cat-pulse {
+      0%, 100% { opacity: 0.3; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.2); }
+    }
+    @keyframes cat-fade-in { to { opacity: 1; } }
+    @media (hover: none), (pointer: coarse) {
+      html, body, a, button, input, textarea { cursor: auto !important; }
+      .cursor { display: none !important; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+      .cat-loader-dot { animation: none; opacity: 0.7; }
+    }
   </style>
 </head>
 <body>
 
   <div class="cursor" id="cursor"></div>
+  <div class="cat-loader" id="catLoader">
+    <div class="cat-loader-dot"></div>
+    <p class="cat-loader-text">Entering…</p>
+  </div>
   <canvas id="voidCanvas"></canvas>
 
   <div class="mode-indicator" id="modeIndicator"></div>
@@ -336,11 +446,9 @@
   <!-- COMPLETE SCREEN -->
   <div class="screen hidden gone" id="completeScreen">
     <div class="complete-inner">
-      <div class="star-orb">
-        <div class="star-ring"></div>
-        <div class="star-ring"></div>
-        <div class="star-ring"></div>
-        <div class="star-core"></div>
+      <div class="complete-mark" id="completeMark">
+        <!-- Rings — stages revealed progressively by JS -->
+        <div class="complete-mark-dot"></div>
       </div>
       <h2 class="complete-title">You <em>stayed.</em></h2>
       <span class="complete-dur" id="completeDuration"></span>
@@ -389,15 +497,18 @@
 
   // ── CURSOR ──
   const cursorEl = document.getElementById('cursor');
-  let mx = 0, my = 0;
-  document.addEventListener('mousemove', e => {
-    mx = e.clientX; my = e.clientY;
-    cursorEl.style.left = mx + 'px'; cursorEl.style.top = my + 'px';
-  });
-  document.querySelectorAll('button, a').forEach(el => {
-    el.addEventListener('mouseenter', () => { cursorEl.style.width='8px'; cursorEl.style.height='8px'; });
-    el.addEventListener('mouseleave', () => { cursorEl.style.width='4px'; cursorEl.style.height='4px'; });
-  });
+  const hasHover = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+  if (hasHover) {
+    let mx = 0, my = 0;
+    document.addEventListener('mousemove', e => {
+      mx = e.clientX; my = e.clientY;
+      cursorEl.style.left = mx + 'px'; cursorEl.style.top = my + 'px';
+    });
+    document.querySelectorAll('button, a').forEach(el => {
+      el.addEventListener('mouseenter', () => { cursorEl.style.width='8px'; cursorEl.style.height='8px'; });
+      el.addEventListener('mouseleave', () => { cursorEl.style.width='4px'; cursorEl.style.height='4px'; });
+    });
+  }
 
   // ── ESCAPE PANEL ──
   const panel = document.getElementById('escapePanel');
@@ -525,8 +636,45 @@
       ];
       document.getElementById('completeQuote').textContent =
         quotes[Math.floor(Math.random() * quotes.length)];
+      decorateCompleteMark((state.catatons || 0) + catatonsEarned);
       showScreen('completeScreen');
     }, early ? 900 : 2200);
+  }
+
+  function decorateCompleteMark(totalCatatons) {
+    const mark = document.getElementById('completeMark');
+    if (!mark) return;
+    mark.querySelectorAll('.complete-mark-ring, .complete-mark-arm').forEach(el => el.remove());
+    const dot = mark.querySelector('.complete-mark-dot');
+
+    if (totalCatatons >= 1) {
+      const r1 = document.createElement('div');
+      r1.className = 'complete-mark-ring r1';
+      mark.insertBefore(r1, dot);
+    }
+    if (totalCatatons >= 10) {
+      const r2 = document.createElement('div');
+      r2.className = 'complete-mark-ring r2';
+      mark.insertBefore(r2, dot);
+    }
+    if (totalCatatons >= 25) {
+      const r3 = document.createElement('div');
+      r3.className = 'complete-mark-ring r3';
+      mark.insertBefore(r3, dot);
+    }
+    if (totalCatatons >= 40) {
+      const r4 = document.createElement('div');
+      r4.className = 'complete-mark-ring r4';
+      mark.insertBefore(r4, dot);
+
+      const arm1 = document.createElement('div');
+      arm1.className = 'complete-mark-arm';
+      mark.insertBefore(arm1, dot);
+
+      const arm2 = document.createElement('div');
+      arm2.className = 'complete-mark-arm a2';
+      mark.insertBefore(arm2, dot);
+    }
   }
 
   document.getElementById('exitBtn').addEventListener('click', () => endSession(true));
@@ -673,8 +821,15 @@
     function resizeCanvas() {
       const oldW = W || window.innerWidth;
       const oldH = H || window.innerHeight;
-      W = canvas.width  = window.innerWidth;
-      H = canvas.height = window.innerHeight;
+      W = window.innerWidth;
+      H = window.innerHeight;
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width  = W * dpr;
+      canvas.height = H * dpr;
+      canvas.style.width  = W + 'px';
+      canvas.style.height = H + 'px';
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.scale(dpr, dpr);
       CX = W / 2; CY = H / 2;
       // Rescale particle positions proportionally
       if (particles.length && oldW) {
@@ -705,9 +860,9 @@
         vy: (Math.random() - 0.5) * 0.45,
         mass:  0.5 + Math.random() * 1.8,
         size:  0.3 + Math.random() * 1.8,
-        hue:   182 + Math.random() * 22,
-        sat:   22  + Math.random() * 32,
-        lit:   5   + Math.random() * 16,
+        hue:   214 + Math.random() * 14,
+        sat:   30  + Math.random() * 22,
+        lit:  10   + Math.random() * 16,
         alpha: 0.05 + Math.random() * 0.32,
         orbit: 0.00012 + Math.random() * 0.00028,
         fragment:  isFragment,
@@ -845,14 +1000,14 @@
 
         if (warmth < 0.28) {
           const w = warmth / 0.28;
-          p.hue = 182 + w * 78;   // teal → violet
-          p.sat = 22  + w * 48;
-          p.lit = 5   + w * 18 + coreProx * 12;
+          p.hue = 214 + w * 42;   // dark indigo → deep violet
+          p.sat = 30  + w * 40;
+          p.lit = 8   + w * 16 + coreProx * 12;
         } else if (warmth < 0.62) {
           const w = (warmth - 0.28) / 0.34;
-          p.hue = 260 - w * 222;  // violet → amber/gold
+          p.hue = 256 - w * 218;  // violet → amber/gold
           p.sat = 70  + w * 12;
-          p.lit = 23  + w * 34 + coreProx * 22;
+          p.lit = 24  + w * 34 + coreProx * 22;
         } else {
           const w = (warmth - 0.62) / 0.38;
           p.hue = 38  + w * 18;   // gold → warm white
@@ -916,9 +1071,17 @@
       const nebA   = isSession ? 0.1 + sessionProgress * 0.28 : 0.07;
 
       const neb = ctx.createRadialGradient(CX, CY, 0, CX, CY, nebR);
-      neb.addColorStop(0,   `hsla(${nebHue},45%,${isSession ? 4 + sessionProgress*8 : 3}%,${nebA})`);
-      neb.addColorStop(0.5, `hsla(${nebHue},30%,2%,${nebA * 0.45})`);
-      neb.addColorStop(1,   'rgba(0,0,0,0)');
+      if (isSession) {
+        // Center lightness matches bg at warmth 0, rises with session progress
+        const centerLit = 6 + sessionProgress * 14;
+        neb.addColorStop(0,    `hsla(${nebHue},45%,${centerLit}%,${nebA * 0.5})`);
+        neb.addColorStop(0.35, `hsla(${nebHue},35%,${centerLit * 0.7}%,${nebA * 0.35})`);
+        neb.addColorStop(0.7,  `hsla(${nebHue},30%,5%,${nebA * 0.15})`);
+      } else {
+        neb.addColorStop(0,    'rgba(13,27,42,0.05)');
+        neb.addColorStop(0.4,  'rgba(13,27,42,0.02)');
+      }
+      neb.addColorStop(1, 'rgba(0,0,0,0)');
       ctx.fillStyle = neb;
       ctx.fillRect(0, 0, W, H);
 
@@ -934,8 +1097,9 @@
       }
 
       // ── STAGE 3: Galaxy spiral arm hints ──
-      if (getStage(userCatatons) === 3 && isSession && sessionProgress > 0.28) {
-        const armA = Math.min(0.10, (sessionProgress - 0.28) * 0.16);
+      if (getStage(userCatatons) === 3 && isSession && sessionProgress > 0.5) {
+        const intensity = Math.min(1, (sessionProgress - 0.5) * 2);
+        const armA = 0.04 * intensity;
         ctx.save();
         ctx.globalAlpha = armA;
         for (let arm = 0; arm < 2; arm++) {
@@ -975,7 +1139,7 @@
         if (sw.r > 20) {
           ctx.beginPath();
           ctx.arc(CX, CY, sw.r * 0.65, 0, Math.PI * 2);
-          ctx.strokeStyle = `rgba(237,232,223,${sw.alpha * 0.22})`;
+          ctx.strokeStyle = `rgba(212,197,161,${sw.alpha * 0.22})`;
           ctx.lineWidth   = 0.5;
           ctx.stroke();
         }
@@ -1107,14 +1271,26 @@
     }
 
     // ── MAIN LOOP ──
+    let firstFrameRendered = false;
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    function hideLoader() {
+      const el = document.getElementById('catLoader');
+      if (el) el.classList.add('hidden');
+    }
     function loop() {
       t++;
       if (isSession && state.totalSeconds > 0) {
         sessionProgress = Math.max(0, Math.min(1, 1 - (state.secondsLeft / state.totalSeconds)));
       }
-      update();
+      if (!reduceMotion) update();
       render();
-      if (running) animId = requestAnimationFrame(loop);
+      if (!firstFrameRendered) { firstFrameRendered = true; hideLoader(); }
+      if (!running) return;
+      if (reduceMotion) {
+        animId = setTimeout(loop, 166);
+      } else {
+        animId = requestAnimationFrame(loop);
+      }
     }
 
     return {
@@ -1128,7 +1304,7 @@
       stop() {
         running   = false;
         isSession = false;
-        if (animId) { cancelAnimationFrame(animId); animId = null; }
+        if (animId) { cancelAnimationFrame(animId); clearTimeout(animId); animId = null; }
       },
 
       addShockwave() {

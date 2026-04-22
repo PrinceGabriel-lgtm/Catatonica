@@ -42,9 +42,9 @@ const VoidAmbient = (function() {
   }
 
   const PARTICLE_VARIANTS = [
-    { r: 5,  g: 15, b: 30, baseAlpha: 0.5 },
-    { r: 10, g: 20, b: 40, baseAlpha: 0.4 },
-    { r: 3,  g: 10, b: 25, baseAlpha: 0.6 }
+    { r: 25, g: 45, b: 75, baseAlpha: 0.55 },
+    { r: 15, g: 30, b: 55, baseAlpha: 0.65 },
+    { r: 40, g: 60, b: 95, baseAlpha: 0.45 }
   ];
 
   function makeParticle() {
@@ -54,7 +54,7 @@ const VoidAmbient = (function() {
     const variant = PARTICLE_VARIANTS[Math.floor(Math.random() * PARTICLE_VARIANTS.length)];
     return {
       x: CX + Math.cos(angle) * dist, y: CY + Math.sin(angle) * dist,
-      baseDist: dist, vx: (Math.random() - 0.5) * 0.15, vy: (Math.random() - 0.5) * 0.15,
+      baseDist: dist, vx: (Math.random() - 0.5) * 0.22, vy: (Math.random() - 0.5) * 0.22,
       size: 0.4 + Math.random() * 1.2,
       r: variant.r, g: variant.g, b: variant.b,
       alpha: variant.baseAlpha * (0.85 + Math.random() * 0.3),
@@ -194,16 +194,27 @@ const VoidAmbient = (function() {
       if (alpha > 0.25 || boost > 0.3) {
         ctx.beginPath();
         ctx.arc(p.x, p.y, size * 3, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(${p.r},${p.g},${p.b},${alpha * 0.08})`;
+        ctx.fillStyle = `rgba(${p.r},${p.g},${p.b},${alpha * 0.12})`;
         ctx.fill();
       }
     });
   }
 
+  const reduceMotion = typeof window !== 'undefined'
+    && window.matchMedia
+    && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
   function loop() {
     if (!running) return;
-    t++; update(); render();
-    animId = requestAnimationFrame(loop);
+    t++;
+    if (!reduceMotion) update();
+    render();
+    if (!running) return;
+    if (reduceMotion) {
+      animId = setTimeout(loop, 166);
+    } else {
+      animId = requestAnimationFrame(loop);
+    }
   }
 
   function onMouseMove(e) {
@@ -246,7 +257,7 @@ const VoidAmbient = (function() {
 
     stop: function() {
       running = false;
-      if (animId) { cancelAnimationFrame(animId); animId = null; }
+      if (animId) { cancelAnimationFrame(animId); clearTimeout(animId); animId = null; }
       window.removeEventListener('resize', resize);
       document.removeEventListener('mousemove', onMouseMove);
       document.removeEventListener('mouseleave', onMouseLeave);
