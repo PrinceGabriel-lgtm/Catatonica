@@ -9,10 +9,11 @@
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;1,300&family=DM+Mono:wght@300&display=swap" rel="stylesheet"/>
   <style>
     :root {
-      --void: #01060a;
+      --void: #0d1b2a;
+      --void-deep: #050f1e;
       --gold: #d4a830;
       --text: rgba(237,232,223,0.85);
-      --text-dim: rgba(237,232,223,0.18);
+      --text-dim: rgba(237,232,223,0.55);
     }
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html, body { width: 100%; height: 100%; overflow: hidden; background: var(--void); }
@@ -41,7 +42,7 @@
     .escape-panel {
       position: fixed; right: -280px; top: 50%; transform: translateY(-50%);
       width: 260px;
-      background: rgba(1,5,9,0.92);
+      background: rgba(13,27,42,0.92);
       border: 1px solid rgba(255,255,255,0.06); border-right: none;
       padding: 2.5rem 2rem; z-index: 99;
       transition: right 0.5s cubic-bezier(0.16,1,0.3,1);
@@ -93,7 +94,7 @@
 
     .setup-inner {
       text-align: center; max-width: 420px; padding: 2.5rem 2.5rem 2.2rem;
-      background: rgba(1,6,10,0.75);
+      background: rgba(10,22,36,0.75);
       border: 1px solid rgba(255,255,255,0.06);
       backdrop-filter: blur(20px); border-radius: 2px;
     }
@@ -120,7 +121,7 @@
       border: 1px solid rgba(255,255,255,0.05); margin-bottom: 1.5rem;
     }
     .mode-btn {
-      background: rgba(1,6,10,0.85); padding: 1.3rem 0.6rem;
+      background: rgba(10,22,36,0.85); padding: 1.3rem 0.6rem;
       border: none; cursor: none; transition: background 0.35s; text-align: center;
       position: relative; overflow: hidden;
     }
@@ -129,7 +130,7 @@
       background: rgba(212,168,48,0.07); opacity: 0; transition: opacity 0.35s;
     }
     .mode-btn.active::after { opacity: 1; }
-    .mode-btn.active { background: rgba(1,6,10,0.6); }
+    .mode-btn.active { background: rgba(10,22,36,0.6); }
     .mode-name {
       font-family: 'DM Mono', monospace; font-size: 0.42rem;
       letter-spacing: 0.2em; text-transform: uppercase;
@@ -151,7 +152,7 @@
       margin-bottom: 1.8rem;
     }
     .dur-btn {
-      flex: 1; background: rgba(1,6,10,0.85); border: none;
+      flex: 1; background: rgba(10,22,36,0.85); border: none;
       padding: 0.85rem 0; cursor: none;
       font-family: 'DM Mono', monospace; font-size: 0.42rem;
       letter-spacing: 0.14em; text-transform: uppercase;
@@ -163,7 +164,7 @@
     .begin-btn {
       font-family: 'DM Mono', monospace; font-size: 0.5rem;
       letter-spacing: 0.3em; text-transform: uppercase; cursor: none;
-      background: rgba(237,232,223,0.88); color: #01060a;
+      background: rgba(237,232,223,0.88); color: #0d1b2a;
       border: none; padding: 1.1rem 2rem; width: 100%;
       transition: background 0.3s, transform 0.2s, letter-spacing 0.3s;
     }
@@ -182,7 +183,7 @@
 
     /* ── COMPLETE SCREEN ── */
     #completeScreen {
-      background: radial-gradient(ellipse at center, rgba(2,12,18,0.98) 0%, rgba(1,5,9,0.99) 65%);
+      background: radial-gradient(ellipse at center, rgba(13,27,42,0.98) 0%, rgba(5,15,30,0.99) 65%);
     }
     .complete-inner {
       text-align: center; max-width: 400px; padding: 2rem;
@@ -244,7 +245,7 @@
     .btn-return {
       font-family: 'DM Mono', monospace; font-size: 0.48rem;
       letter-spacing: 0.2em; text-transform: uppercase; cursor: none;
-      background: rgba(237,232,223,0.85); color: #01060a;
+      background: rgba(237,232,223,0.85); color: #0d1b2a;
       border: none; padding: 0.9rem 2rem;
       text-decoration: none; display: inline-block; transition: background 0.3s;
     }
@@ -906,7 +907,7 @@
       const trailAlpha = isSession
         ? 0.11 + (1 - sessionProgress) * 0.07
         : 0.22;
-      ctx.fillStyle = `rgba(1,6,10,${trailAlpha})`;
+      ctx.fillStyle = `rgba(13,27,42,${trailAlpha})`;
       ctx.fillRect(0, 0, W, H);
 
       // ── NEBULA BACKGROUND ──

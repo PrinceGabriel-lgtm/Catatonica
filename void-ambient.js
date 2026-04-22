@@ -41,18 +41,23 @@ const VoidAmbient = (function() {
     }
   }
 
+  const PARTICLE_VARIANTS = [
+    { r: 5,  g: 15, b: 30, baseAlpha: 0.5 },
+    { r: 10, g: 20, b: 40, baseAlpha: 0.4 },
+    { r: 3,  g: 10, b: 25, baseAlpha: 0.6 }
+  ];
+
   function makeParticle() {
     const angle = Math.random() * Math.PI * 2;
     const maxR = Math.min(W, H) * 0.48, minR = 30;
     const dist = (minR + Math.sqrt(Math.random()) * (maxR - minR)) * (0.7 + Math.random() * 0.3);
-    const hue = config.temperature === 'cold' ? { min: 180, max: 200 } : { min: 220, max: 280 };
+    const variant = PARTICLE_VARIANTS[Math.floor(Math.random() * PARTICLE_VARIANTS.length)];
     return {
       x: CX + Math.cos(angle) * dist, y: CY + Math.sin(angle) * dist,
       baseDist: dist, vx: (Math.random() - 0.5) * 0.15, vy: (Math.random() - 0.5) * 0.15,
       size: 0.4 + Math.random() * 1.2,
-      hue: hue.min + Math.random() * (hue.max - hue.min),
-      sat: 20 + Math.random() * 25, lit: 10 + Math.random() * 15,
-      alpha: 0.08 + Math.random() * 0.22,
+      r: variant.r, g: variant.g, b: variant.b,
+      alpha: variant.baseAlpha * (0.85 + Math.random() * 0.3),
       shimmer: Math.random() * Math.PI * 2, shimmerSpeed: 0.004 + Math.random() * 0.008,
       breathPhase: Math.random() * Math.PI * 2, pulseBoost: 0
     };
@@ -62,8 +67,8 @@ const VoidAmbient = (function() {
     return {
       x: Math.random() * W, y: Math.random() * H,
       vx: (Math.random() - 0.5) * 0.03, vy: (Math.random() - 0.5) * 0.03,
-      size: 0.15 + Math.random() * 0.25, alpha: 0.015 + Math.random() * 0.035,
-      hue: 180 + Math.random() * 40, twinkle: Math.random() * Math.PI * 2
+      size: 0.15 + Math.random() * 0.25, alpha: 0.02 + Math.random() * 0.04,
+      twinkle: Math.random() * Math.PI * 2
     };
   }
 
@@ -74,7 +79,6 @@ const VoidAmbient = (function() {
   }
 
   function update() {
-    const stage = getStage(config.catatons);
     const breathCycle = Math.sin(t * (Math.PI * 2) / (10 * 60));
     const breathScale = 1 + breathCycle * 0.02 * intensity;
 
@@ -119,12 +123,6 @@ const VoidAmbient = (function() {
 
       p.shimmer += p.shimmerSpeed;
       if (p.pulseBoost > 0) p.pulseBoost *= 0.96;
-
-      if (stage >= 2 && Math.random() < 0.0003 && p.hue > 200) {
-        p.hue = 35 + Math.random() * 10;
-        p.sat = 40 + Math.random() * 20;
-        p.lit = 18 + Math.random() * 8;
-      }
     });
 
     dust.forEach(d => {
@@ -149,76 +147,54 @@ const VoidAmbient = (function() {
   }
 
   function render() {
-    const stage = getStage(config.catatons);
     const trailAlpha = 0.08 + (1 - intensity) * 0.12;
-    ctx.fillStyle = `rgba(1,6,10,${trailAlpha})`;
+    ctx.fillStyle = `rgba(13,27,42,${trailAlpha})`;
     ctx.fillRect(0, 0, W, H);
 
-    // Nebula glow
+    // Nebula glow — deep indigo wash, darker than background
     const nebRadius = 50 + intensity * Math.min(W, H) * 0.15;
-    const nebHue = config.temperature === 'cold' ? 185 : 240;
-    const nebAlpha = 0.04 + intensity * 0.06;
+    const nebAlpha = 0.05 + intensity * 0.08;
     const neb = ctx.createRadialGradient(CX, CY, 0, CX, CY, nebRadius);
-    neb.addColorStop(0, `hsla(${nebHue},35%,5%,${nebAlpha})`);
-    neb.addColorStop(0.6, `hsla(${nebHue},25%,3%,${nebAlpha * 0.4})`);
+    neb.addColorStop(0, `rgba(5,15,30,${nebAlpha})`);
+    neb.addColorStop(0.6, `rgba(3,10,25,${nebAlpha * 0.5})`);
     neb.addColorStop(1, 'rgba(0,0,0,0)');
     ctx.fillStyle = neb;
     ctx.fillRect(0, 0, W, H);
 
-    // Stage 3: spiral arm hints
-    if (stage === 3) {
-      ctx.save();
-      ctx.globalAlpha = 0.025 * intensity;
-      for (let arm = 0; arm < 2; arm++) {
-        ctx.beginPath();
-        const base = arm * Math.PI + t * 0.00003;
-        for (let r = 10; r < Math.min(W, H) * 0.35; r += 2) {
-          const a = base + r * 0.012, px = CX + Math.cos(a) * r, py = CY + Math.sin(a) * r;
-          r === 10 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
-        }
-        ctx.strokeStyle = 'rgba(180,140,60,0.8)';
-        ctx.lineWidth = 0.4;
-        ctx.stroke();
-      }
-      ctx.restore();
-    }
-
-    // Pulse waves
+    // Pulse waves — muted indigo ring
     pulseWaves.forEach(pw => {
       ctx.beginPath();
       ctx.arc(CX, CY, pw.radius, 0, Math.PI * 2);
-      const pwHue = config.temperature === 'cold' ? 190 : 250;
-      ctx.strokeStyle = `hsla(${pwHue},40%,50%,${pw.alpha})`;
+      ctx.strokeStyle = `rgba(25,50,85,${pw.alpha})`;
       ctx.lineWidth = 1.5 * (1 - pw.radius / pw.maxRadius);
       ctx.stroke();
     });
 
-    // Dust
+    // Dust — dim indigo flecks
     dust.forEach(d => {
       const tw = 0.5 + 0.5 * Math.sin(d.twinkle);
       ctx.beginPath();
       ctx.arc(d.x, d.y, d.size, 0, Math.PI * 2);
-      ctx.fillStyle = `hsla(${d.hue},15%,45%,${d.alpha * tw * intensity})`;
+      ctx.fillStyle = `rgba(8,18,35,${d.alpha * tw * intensity})`;
       ctx.fill();
     });
 
-    // Particles
+    // Particles — dark indigo, darker than background so they read as depth
     particles.forEach(p => {
       const shimVal = Math.sin(p.shimmer) * 0.04;
       const boost = p.pulseBoost;
       const size = p.size * (0.6 + intensity * 0.4);
       const alpha = Math.min(0.9, (p.alpha + shimVal) * intensity + boost * 0.4);
-      const lit = p.lit + boost * 30;
 
       ctx.beginPath();
       ctx.arc(p.x, p.y, Math.max(0.3, size), 0, Math.PI * 2);
-      ctx.fillStyle = `hsla(${p.hue},${p.sat}%,${lit}%,${alpha})`;
+      ctx.fillStyle = `rgba(${p.r},${p.g},${p.b},${alpha})`;
       ctx.fill();
 
       if (alpha > 0.25 || boost > 0.3) {
         ctx.beginPath();
         ctx.arc(p.x, p.y, size * 3, 0, Math.PI * 2);
-        ctx.fillStyle = `hsla(${p.hue},${p.sat}%,${lit}%,${alpha * 0.08})`;
+        ctx.fillStyle = `rgba(${p.r},${p.g},${p.b},${alpha * 0.08})`;
         ctx.fill();
       }
     });

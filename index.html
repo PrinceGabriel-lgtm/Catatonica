@@ -11,15 +11,16 @@
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Mono:ital,wght@0,300;0,400;1,300&family=Outfit:wght@200;300;400&display=swap" rel="stylesheet" />
   <style>
     :root {
-      --void: #0a0806;
-      --deep: #0f0d0b;
-      --surface: #161412;
-      --surface2: #1c1a17;
+      --void: #0d1b2a;
+      --void-deep: #050f1e;
+      --deep: #0a1624;
+      --surface: #0a1624;
+      --surface2: #132235;
       --border: rgba(255,255,255,0.055);
       --border-hover: rgba(255,255,255,0.11);
       --text-primary: #ede8df;
       --text-muted: rgba(237,232,223,0.42);
-      --text-dim: rgba(237,232,223,0.18);
+      --text-dim: rgba(237,232,223,0.55);
       --accent: #c8bfad;
       --accent-cold: #5eb8cc;
       --gold: #d4a830;
@@ -133,10 +134,10 @@
     .waitlist-input:focus { border-color: rgba(196,164,85,0.2); }
     .waitlist-btn { font-family: 'DM Mono', monospace; font-size: 0.55rem; letter-spacing: 0.18em; text-transform: uppercase; cursor: none; background: var(--text-primary); color: var(--void); border: none; padding: 1rem 1.8rem; white-space: nowrap; transition: background 0.3s; }
     .waitlist-btn:hover { background: var(--gold); }
-    .waitlist-note { font-family: 'DM Mono', monospace; font-size: 0.44rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-dim); margin-top: 1.5rem; }
+    .waitlist-note { font-family: 'DM Mono', monospace; font-size: 0.75rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-dim); margin-top: 1.5rem; }
     footer { border-top: 1px solid var(--border); padding: 2.5rem 4rem; display: flex; justify-content: space-between; align-items: center; }
     .footer-logo { font-family: 'Cormorant Garamond', serif; font-size: 0.9rem; font-weight: 300; letter-spacing: 0.35em; text-transform: uppercase; color: var(--text-dim); }
-    .footer-copy { font-family: 'DM Mono', monospace; font-size: 0.44rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-dim); }
+    .footer-copy { font-family: 'DM Mono', monospace; font-size: 0.75rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-dim); }
     @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     .reveal { opacity: 0; transform: translateY(24px); transition: opacity 0.8s ease, transform 0.8s ease; }
@@ -338,33 +339,32 @@
           <li class="active">Early access to all new modes</li>
           <li class="active">Direct line to the founders</li>
         </ul>
-        <a href="#waitlist" class="btn-ghost" style="display:block;text-align:center;">Join Waitlist →</a>
+        <a href="#begin" class="btn-ghost" style="display:block;text-align:center;">Notify Me →</a>
       </div>
     </div>
   </section>
 
   <div class="divider"></div>
 
-  <!-- WAITLIST -->
-  <section class="waitlist" id="waitlist">
+  <!-- THE THRESHOLD -->
+  <section class="waitlist" id="begin">
     <div class="waitlist-inner reveal">
-      <p class="waitlist-eyebrow">Early Access</p>
+      <p class="waitlist-eyebrow">Begin</p>
       <h2 class="waitlist-title">The void is <em>open.</em></h2>
-      <p class="waitlist-sub">Join the first cohort. Be among those who found it before the noise did.</p>
-      <form class="waitlist-form" id="waitlistForm">
-        <input type="email" class="waitlist-input" placeholder="your@email.com" id="waitlistEmail" required autocomplete="off" />
-        <button type="submit" class="waitlist-btn">Enter →</button>
-      </form>
-      <p class="waitlist-note" id="waitlistMsg">No noise. No newsletter. One message when The Order opens.</p>
+      <p class="waitlist-sub">Name what you're carrying. Sit with it. Earn your silence. Release it when you're ready.</p>
+      <div style="max-width: 320px; margin: 0 auto;">
+        <a href="app.html" class="waitlist-btn" style="display: block; text-align: center; text-decoration: none; padding: 1.2rem 2rem;">Enter the Void →</a>
+      </div>
+      <p class="waitlist-note">No account required to begin. Save your practice when you're ready.</p>
     </div>
   </section>
 
   <footer>
     <div class="footer-logo">Catatonica</div>
     <div style="display:flex;align-items:center;gap:2rem;flex-wrap:wrap;">
-      <a href="terms.html" style="font-family:'DM Mono',monospace;font-size:0.44rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--text-dim);text-decoration:none;transition:color 0.3s;" onmouseover="this.style.color='var(--text-muted)'" onmouseout="this.style.color='var(--text-dim)'">Terms</a>
-      <a href="privacy.html" style="font-family:'DM Mono',monospace;font-size:0.44rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--text-dim);text-decoration:none;transition:color 0.3s;" onmouseover="this.style.color='var(--text-muted)'" onmouseout="this.style.color='var(--text-dim)'">Privacy</a>
-      <a href="refund.html" style="font-family:'DM Mono',monospace;font-size:0.44rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--text-dim);text-decoration:none;transition:color 0.3s;" onmouseover="this.style.color='var(--text-muted)'" onmouseout="this.style.color='var(--text-dim)'">Refunds</a>
+      <a href="terms.html" style="font-family:'DM Mono',monospace;font-size:0.75rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--text-dim);text-decoration:none;transition:color 0.3s;" onmouseover="this.style.color='var(--text-muted)'" onmouseout="this.style.color='var(--text-dim)'">Terms</a>
+      <a href="privacy.html" style="font-family:'DM Mono',monospace;font-size:0.75rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--text-dim);text-decoration:none;transition:color 0.3s;" onmouseover="this.style.color='var(--text-muted)'" onmouseout="this.style.color='var(--text-dim)'">Privacy</a>
+      <a href="refund.html" style="font-family:'DM Mono',monospace;font-size:0.75rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--text-dim);text-decoration:none;transition:color 0.3s;" onmouseover="this.style.color='var(--text-muted)'" onmouseout="this.style.color='var(--text-dim)'">Refunds</a>
       <div class="footer-copy">© 2026 Catatonica. All rights reserved.</div>
     </div>
   </footer>
@@ -382,22 +382,6 @@
       entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); } });
     }, { threshold: 0.1, rootMargin: '0px 0px -60px 0px' });
     document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
-
-    document.getElementById('waitlistForm').addEventListener('submit', async e => {
-      e.preventDefault();
-      const email = document.getElementById('waitlistEmail').value.trim();
-      const msg = document.getElementById('waitlistMsg');
-      const btn = e.target.querySelector('button');
-      btn.textContent = 'Entering…'; btn.disabled = true;
-      try {
-        const existing = JSON.parse(localStorage.getItem('cat_waitlist') || '[]');
-        if (!existing.includes(email)) { existing.push(email); localStorage.setItem('cat_waitlist', JSON.stringify(existing)); }
-        msg.textContent = "You're in. The void awaits.";
-        msg.style.color = 'rgba(196,164,85,0.6)';
-        document.getElementById('waitlistEmail').value = '';
-      } catch(err) { msg.textContent = 'Something went wrong. Try again.'; }
-      btn.textContent = 'Enter →'; btn.disabled = false;
-    });
   </script>
 
   <canvas id="voidAmbientCanvas" style="position:fixed;inset:0;width:100vw;height:100vh;z-index:-1;pointer-events:none;"></canvas>

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#080808" />
+  <meta name="theme-color" content="#0d1b2a" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   <meta name="apple-mobile-web-app-title" content="Catatonica" />
@@ -16,15 +16,16 @@
 
   <style>
     :root {
-      --void: #080808;
-      --deep: #0f0f0f;
-      --surface: #141414;
-      --surface2: #1a1a1a;
+      --void: #0d1b2a;
+      --void-deep: #050f1e;
+      --deep: #0a1624;
+      --surface: #0a1624;
+      --surface2: #132235;
       --border: rgba(255,255,255,0.06);
       --border-hover: rgba(255,255,255,0.12);
       --text-primary: #e8e4dc;
       --text-muted: rgba(232,228,220,0.38);
-      --text-dim: rgba(232,228,220,0.16);
+      --text-dim: rgba(232,228,220,0.55);
       --accent: #c8bfad;
       --accent-cold: #5eb8cc;
       --gold: #d4a830;
@@ -135,20 +136,22 @@
     .onboard-input:focus { border-color: rgba(196,169,109,0.3); }
     .onboard-input-hint {
       font-family: 'DM Mono', monospace;
-      font-size: 0.5rem; letter-spacing: 0.12em;
+      font-size: 0.75rem; letter-spacing: 0.12em;
       color: var(--text-dim); margin-top: 0.6rem;
       text-transform: uppercase;
     }
     .onboard-btn {
-      background: var(--text); color: var(--void);
-      border: none; padding: 1rem 2rem;
+      background: rgba(196,164,85,0.12);
+      color: #d4a830;
+      border: 1px solid rgba(196,164,85,0.5);
+      padding: 1rem 2rem;
       font-family: 'DM Mono', monospace;
-      font-size: 0.68rem; letter-spacing: 0.18em;
+      font-size: 0.68rem; font-weight: 400; letter-spacing: 0.18em;
       text-transform: uppercase; cursor: pointer;
       margin-top: 1.5rem; align-self: flex-start;
-      transition: background 0.3s ease;
+      transition: background 0.3s ease, color 0.3s ease;
     }
-    .onboard-btn:hover { background: var(--gold); }
+    .onboard-btn:hover { background: var(--gold); color: var(--void); }
     .onboard-skip {
       background: none; border: none;
       font-family: 'DM Mono', monospace;
@@ -295,7 +298,7 @@
       border-bottom: 1px solid var(--border);
       padding: 1.2rem 2.5rem;
       display: flex; justify-content: space-between; align-items: center;
-      background: rgba(8,8,8,0.94);
+      background: rgba(13,27,42,0.94);
       backdrop-filter: blur(12px);
       z-index: 100; flex-shrink: 0;
     }
@@ -564,7 +567,7 @@
     /* ─── MODALS ─── */
     .overlay {
       position: fixed; inset: 0;
-      background: rgba(8,8,8,0.9);
+      background: rgba(13,27,42,0.9);
       z-index: 500;
       display: flex; align-items: center; justify-content: center;
       padding: 1.5rem;
