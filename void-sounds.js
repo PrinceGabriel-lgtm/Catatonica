@@ -577,53 +577,48 @@ const VoidSounds = (function() {
     },
 
     /**
-     * bell — 432Hz completion bell with 4s exponential decay
+     * bell — struck bowl exit tone (Pass 2).
+     *   440Hz sine fundamental + 880Hz overtone at 30%, routed through a
+     *   2kHz low-pass. 10ms attack, 2.5s exponential decay, peak 0.25.
+     *   A small bowl struck in a dry close room — no reverb, native nodes only.
      */
     bell: function() {
       if (!initialized || !settings.uiEnabled) return;
 
       const now = ctx.currentTime;
-      const duration = 4.05;
-      const harmDuration = duration * 0.7;
+      const attack = 0.010;
+      const decay  = 2.500;
+      const peak   = 0.25;
 
-      const osc = ctx.createOscillator();
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(432, now);
+      const lpf = ctx.createBiquadFilter();
+      lpf.type = 'lowpass';
+      lpf.frequency.value = 2000;
+      lpf.Q.value = 0.7;
+      lpf.connect(uiGain);
 
-      // Add subtle harmonics for richness
-      const osc2 = ctx.createOscillator();
-      osc2.type = 'sine';
-      osc2.frequency.setValueAtTime(864, now);
+      const fund = ctx.createOscillator();
+      fund.type = 'sine';
+      fund.frequency.setValueAtTime(440, now);
+      const fundGain = ctx.createGain();
+      fundGain.gain.setValueAtTime(0.0001, now);
+      fundGain.gain.linearRampToValueAtTime(peak, now + attack);
+      fundGain.gain.exponentialRampToValueAtTime(0.0001, now + attack + decay);
+      fund.connect(fundGain);
+      fundGain.connect(lpf);
 
-      const osc3 = ctx.createOscillator();
-      osc3.type = 'sine';
-      osc3.frequency.setValueAtTime(1296, now);
+      const over = ctx.createOscillator();
+      over.type = 'sine';
+      over.frequency.setValueAtTime(880, now);
+      const overGain = ctx.createGain();
+      overGain.gain.setValueAtTime(0.0001, now);
+      overGain.gain.linearRampToValueAtTime(peak * 0.30, now + attack);
+      overGain.gain.exponentialRampToValueAtTime(0.0001, now + attack + decay);
+      over.connect(overGain);
+      overGain.connect(lpf);
 
-      const mainGain = ctx.createGain();
-      mainGain.gain.setValueAtTime(0, now);
-      mainGain.gain.linearRampToValueAtTime(0.3, now + ATTACK_MIN);
-      mainGain.gain.exponentialRampToValueAtTime(0.001, now + duration - RELEASE_TAIL);
-      mainGain.gain.linearRampToValueAtTime(0, now + duration);
-
-      const harmGain = ctx.createGain();
-      harmGain.gain.setValueAtTime(0, now);
-      harmGain.gain.linearRampToValueAtTime(0.08, now + ATTACK_MIN);
-      harmGain.gain.exponentialRampToValueAtTime(0.001, now + harmDuration - RELEASE_TAIL);
-      harmGain.gain.linearRampToValueAtTime(0, now + harmDuration);
-
-      osc.connect(mainGain);
-      osc2.connect(harmGain);
-      osc3.connect(harmGain);
-
-      mainGain.connect(uiGain);
-      harmGain.connect(uiGain);
-
-      osc.start(now);
-      osc2.start(now);
-      osc3.start(now);
-      osc.stop(now + duration + 0.01);
-      osc2.stop(now + duration + 0.01);
-      osc3.stop(now + duration + 0.01);
+      const stopAt = now + attack + decay + 0.05;
+      fund.start(now); over.start(now);
+      fund.stop(stopAt); over.stop(stopAt);
     }
   };
 

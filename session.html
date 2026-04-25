@@ -17,9 +17,17 @@
        them to our behest.
 
        — Immanuel Gabriel, founder's note
+
+       THE FIELD — medium of becoming.
+       The Higgs field born of the cataton. Sessions are synthesis.
+       The star is what you made. Pressure, heat, mass, gravity —
+       all coming together to form a thought.
+
+       — Immanuel Gabriel, April 24 2026, Pass 2 commit
        ───────────────────────────────────────────────────────────── */
     :root {
-      --void: #01060a;
+      --void: #0d1b2a;
+      --void-deep: #050f1e;
       --gold: #d4a830;
       --text: rgba(212,197,161,0.85);
       --text-dim: rgba(212,197,161,0.55);
@@ -29,12 +37,27 @@
       --text-body:     1rem;
       --text-meta:     0.85rem;
       --text-micro:    0.75rem;
+
+      /* ─── The Field palette — Pass 2 target (scaffolding for 2.5) ─── */
+      --field-abyss: #060912;          /* deep base, the Field at rest */
+      --field-prussian: #0A1F44;       /* Prussian blue, landing field */
+      --field-violet-vortex: #1a1033;  /* violet hint at vortex core */
+      --particle-cool: #4A6FA5;        /* cool indigo, early session */
+      --particle-warm: #D4A95F;        /* warm amber-gold, late session */
+      --nebula-veining: #050814;       /* darker than abyss, "dust lanes" */
+      --cream-gold: #E8D4A8;           /* completion star, doctrine accent */
     }
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html, body { width: 100%; height: 100%; overflow: hidden; background: var(--void); }
     body { cursor: none; }
 
-    canvas { position: fixed; inset: 0; width: 100%; height: 100%; }
+    canvas {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      z-index: 0;
+      pointer-events: none;
+    }
 
     /* ── ESCAPE TAB ── */
     .escape-tab { position: fixed; right: 0; top: 50%; transform: translateY(-50%); z-index: 100; }
@@ -57,7 +80,7 @@
     .escape-panel {
       position: fixed; right: -280px; top: 50%; transform: translateY(-50%);
       width: 260px;
-      background: rgba(1,5,9,0.92);
+      background: rgba(13,27,42,0.92);
       border: 1px solid rgba(255,255,255,0.06); border-right: none;
       padding: 2.5rem 2rem; z-index: 99;
       transition: right 0.5s cubic-bezier(0.16,1,0.3,1);
@@ -109,7 +132,7 @@
 
     .setup-inner {
       text-align: center; max-width: 420px; padding: 2.5rem 2.5rem 2.2rem;
-      background: rgba(1,6,10,0.75);
+      background: rgba(10,22,36,0.75);
       border: 1px solid rgba(255,255,255,0.06);
       backdrop-filter: blur(20px); border-radius: 2px;
     }
@@ -136,7 +159,7 @@
       border: 1px solid rgba(255,255,255,0.05); margin-bottom: 1.5rem;
     }
     .mode-btn {
-      background: rgba(1,6,10,0.85); padding: 1.3rem 0.6rem;
+      background: rgba(10,22,36,0.85); padding: 1.3rem 0.6rem;
       border: none; cursor: none; transition: background 0.35s; text-align: center;
       position: relative; overflow: hidden;
     }
@@ -145,7 +168,7 @@
       background: rgba(212,168,48,0.07); opacity: 0; transition: opacity 0.35s;
     }
     .mode-btn.active::after { opacity: 1; }
-    .mode-btn.active { background: rgba(1,6,10,0.6); }
+    .mode-btn.active { background: rgba(10,22,36,0.6); }
     .mode-name {
       font-family: 'DM Mono', monospace; font-size: var(--text-micro);
       letter-spacing: 0.2em; text-transform: uppercase;
@@ -167,7 +190,7 @@
       margin-bottom: 1.8rem;
     }
     .dur-btn {
-      flex: 1; background: rgba(1,6,10,0.85); border: none;
+      flex: 1; background: rgba(10,22,36,0.85); border: none;
       padding: 0.85rem 0; cursor: none;
       font-family: 'DM Mono', monospace; font-size: var(--text-micro);
       letter-spacing: 0.14em; text-transform: uppercase;
@@ -179,7 +202,7 @@
     .begin-btn {
       font-family: 'DM Mono', monospace; font-size: var(--text-micro);
       letter-spacing: 0.3em; text-transform: uppercase; cursor: none;
-      background: rgba(212,197,161,0.88); color: #01060a;
+      background: rgba(212,197,161,0.88); color: #0d1b2a;
       border: none; padding: 1.1rem 2rem; width: 100%;
       transition: background 0.3s, transform 0.2s, letter-spacing 0.3s;
     }
@@ -198,7 +221,7 @@
 
     /* ── COMPLETE SCREEN ── */
     #completeScreen {
-      background: radial-gradient(ellipse at center, rgba(2,12,18,0.98) 0%, rgba(1,5,9,0.99) 65%);
+      background: radial-gradient(ellipse at center, rgba(13,27,42,0.98) 0%, rgba(5,15,30,0.99) 65%);
     }
     .complete-inner {
       text-align: center; max-width: 400px; padding: 2rem;
@@ -308,7 +331,7 @@
     .btn-return {
       font-family: 'DM Mono', monospace; font-size: var(--text-micro);
       letter-spacing: 0.2em; text-transform: uppercase; cursor: none;
-      background: rgba(212,197,161,0.85); color: #01060a;
+      background: rgba(212,197,161,0.85); color: #0d1b2a;
       border: none; padding: 0.9rem 2rem;
       text-decoration: none; display: inline-block; transition: background 0.3s;
     }
@@ -370,6 +393,18 @@
         scroll-behavior: auto !important;
       }
       .cat-loader-dot { animation: none; opacity: 0.7; }
+    }
+
+    /* ─── Mobile spacing audit (Pass 2): tight viewports ─── */
+    @media (max-width: 480px) {
+      .setup-inner { padding: 2rem 1.4rem 1.8rem; max-width: calc(100vw - 1.6rem); }
+      .setup-title { font-size: 2.2rem; }
+      .mode-btn { padding: 1.4rem 0.4rem; min-height: 44px; }
+      .dur-btn { padding: 1rem 0; min-height: 44px; }
+      .begin-btn { padding: 1.15rem 1.4rem; min-height: 44px; letter-spacing: 0.22em; }
+      .panel-exit { padding: 0.95rem 1rem; min-height: 44px; }
+      .escape-panel { width: 240px; right: -260px; padding: 2rem 1.4rem; }
+      .escape-handle { min-width: 28px; }
     }
   </style>
 </head>
@@ -679,23 +714,55 @@
 
   document.getElementById('exitBtn').addEventListener('click', () => endSession(true));
   document.getElementById('goAgainBtn').addEventListener('click', () => {
-    window.location.href = state.sitId ? 'app.html' : 'catatonica-session.html';
+    window.location.href = state.sitId ? 'app.html' : 'session.html';
   });
 
   // ── BELL ──
+  // Struck bowl — small bowl, dry close room. Pass 2 exit sound.
+  //   Fundamental 440Hz sine + 880Hz overtone at 30%, through a
+  //   2kHz low-pass. 10ms attack, 2.5s exponential decay, peak 0.25.
   function playBell() {
     try {
-      const ac = new AudioContext();
-      [[432, 0.28, 0], [864, 0.12, 0.06], [1296, 0.06, 0.12]].forEach(([freq, vol, delay]) => {
-        const o = ac.createOscillator(), g = ac.createGain();
-        o.connect(g); g.connect(ac.destination);
-        o.frequency.value = freq; o.type = 'sine';
-        const t0 = ac.currentTime + delay;
-        g.gain.setValueAtTime(0, t0);
-        g.gain.linearRampToValueAtTime(vol, t0 + 0.05);
-        g.gain.exponentialRampToValueAtTime(0.001, t0 + 5);
-        o.start(t0); o.stop(t0 + 5);
-      });
+      const ac = new (window.AudioContext || window.webkitAudioContext)();
+      const now = ac.currentTime;
+      const attack = 0.010;
+      const decay  = 2.500;
+      const peak   = 0.25;
+
+      const lpf = ac.createBiquadFilter();
+      lpf.type = 'lowpass';
+      lpf.frequency.value = 2000;
+      lpf.Q.value = 0.7;
+      lpf.connect(ac.destination);
+
+      // Fundamental — 440Hz sine
+      const fund = ac.createOscillator();
+      fund.type = 'sine';
+      fund.frequency.value = 440;
+      const fundGain = ac.createGain();
+      fundGain.gain.setValueAtTime(0.0001, now);
+      fundGain.gain.linearRampToValueAtTime(peak, now + attack);
+      fundGain.gain.exponentialRampToValueAtTime(0.0001, now + attack + decay);
+      fund.connect(fundGain);
+      fundGain.connect(lpf);
+
+      // Overtone — 880Hz at 30% amplitude
+      const over = ac.createOscillator();
+      over.type = 'sine';
+      over.frequency.value = 880;
+      const overGain = ac.createGain();
+      overGain.gain.setValueAtTime(0.0001, now);
+      overGain.gain.linearRampToValueAtTime(peak * 0.30, now + attack);
+      overGain.gain.exponentialRampToValueAtTime(0.0001, now + attack + decay);
+      over.connect(overGain);
+      overGain.connect(lpf);
+
+      const stopAt = now + attack + decay + 0.05;
+      fund.start(now); over.start(now);
+      fund.stop(stopAt); over.stop(stopAt);
+
+      // Release the AudioContext after the tone finishes
+      setTimeout(() => { try { ac.close(); } catch(e) {} }, (attack + decay + 0.2) * 1000);
     } catch(e) {}
   }
 
@@ -823,7 +890,7 @@
       const oldH = H || window.innerHeight;
       W = window.innerWidth;
       H = window.innerHeight;
-      const dpr = window.devicePixelRatio || 1;
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
       canvas.width  = W * dpr;
       canvas.height = H * dpr;
       canvas.style.width  = W + 'px';
@@ -1061,7 +1128,7 @@
       const trailAlpha = isSession
         ? 0.11 + (1 - sessionProgress) * 0.07
         : 0.22;
-      ctx.fillStyle = `rgba(1,6,10,${trailAlpha})`;
+      ctx.fillStyle = `rgba(13,27,42,${trailAlpha})`;
       ctx.fillRect(0, 0, W, H);
 
       // ── NEBULA BACKGROUND ──

@@ -19,6 +19,13 @@
        them to our behest.
 
        — Immanuel Gabriel, founder's note
+
+       THE FIELD — medium of becoming.
+       The Higgs field born of the cataton. Sessions are synthesis.
+       The star is what you made. Pressure, heat, mass, gravity —
+       all coming together to form a thought.
+
+       — Immanuel Gabriel, April 24 2026, Pass 2 commit
        ───────────────────────────────────────────────────────────── */
     :root {
       --void: #0d1b2a;
@@ -42,6 +49,15 @@
       --text-body:     1rem;
       --text-meta:     0.85rem;
       --text-micro:    0.75rem;
+
+      /* ─── The Field palette — Pass 2 target (scaffolding for 2.5) ─── */
+      --field-abyss: #060912;          /* deep base, the Field at rest */
+      --field-prussian: #0A1F44;       /* Prussian blue, landing field */
+      --field-violet-vortex: #1a1033;  /* violet hint at vortex core */
+      --particle-cool: #4A6FA5;        /* cool indigo, early session */
+      --particle-warm: #D4A95F;        /* warm amber-gold, late session */
+      --nebula-veining: #050814;       /* darker than abyss, "dust lanes" */
+      --cream-gold: #E8D4A8;           /* completion star, doctrine accent */
     }
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
@@ -181,9 +197,38 @@
       }
       .cat-loader-dot { animation: none; opacity: 0.7; }
     }
+
+    /* ─── Canvas layer: full viewport Field, behind content ─── */
+    #voidAmbientCanvas {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      z-index: 0;
+      pointer-events: none;
+    }
+    nav, .hero, .doctrine, .how, .catatons-section, .obsolescence, .pricing, .waitlist, footer, .divider {
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ─── Mobile spacing audit (Pass 2): tight viewports ─── */
+    @media (max-width: 480px) {
+      nav { padding: 1rem 1.1rem; gap: 0.5rem; }
+      .nav-logo span { letter-spacing: 0.22em !important; font-size: 0.82rem !important; }
+      .nav-links { gap: 1rem; }
+      .nav-enter { padding: 0.5rem 0.85rem; letter-spacing: 0.14em; }
+      .btn-primary, .btn-ghost, .waitlist-btn { min-height: 44px; display: inline-flex; align-items: center; justify-content: center; }
+      .hero { padding: 8rem 1.2rem 4rem; }
+      .doctrine, .how, .catatons-section, .obsolescence, .pricing, .waitlist { padding-left: 1.2rem; padding-right: 1.2rem; }
+      .stage-row { grid-template-columns: 1fr auto; gap: 0.6rem 1rem; }
+      .stage-row .stage-unlock { grid-column: 1 / -1; }
+      .pricing-card { padding: 2.2rem 1.6rem; }
+      footer { padding: 1.5rem 1.2rem; }
+    }
   </style>
 </head>
 <body>
+  <canvas id="voidAmbientCanvas"></canvas>
   <div class="cursor" id="cursor"></div>
   <div class="cursor-ring" id="cursorRing"></div>
 
@@ -416,7 +461,6 @@
     document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
   </script>
 
-  <canvas id="voidAmbientCanvas" style="position:fixed;inset:0;width:100vw;height:100vh;z-index:-1;pointer-events:none;"></canvas>
   <script src="/void-ambient.js"></script>
   <script>
     VoidAmbient.init({

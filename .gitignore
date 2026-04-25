@@ -7,3 +7,6 @@ audio/*.mp3
 node_modules
 sounds/brown-noise-raw.mp3
 .claude/
+
+# Local working notes
+notes/

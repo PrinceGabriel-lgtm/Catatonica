@@ -2,6 +2,12 @@
  * VoidAmbient — The universe at rest
  * A quieter sibling of the session voidEngine. Particles drift, not coalesce.
  * The doctrine made visible: even at rest, the void breathes.
+ *
+ * THE FIELD — medium of becoming.
+ * The Higgs field born of the cataton. Sessions are synthesis.
+ * The star is what you made. Pressure, heat, mass, gravity —
+ * all coming together to form a thought.
+ *   — Immanuel Gabriel, April 24 2026, Pass 2 commit
  */
 const VoidAmbient = (function() {
   'use strict';
@@ -31,8 +37,14 @@ const VoidAmbient = (function() {
   function resize() {
     if (!canvas) return;
     const oldW = W || window.innerWidth, oldH = H || window.innerHeight;
-    W = canvas.width = canvas.offsetWidth;
-    H = canvas.height = canvas.offsetHeight;
+    const cssW = canvas.offsetWidth, cssH = canvas.offsetHeight;
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    canvas.width = cssW * dpr;
+    canvas.height = cssH * dpr;
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.scale(dpr, dpr);
+    W = cssW;
+    H = cssH;
     CX = W / 2; CY = H / 2;
     if (particles.length && oldW && oldH) {
       const sx = W / oldW, sy = H / oldH;
