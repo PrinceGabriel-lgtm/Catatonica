@@ -17,6 +17,13 @@
        them to our behest.
 
        — Immanuel Gabriel, founder's note
+
+       THE FIELD — medium of becoming.
+       The Higgs field born of the cataton. Sessions are synthesis.
+       The star is what you made. Pressure, heat, mass, gravity —
+       all coming together to form a thought.
+
+       — Immanuel Gabriel, April 24 2026, Pass 2 commit
        ───────────────────────────────────────────────────────────── */
     :root {
       --void: #0d1b2a;
@@ -39,6 +46,15 @@
       --text-body:     1rem;
       --text-meta:     0.85rem;
       --text-micro:    0.75rem;
+
+      /* ─── The Field palette — Pass 2 target (scaffolding for 2.5) ─── */
+      --field-abyss: #060912;          /* deep base, the Field at rest */
+      --field-prussian: #0A1F44;       /* Prussian blue, landing field */
+      --field-violet-vortex: #1a1033;  /* violet hint at vortex core */
+      --particle-cool: #4A6FA5;        /* cool indigo, early session */
+      --particle-warm: #D4A95F;        /* warm amber-gold, late session */
+      --nebula-veining: #050814;       /* darker than abyss, "dust lanes" */
+      --cream-gold: #E8D4A8;           /* completion star, doctrine accent */
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -377,6 +393,42 @@
       }
       .cat-loader-dot { animation: none; opacity: 0.7; }
     }
+
+    /* ─── Mobile spacing audit (Pass 2): tight viewports ─── */
+    @media (max-width: 480px) {
+      /* chronicle-specific tight-viewport rules */
+      /* placeholder block — leave empty body if no specific rules apply,
+         this exists primarily to mark chronicle as Pass 2-aligned and
+         to receive future tweaks in Pass 2.5.5 */
+    }
+
+    .footer-legal {
+      font-size: 0.75rem;
+      line-height: 1.5;
+      color: var(--text-dim, rgba(232, 212, 168, 0.6));
+      text-align: center;
+      max-width: 640px;
+      margin: 2rem auto 1rem;
+      padding: 0 1rem;
+      letter-spacing: 0.02em;
+    }
+
+    .footer-legal-detail {
+      display: inline-block;
+      margin-top: 0.35rem;
+      font-size: 0.7rem;
+      opacity: 0.8;
+    }
+
+    @media (max-width: 480px) {
+      .footer-legal {
+        font-size: 0.7rem;
+        margin: 1.5rem auto 0.75rem;
+      }
+      .footer-legal-detail {
+        font-size: 0.65rem;
+      }
+    }
   </style>
 </head>
 <body>
@@ -595,5 +647,18 @@
 
     renderList();
   </script>
+
+  <footer>
+    <div class="footer-copy">
+      <p class="footer-legal">
+        © 2026 Immanuel Gabriel. All rights reserved.
+        <br>
+        <span class="footer-legal-detail">
+          Catatonica, the cataton symbol, “the Field,” “Planned Obsolescence” (in its usage herein),
+          and the Order of the Still Voice are trademarks and original works of Immanuel Gabriel.
+        </span>
+      </p>
+    </div>
+  </footer>
 </body>
 </html>

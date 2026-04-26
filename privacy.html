@@ -30,6 +30,34 @@
     li { font-size: 0.9rem; color: var(--muted); line-height: 1.8; margin-bottom: 0.3rem; }
     a { color: var(--gold); text-decoration: none; }
     a:hover { text-decoration: underline; }
+
+    .footer-legal {
+      font-size: 0.75rem;
+      line-height: 1.5;
+      color: var(--text-dim, rgba(232, 212, 168, 0.6));
+      text-align: center;
+      max-width: 640px;
+      margin: 2rem auto 1rem;
+      padding: 0 1rem;
+      letter-spacing: 0.02em;
+    }
+
+    .footer-legal-detail {
+      display: inline-block;
+      margin-top: 0.35rem;
+      font-size: 0.7rem;
+      opacity: 0.8;
+    }
+
+    @media (max-width: 480px) {
+      .footer-legal {
+        font-size: 0.7rem;
+        margin: 1.5rem auto 0.75rem;
+      }
+      .footer-legal-detail {
+        font-size: 0.65rem;
+      }
+    }
   </style>
 </head>
 <body>
@@ -105,5 +133,18 @@
   <h2>10. Contact</h2>
   <p>For privacy questions or data requests: <a href="mailto:hello@catatonica.app">hello@catatonica.app</a></p>
 </div>
+
+<footer>
+  <div class="footer-copy">
+    <p class="footer-legal">
+      © 2026 Immanuel Gabriel. All rights reserved.
+      <br>
+      <span class="footer-legal-detail">
+        Catatonica, the cataton symbol, “the Field,” “Planned Obsolescence” (in its usage herein),
+        and the Order of the Still Voice are trademarks and original works of Immanuel Gabriel.
+      </span>
+    </p>
+  </div>
+</footer>
 </body>
 </html>
