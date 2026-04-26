@@ -394,6 +394,7 @@
       text-transform: uppercase; color: var(--text-muted);
       background: none; border: none; cursor: pointer;
       transition: color 0.3s ease; padding: 0;
+      text-decoration: none;
     }
     .nav-btn:hover { color: var(--text-primary); }
     .nav-btn.active { color: var(--accent-cold); }
@@ -984,7 +985,7 @@
           <span class="tc-num" id="totalCatons">0</span>
           <span class="tc-label">Total<br>Catatons</span>
         </div>
-        <button class="nav-btn" id="archiveBtn">Archive</button>
+        <a href="chronicle.html" class="nav-btn" id="archiveBtn">Chronicle</a>
         <button class="nav-btn" id="signOutBtn">Sign out</button>
       </div>
     </nav>
@@ -1014,14 +1015,6 @@
       <div class="sit-list" id="sitList"></div>
     </div>
 
-    <!-- Archive view -->
-    <div class="app-content" id="archiveView" style="display:none">
-      <div class="page-header">
-        <p class="page-eyebrow">Mastered</p>
-        <h1 class="page-title">What you've <em>released.</em></h1>
-      </div>
-      <div class="archive-list" id="arcList"></div>
-    </div>
   </div>
 
   <!-- ─── SESSION MODAL ─── -->
@@ -1182,7 +1175,6 @@
   let sessMode = 'silence';
   let sessDuration = 10;
   let obsMode = 'manifesto';
-  let showingArchive = false;
 
   // ─── CURSOR ───
   const cursorEl = document.getElementById('cursor');
@@ -1437,7 +1429,6 @@
   // ─── RENDER ───
   function render() {
     renderSituations();
-    renderArchive();
     updateNav();
   }
 
@@ -1517,32 +1508,6 @@
     });
   }
 
-  function renderArchive() {
-    const list = document.getElementById('arcList');
-    list.innerHTML = '';
-
-    if (archive.length === 0) {
-      list.innerHTML = `<div class="empty">
-        <p class="empty-title">Nothing mastered yet.</p>
-        <p class="empty-sub">Completed situations will live here.</p>
-      </div>`;
-      return;
-    }
-
-    archive.forEach(sit => {
-      const d = document.createElement('div');
-      d.className = 'archive-card';
-      d.innerHTML = `
-        <div>
-          <div class="arc-name">${esc(sit.name)}</div>
-          <div class="arc-meta">Mastered ${fmtDate(sit.completed_at)} · ${sit.sessions} sessions</div>
-          ${sit.genesis ? `<div class="arc-genesis">"${esc(sit.genesis)}"</div>` : ''}
-        </div>
-        <div class="arc-catatons">${sit.catatons}</div>`;
-      list.appendChild(d);
-    });
-  }
-
   // ─── ADD SITUATION ───
   const newInput = document.getElementById('newSitInput');
   const enterBtn = document.getElementById('addEnterBtn');
@@ -1598,15 +1563,6 @@
     renderSituations();
     toast('Situation removed.');
   }
-
-  // ─── ARCHIVE TOGGLE ───
-  document.getElementById('archiveBtn').addEventListener('click', () => {
-    showingArchive = !showingArchive;
-    document.getElementById('activeView').style.display = showingArchive ? 'none' : '';
-    document.getElementById('archiveView').style.display = showingArchive ? '' : 'none';
-    document.getElementById('archiveBtn').textContent = showingArchive ? 'Active' : 'Archive';
-    document.getElementById('archiveBtn').classList.toggle('active', showingArchive);
-  });
 
   // ─── SESSION MODAL ───
   function openSessionModal(id) {
