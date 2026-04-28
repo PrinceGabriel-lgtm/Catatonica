@@ -98,24 +98,7 @@
       }
     }
 
-    /* ─── SCREENS ─── */
-    .screen { display: none; min-height: 100vh; }
-    .screen.active { display: flex; flex-direction: column; }
-
-    /* ─── LOADING ─── */
-    #loadingScreen {
-      align-items: center; justify-content: center;
-      background: var(--void);
-    }
-    .loading-logo {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 1.2rem; letter-spacing: 0.4em;
-      text-transform: uppercase; color: var(--text-muted);
-      animation: pulse 2s ease infinite;
-    }
-    @keyframes pulse {
-      0%,100% { opacity: 0.3; } 50% { opacity: 0.8; }
-    }
+    /* ─── LOADING (Pass 2.0.4: cat-loader is now the boot indicator) ─── */
     .cat-loader {
       position: fixed; inset: 0;
       display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -145,142 +128,7 @@
     }
     @keyframes cat-fade-in { to { opacity: 1; } }
 
-    /* ─── ONBOARDING ─── */
-    #onboardScreen {
-      display: flex; align-items: center; justify-content: center;
-      min-height: 100vh; padding: 2rem;
-      background: var(--void);
-    }
-    .onboard-wrap {
-      width: 100%; max-width: 520px;
-      position: relative;
-    }
-    .onboard-step {
-      display: none; flex-direction: column;
-      animation: fadeUp 0.6s ease forwards;
-    }
-    .onboard-step.active { display: flex; }
-
-    .onboard-mark {
-      margin-bottom: 2rem;
-      opacity: 0.8;
-    }
-    .onboard-eyebrow {
-      font-family: 'DM Mono', monospace;
-      font-size: var(--text-micro); letter-spacing: 0.28em;
-      text-transform: uppercase; color: var(--gold);
-      opacity: 0.6; margin-bottom: 1rem;
-    }
-    .onboard-title {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: clamp(2.2rem, 6vw, 3.5rem);
-      font-weight: 300; color: var(--text);
-      line-height: 1.05; margin-bottom: 1.8rem;
-    }
-    .onboard-title em { font-style: italic; color: var(--gold); }
-    .onboard-body {
-      font-size: 0.92rem; color: var(--muted);
-      line-height: 1.8; margin-bottom: 1rem;
-      max-width: 440px;
-    }
-    .onboard-input-wrap { margin: 1.5rem 0; }
-    .onboard-input {
-      width: 100%; background: var(--surface);
-      border: 1px solid var(--border); border-radius: 0;
-      padding: 1.1rem 1.4rem; outline: none;
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 1.2rem; font-weight: 300;
-      color: var(--text); transition: border-color 0.3s ease;
-    }
-    .onboard-input::placeholder { color: var(--text-dim); font-style: italic; }
-    .onboard-input:focus { border-color: rgba(196,169,109,0.3); }
-    .onboard-input-hint {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.75rem; letter-spacing: 0.12em;
-      color: var(--text-dim); margin-top: 0.6rem;
-      text-transform: uppercase;
-    }
-    .onboard-btn {
-      background: rgba(196,164,85,0.12);
-      color: #d4a830;
-      border: 1px solid rgba(196,164,85,0.5);
-      padding: 1rem 2rem;
-      font-family: 'DM Mono', monospace;
-      font-size: var(--text-micro); font-weight: 400; letter-spacing: 0.18em;
-      text-transform: uppercase; cursor: pointer;
-      margin-top: 1.5rem; align-self: flex-start;
-      transition: background 0.3s ease, color 0.3s ease;
-    }
-    .onboard-btn:hover { background: var(--gold); color: var(--void); }
-    .onboard-skip {
-      background: none; border: none;
-      font-family: 'DM Mono', monospace;
-      font-size: var(--text-micro); letter-spacing: 0.12em;
-      text-transform: uppercase; color: var(--text-dim);
-      cursor: pointer; margin-top: 1rem;
-      padding: 0; align-self: flex-start;
-      transition: color 0.3s ease;
-    }
-    .onboard-skip:hover { color: var(--muted); }
-    .onboard-modes {
-      display: grid; grid-template-columns: repeat(3, 1fr);
-      gap: 1px; background: var(--border);
-      border: 1px solid var(--border);
-      margin: 1.5rem 0;
-    }
-    .onboard-mode {
-      background: var(--void); padding: 1.2rem 1rem;
-      text-align: center; cursor: pointer;
-      transition: background 0.3s ease;
-    }
-    .onboard-mode:hover, .onboard-mode.active {
-      background: var(--surface);
-    }
-    .onboard-mode.active { position: relative; }
-    .onboard-mode.active::after {
-      content: ''; position: absolute;
-      bottom: 0; left: 0; right: 0;
-      height: 1px; background: var(--gold);
-    }
-    .onboard-mode-name {
-      display: block;
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 1rem; color: var(--text); margin-bottom: 0.2rem;
-    }
-    .onboard-mode-desc {
-      font-family: 'DM Mono', monospace;
-      font-size: var(--text-micro); letter-spacing: 0.1em;
-      text-transform: uppercase; color: var(--text-dim);
-    }
-
-    /* ─── AUTH SCREEN ─── */
-    #authScreen {
-      align-items: center; justify-content: center;
-      padding: 2rem;
-    }
-
-    .auth-box {
-      width: 100%; max-width: 420px;
-      border: 1px solid var(--border);
-      padding: 3rem;
-      background: var(--surface);
-    }
-
-    .auth-logo {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 1rem; letter-spacing: 0.35em;
-      text-transform: uppercase; color: var(--text-primary);
-      margin-bottom: 0.4rem;
-    }
-    .auth-logo span { font-style: italic; color: var(--accent); }
-
-    .auth-tagline {
-      font-family: 'DM Mono', monospace;
-      font-size: var(--text-micro); letter-spacing: 0.2em;
-      text-transform: uppercase; color: var(--text-dim);
-      margin-bottom: 2.5rem;
-    }
-
+    /* ─── AUTH SHARED (Pass 2.0.4: panel rules live near bottom of stylesheet) ─── */
     .auth-title {
       font-family: 'Cormorant Garamond', serif;
       font-size: 1.8rem; font-weight: 300;
@@ -292,53 +140,6 @@
       font-size: 0.8rem; color: var(--text-muted);
       margin-bottom: 2rem; line-height: 1.6;
     }
-
-    .field { margin-bottom: 1rem; }
-    .field label {
-      font-family: 'DM Mono', monospace;
-      font-size: var(--text-micro); letter-spacing: 0.2em;
-      text-transform: uppercase; color: var(--text-dim);
-      display: block; margin-bottom: 0.5rem;
-    }
-    .field input {
-      width: 100%; background: var(--void);
-      border: 1px solid var(--border); outline: none;
-      padding: 0.9rem 1rem;
-      font-family: 'Outfit', sans-serif;
-      font-size: 0.9rem; font-weight: 300;
-      color: var(--text-primary);
-      transition: border-color 0.3s ease;
-    }
-    .field input:focus { border-color: rgba(122,158,168,0.3); }
-    .field input::placeholder { color: var(--text-dim); }
-
-    .auth-btn {
-      width: 100%; padding: 1rem;
-      background: var(--text-primary); color: var(--void);
-      border: none; cursor: pointer;
-      font-family: 'DM Mono', monospace;
-      font-size: var(--text-micro); letter-spacing: 0.2em;
-      text-transform: uppercase;
-      transition: background 0.3s ease;
-      margin-top: 0.5rem;
-    }
-    .auth-btn:hover { background: var(--accent-cold); color: var(--void); }
-    .auth-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-
-    .auth-switch {
-      font-family: 'DM Mono', monospace;
-      font-size: var(--text-micro); letter-spacing: 0.1em;
-      color: var(--text-dim); margin-top: 1.5rem;
-      text-align: center;
-    }
-    .auth-switch button {
-      background: none; border: none; cursor: pointer;
-      color: var(--accent-cold);
-      font-family: 'DM Mono', monospace;
-      font-size: var(--text-micro); letter-spacing: 0.1em;
-      transition: color 0.3s ease;
-    }
-    .auth-switch button:hover { color: var(--text-primary); }
 
     .auth-message {
       font-family: 'DM Mono', monospace;
@@ -839,7 +640,6 @@
       z-index: 0;
       pointer-events: none;
     }
-    .screen { position: relative; z-index: 1; }
 
     /* ─── Mobile spacing audit (Pass 2): tight viewports ─── */
     @media (max-width: 480px) {
@@ -856,9 +656,187 @@
       .sit-right { justify-content: space-between; width: 100%; }
       .sit-actions { flex-direction: row; flex-wrap: wrap; gap: 0.45rem; }
       .s-btn { min-height: 44px; padding: 0.55rem 0.9rem; display: inline-flex; align-items: center; }
-      .auth-box { padding: 2rem 1.5rem; }
-      .auth-btn { min-height: 44px; }
-      .onboard-btn { min-height: 44px; display: inline-flex; align-items: center; }
+      .auth-panel, .guest-panel, .intro-panel { padding: 2.5rem 1.2rem 4rem; }
+      .auth-input { padding: 0.85rem 0.9rem; }
+    }
+
+    /* ─── App view transitions (Pass 2.0.4) ─── */
+    .app-view {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      overflow-y: auto;
+      opacity: 0;
+      transform: translateY(8px);
+      transition: opacity 400ms ease, transform 400ms ease;
+      pointer-events: none;
+      z-index: 1;
+    }
+    .app-view.is-visible {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+    .app-view.is-leaving {
+      opacity: 0;
+      transition: opacity 300ms ease;
+    }
+
+    /* ─── Intro view (Pass 2.0.4) ─── */
+    .intro-panel {
+      width: 100%; max-width: 520px;
+      margin: 0 auto;
+      padding: 4rem 2rem 6rem;
+      display: flex; flex-direction: column;
+      min-height: 100vh; justify-content: center;
+    }
+    .intro-mark { margin-bottom: 2rem; opacity: 0.8; }
+    .intro-eyebrow {
+      font-family: 'DM Mono', monospace;
+      font-size: var(--text-micro); letter-spacing: 0.28em;
+      text-transform: uppercase; color: var(--gold);
+      opacity: 0.6; margin-bottom: 1rem;
+    }
+    .intro-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(2.2rem, 6vw, 3.5rem);
+      font-weight: 300; color: var(--text-primary);
+      line-height: 1.05; margin-bottom: 1.8rem;
+    }
+    .intro-title em { font-style: italic; color: var(--gold); }
+    .intro-body {
+      font-size: 0.92rem; color: var(--text-muted);
+      line-height: 1.8; margin-bottom: 1rem;
+      max-width: 440px;
+    }
+    .intro-btn {
+      background: rgba(196,164,85,0.12);
+      color: var(--gold);
+      border: 1px solid rgba(196,164,85,0.5);
+      padding: 1rem 2rem;
+      font-family: 'DM Mono', monospace;
+      font-size: var(--text-micro); font-weight: 400; letter-spacing: 0.18em;
+      text-transform: uppercase; cursor: pointer;
+      margin-top: 1.5rem; align-self: flex-start;
+      transition: background 0.3s ease, color 0.3s ease;
+      min-height: 44px;
+    }
+    .intro-btn:hover { background: var(--gold); color: var(--void); }
+    .intro-skip {
+      background: none; border: none;
+      font-family: 'DM Mono', monospace;
+      font-size: var(--text-micro); letter-spacing: 0.12em;
+      text-transform: uppercase; color: var(--text-dim);
+      cursor: pointer; margin-top: 1rem;
+      padding: 0.5rem 0; align-self: flex-start;
+      transition: color 0.3s ease;
+      min-height: 44px;
+    }
+    .intro-skip:hover { color: var(--text-muted); }
+
+    /* ─── Auth & guest panels (Pass 2.0.4) ─── */
+    .auth-panel, .guest-panel {
+      width: 100%; max-width: 440px;
+      margin: 0 auto;
+      padding: 4rem 2rem 6rem;
+      display: flex; flex-direction: column;
+      min-height: 100vh; justify-content: center;
+    }
+    .auth-form {
+      display: flex; flex-direction: column;
+      margin-top: 0.5rem;
+    }
+    .auth-label {
+      font-family: 'DM Mono', monospace;
+      font-size: var(--text-micro); letter-spacing: 0.2em;
+      text-transform: uppercase; color: var(--text-dim);
+      margin-bottom: 0.4rem;
+    }
+    .auth-input {
+      width: 100%; background: var(--void);
+      border: 1px solid var(--border); outline: none;
+      padding: 0.9rem 1rem;
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.95rem; font-weight: 300;
+      color: var(--text-primary);
+      transition: border-color 0.3s ease;
+      margin-bottom: 0.9rem;
+    }
+    .auth-input:focus { border-color: rgba(122,158,168,0.3); }
+    .auth-btn-primary {
+      width: 100%; padding: 1rem;
+      background: var(--text-primary); color: var(--void);
+      border: none; cursor: pointer;
+      font-family: 'DM Mono', monospace;
+      font-size: var(--text-micro); letter-spacing: 0.2em;
+      text-transform: uppercase;
+      transition: background 0.3s ease;
+      margin-top: 0.4rem;
+      min-height: 44px;
+    }
+    .auth-btn-primary:hover { background: var(--accent-cold); color: var(--void); }
+    .auth-btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+    .auth-btn-link {
+      width: 100%; background: none; border: none; cursor: pointer;
+      padding: 0.7rem 0;
+      font-family: 'DM Mono', monospace;
+      font-size: var(--text-micro); letter-spacing: 0.15em;
+      text-transform: uppercase; color: var(--text-dim);
+      text-align: center;
+      transition: color 0.3s ease;
+      min-height: 44px;
+    }
+    .auth-btn-link:hover { color: var(--accent-cold); }
+    .auth-btn-link-inline {
+      background: none; border: none; cursor: pointer;
+      font-family: 'DM Mono', monospace;
+      font-size: var(--text-micro); letter-spacing: 0.12em;
+      color: var(--accent-cold);
+      transition: color 0.3s ease;
+      padding: 0;
+    }
+    .auth-btn-link-inline:hover { color: var(--text-primary); }
+    .auth-toggle {
+      font-family: 'DM Mono', monospace;
+      font-size: var(--text-micro); letter-spacing: 0.1em;
+      color: var(--text-dim); margin-top: 1.2rem;
+      text-align: center;
+    }
+    .auth-fineprint {
+      font-family: 'DM Mono', monospace;
+      font-size: var(--text-micro); letter-spacing: 0.1em;
+      color: var(--text-dim);
+      margin: 0.2rem 0 1rem;
+      line-height: 1.7;
+    }
+
+    /* ─── Guest taste panel (Pass 2.0.4) ─── */
+    .guest-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.8rem; font-weight: 300;
+      color: var(--text-primary); margin-bottom: 0.4rem;
+    }
+    .guest-title em { font-style: italic; color: var(--accent); }
+    .guest-sub {
+      font-size: 0.85rem; color: var(--text-muted);
+      margin-bottom: 2rem; line-height: 1.7;
+    }
+    .guest-duration-row {
+      display: flex; gap: 1px;
+      background: var(--border); border: 1px solid var(--border);
+      margin-bottom: 1.5rem;
+    }
+    .guest-duration-btn {
+      flex: 1; background: var(--void); border: none;
+      padding: 1rem; cursor: pointer;
+      font-family: 'DM Mono', monospace;
+      font-size: var(--text-micro); letter-spacing: 0.15em;
+      text-transform: uppercase; color: var(--text-muted);
+      transition: background 0.3s ease, color 0.3s ease;
+      min-height: 44px;
+    }
+    .guest-duration-btn:hover {
+      background: var(--surface2); color: var(--text-primary);
     }
   </style>
 </head>
@@ -868,110 +846,104 @@
   <div class="cursor" id="cursor"></div>
   <div class="cursor-ring" id="cursorRing"></div>
 
-  <!-- ─── LOADING ─── -->
-  <div class="screen active" id="loadingScreen">
+  <!-- ─── LOADING (boot indicator) ─── -->
+  <div class="cat-loader" id="loadingScreen">
     <div class="cat-loader-dot"></div>
     <p class="cat-loader-text" id="loaderText">Still loading…</p>
   </div>
 
-  <!-- ─── ONBOARDING ─── -->
-  <div class="screen" id="onboardScreen">
-    <div class="onboard-wrap">
-
-      <!-- Step 1: Welcome -->
-      <div class="onboard-step active" id="onboardStep1">
-        <div class="onboard-mark">
-          <svg width="48" height="48" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
-            <path d="M 295.26 255.00 A 110 110 0 1 0 295.26 145.00"
-              fill="none" stroke="#c4a96d" stroke-width="10" stroke-linecap="round"/>
-            <circle cx="200" cy="200" r="8" fill="#c4a96d"/>
-          </svg>
-        </div>
-        <p class="onboard-eyebrow">Welcome</p>
-        <h1 class="onboard-title">You found<br><em>the void.</em></h1>
-        <p class="onboard-body">Catatonica is a stillness practice for the things you're not ready to let go of yet. A loss. A transition. A decision you keep circling. Name it. Sit with it. Release it when you're ready.</p>
-        <p class="onboard-body">No advice. No AI suggestions. No streaks. Just you and the thing you're carrying.</p>
-        <button class="onboard-btn" id="onboardNext1">I'm ready →</button>
+  <!-- ─── INTRO (Pass 2.0.4) ─── -->
+  <div class="app-view" id="view-intro" style="display:none">
+    <div class="intro-panel">
+      <div class="intro-mark">
+        <svg width="48" height="48" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+          <path d="M 295.26 255.00 A 110 110 0 1 0 295.26 145.00"
+            fill="none" stroke="#c4a96d" stroke-width="10" stroke-linecap="round"/>
+          <circle cx="200" cy="200" r="8" fill="#c4a96d"/>
+        </svg>
       </div>
-
-      <!-- Step 2: Name your first situation -->
-      <div class="onboard-step" id="onboardStep2">
-        <p class="onboard-eyebrow">Step 01</p>
-        <h2 class="onboard-title">What are you<br><em>sitting with?</em></h2>
-        <p class="onboard-body">Name it plainly. One sentence is enough. This becomes your first situation — the thing you'll accumulate Catatons on.</p>
-        <div class="onboard-input-wrap">
-          <input
-            type="text"
-            id="onboardSitInput"
-            class="onboard-input"
-            placeholder="A transition I haven't processed…"
-            maxlength="120"
-            autocomplete="off"
-          />
-          <p class="onboard-input-hint">Press Enter or tap the button when ready.</p>
-        </div>
-        <button class="onboard-btn" id="onboardNext2">Name it →</button>
-        <button class="onboard-skip" id="onboardSkip">Skip for now — I'll add it myself</button>
-      </div>
-
-      <!-- Step 3: Begin first session -->
-      <div class="onboard-step" id="onboardStep3">
-        <p class="onboard-eyebrow">Step 02</p>
-        <h2 class="onboard-title">Your first<br><em>session.</em></h2>
-        <p class="onboard-body">A session is a timed block of silence where you sit with your situation. Nothing to do. Nothing to solve. Just presence.</p>
-        <p class="onboard-body">Start with 5 or 10 minutes. You'll earn your first Catatons when you finish.</p>
-        <div class="onboard-modes">
-          <div class="onboard-mode active" data-mode="silence">
-            <span class="onboard-mode-name">Silence</span>
-            <span class="onboard-mode-desc">Pure void</span>
-          </div>
-          <div class="onboard-mode" data-mode="sound">
-            <span class="onboard-mode-name">Sound</span>
-            <span class="onboard-mode-desc">Ambient tones</span>
-          </div>
-          <div class="onboard-mode" data-mode="visual">
-            <span class="onboard-mode-name">Breathing</span>
-            <span class="onboard-mode-desc">Visual guide</span>
-          </div>
-        </div>
-        <button class="onboard-btn" id="onboardBegin">Begin my first session →</button>
-        <button class="onboard-skip" id="onboardSkip2">Go to dashboard instead</button>
-      </div>
-
+      <p class="intro-eyebrow">Welcome</p>
+      <h1 class="intro-title">You found<br><em>the void.</em></h1>
+      <p class="intro-body">Catatonica is a stillness practice for the things you're not ready to let go of yet. A loss. A transition. A decision you keep circling. Name it. Sit with it. Release it when you're ready.</p>
+      <p class="intro-body">No advice. No AI suggestions. No streaks. Just you and the thing you're carrying.</p>
+      <button class="intro-btn" id="introReadyBtn">I'm ready →</button>
+      <button class="intro-skip" id="introSkipBtn">Skip for now — taste a session</button>
     </div>
   </div>
 
-  <!-- ─── AUTH ─── -->
-  <div class="screen" id="authScreen">
-    <div class="auth-box">
-      <div class="auth-logo">Cata<span>tonica</span></div>
-      <div class="auth-tagline">The Art of Doing Nothing</div>
+  <!-- ─── AUTH (Pass 2.0.4) ─── -->
+  <div class="app-view" id="view-auth" style="display:none">
+    <div class="auth-panel">
+      <h1 class="auth-title">Enter the <em>void.</em></h1>
+      <p class="auth-sub">Sign in to begin accumulating Catatons across all your devices.</p>
 
-      <h2 class="auth-title" id="authTitle">Enter the <em>void.</em></h2>
-      <p class="auth-sub" id="authSub">Sign in to begin accumulating Catatons across all your devices.</p>
+      <div class="auth-form" id="authFormSignIn">
+        <label class="auth-label" for="authEmail">Email</label>
+        <input type="email" class="auth-input" id="authEmail" autocomplete="email" placeholder="your@email.com" />
 
-      <div class="field">
-        <label>Email</label>
-        <input type="email" id="authEmail" placeholder="your@email.com" autocomplete="email" />
+        <label class="auth-label" for="authPassword">Password</label>
+        <input type="password" class="auth-input" id="authPassword" autocomplete="current-password" placeholder="••••••••" />
+
+        <button class="auth-btn-primary" id="authSignInBtn">Sign in</button>
+
+        <button class="auth-btn-link" id="authMagicLinkBtn">or send me a magic link instead</button>
+        <button class="auth-btn-link" id="authForgotBtn">Forgot your password?</button>
+
+        <p class="auth-toggle">Don't have an account? <button class="auth-btn-link-inline" id="authShowSignUpBtn">Sign up</button></p>
       </div>
-      <div class="field" id="passwordField">
-        <label>Password</label>
-        <input type="password" id="authPassword" placeholder="••••••••" autocomplete="current-password" />
+
+      <div class="auth-form" id="authFormSignUp" style="display:none">
+        <label class="auth-label" for="authSignUpEmail">Email</label>
+        <input type="email" class="auth-input" id="authSignUpEmail" autocomplete="email" placeholder="your@email.com" />
+
+        <label class="auth-label" for="authSignUpPassword">Choose a password</label>
+        <input type="password" class="auth-input" id="authSignUpPassword" autocomplete="new-password" placeholder="At least 8 characters" />
+
+        <p class="auth-fineprint">We'll send a verification link to confirm your email.</p>
+
+        <button class="auth-btn-primary" id="authSignUpBtn">Create account</button>
+        <p class="auth-toggle">Already have an account? <button class="auth-btn-link-inline" id="authShowSignInBtn">Sign in</button></p>
       </div>
 
-      <button class="auth-btn" id="authSubmit">Enter →</button>
+      <div class="auth-message" id="authMessage" style="display:none"></div>
+    </div>
+  </div>
 
-      <div class="auth-message" id="authMessage"></div>
+  <!-- ─── GUEST SESSION (Pass 2.0.4 — stub) ─── -->
+  <div class="app-view" id="view-guest-session" style="display:none">
+    <div class="guest-panel">
+      <h1 class="guest-title">A <em>taste.</em></h1>
+      <p class="guest-sub">One short session, no account needed. Your Cataton lives only here, in this browser, until you sign up.</p>
 
-      <div class="auth-switch">
-        <span id="authSwitchText">No account yet?</span>
-        <button id="authSwitchBtn">Create one</button>
+      <div class="guest-duration-row">
+        <button class="guest-duration-btn" data-duration="1">1 minute</button>
+        <button class="guest-duration-btn" data-duration="5">5 minutes</button>
+        <button class="guest-duration-btn" data-duration="10">10 minutes</button>
+      </div>
+
+      <button class="auth-btn-link" id="guestBackBtn">Actually, let me sign in</button>
+    </div>
+  </div>
+
+  <!-- ─── PASSWORD RESET (Pass 2.0.4) ─── -->
+  <div class="app-view" id="view-password-reset" style="display:none">
+    <div class="auth-panel">
+      <h1 class="auth-title">Set a new <em>password.</em></h1>
+      <p class="auth-sub">Choose something memorable. You'll use this to sign in next time.</p>
+
+      <div class="auth-form">
+        <label class="auth-label" for="resetNewPassword">New password</label>
+        <input type="password" class="auth-input" id="resetNewPassword" autocomplete="new-password" placeholder="At least 8 characters" />
+
+        <button class="auth-btn-primary" id="resetSubmitBtn">Update password</button>
+
+        <div class="auth-message" id="resetMessage" style="display:none"></div>
       </div>
     </div>
   </div>
 
-  <!-- ─── MAIN APP ─── -->
-  <div class="screen" id="appScreen">
+  <!-- ─── DASHBOARD (Pass 2.0.4) ─── -->
+  <div class="app-view" id="view-dashboard" style="display:none">
     <nav>
       <a href="index.html" class="nav-logo" style="display:flex;align-items:center;gap:0.7rem;text-decoration:none;">
         <svg width="22" height="22" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -1205,12 +1177,6 @@
     });
   }
 
-  // ─── SCREEN HELPER ───
-  function showScreen(id) {
-    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-    document.getElementById(id).classList.add('active');
-  }
-
   // ─── TOAST ───
   function toast(msg, duration = 2500) {
     const t = document.getElementById('toast');
@@ -1219,188 +1185,258 @@
     setTimeout(() => t.classList.remove('show'), duration);
   }
 
-  // ─── AUTH INIT ───
-  async function init() {
-    // If we're returning from a magic link, Supabase leaves access_token in the URL hash.
-    const loaderText = document.getElementById('loaderText');
-    if (loaderText && /access_token=|type=magiclink|type=recovery/.test(window.location.hash)) {
-      loaderText.textContent = 'Entering…';
+  // ─── VIEW STATE MACHINE (Pass 2.0.4) ───
+  let currentView = null;
+  const VALID_VIEWS = ['intro', 'auth', 'guest-session', 'dashboard', 'password-reset'];
+
+  function setView(name) {
+    if (!VALID_VIEWS.includes(name)) return;
+    if (name === currentView) return;
+
+    const current = currentView ? document.getElementById('view-' + currentView) : null;
+    const next = document.getElementById('view-' + name);
+    if (!next) return;
+
+    if (current) {
+      current.classList.add('is-leaving');
+      current.classList.remove('is-visible');
     }
-    const { data: { session } } = await sb.auth.getSession();
-    if (session?.user) {
-      currentUser = session.user;
-      await loadData();
-      const needsOnboarding = await checkOnboarding();
-      if (!needsOnboarding) {
-        showScreen('appScreen');
-        // Pulse on return to acknowledge the user
-        if (typeof VoidAmbient !== 'undefined') VoidAmbient.pulse();
+
+    const transitionDelay = current ? 300 : 0;
+    setTimeout(() => {
+      if (current) {
+        current.style.display = 'none';
+        current.classList.remove('is-leaving');
       }
-    } else {
-      showScreen('authScreen');
-    }
-  }
+      next.style.display = 'block';
+      // Force reflow so transition triggers
+      // eslint-disable-next-line no-unused-expressions
+      next.offsetHeight;
+      next.classList.add('is-visible');
+      currentView = name;
 
-  // ─── ONBOARDING ───
-  let onboardMode = 'silence';
-  let onboardSitId = null;
-
-  async function checkOnboarding() {
-    // Show onboarding only for brand new users (0 situations, never onboarded)
-    const onboarded = localStorage.getItem(`cat_onboarded_${currentUser.id}`);
-    if (!onboarded && situations.length === 0) {
-      showScreen('onboardScreen');
-      return true;
-    }
-    return false;
-  }
-
-  // Step 1 → Step 2
-  document.getElementById('onboardNext1').addEventListener('click', () => {
-    document.getElementById('onboardStep1').classList.remove('active');
-    document.getElementById('onboardStep2').classList.add('active');
-    setTimeout(() => document.getElementById('onboardSitInput').focus(), 100);
-  });
-
-  // Step 2: name situation → Step 3
-  document.getElementById('onboardSitInput').addEventListener('keydown', e => {
-    if (e.key === 'Enter') document.getElementById('onboardNext2').click();
-  });
-
-  document.getElementById('onboardNext2').addEventListener('click', async () => {
-    const name = document.getElementById('onboardSitInput').value.trim();
-    if (!name) {
-      document.getElementById('onboardSitInput').focus();
-      return;
-    }
-    // Save situation
-    const { data, error } = await sb.from('situations').insert({
-      user_id: currentUser.id,
-      name,
-      sessions: 0,
-      catatons: 0,
-      manifesto: '',
-    }).select().single();
-
-    if (!error && data) {
-      onboardSitId = data.id;
-      await loadData();
-    }
-    document.getElementById('onboardStep2').classList.remove('active');
-    document.getElementById('onboardStep3').classList.add('active');
-  });
-
-  // Skip step 2
-  document.getElementById('onboardSkip').addEventListener('click', () => {
-    localStorage.setItem(`cat_onboarded_${currentUser.id}`, '1');
-    showScreen('appScreen');
-    render();
-  });
-
-  // Mode selection in onboarding
-  document.querySelectorAll('.onboard-mode').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('.onboard-mode').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      onboardMode = btn.dataset.mode;
-    });
-  });
-
-  // Begin first session from onboarding
-  document.getElementById('onboardBegin').addEventListener('click', () => {
-    localStorage.setItem(`cat_onboarded_${currentUser.id}`, '1');
-    const params = new URLSearchParams({
-      sitId: onboardSitId || '',
-      mode: onboardMode,
-      duration: 10,
-      userId: currentUser.id,
-    });
-    window.location.href = 'session.html?' + params.toString();
-  });
-
-  // Skip step 3 → dashboard
-  document.getElementById('onboardSkip2').addEventListener('click', () => {
-    localStorage.setItem(`cat_onboarded_${currentUser.id}`, '1');
-    showScreen('appScreen');
-    render();
-  });
-
-  // ─── AUTH MODE TOGGLE ───
-  let authMode = 'signin';
-  document.getElementById('authSwitchBtn').addEventListener('click', () => {
-    authMode = authMode === 'signin' ? 'signup' : 'signin';
-    document.getElementById('authTitle').innerHTML =
-      authMode === 'signin' ? 'Enter the <em>void.</em>' : 'Begin the <em>journey.</em>';
-    document.getElementById('authSub').textContent =
-      authMode === 'signin'
-        ? 'Sign in to continue accumulating Catatons.'
-        : 'Create your account. Your silence awaits.';
-    document.getElementById('authSubmit').textContent =
-      authMode === 'signin' ? 'Enter →' : 'Create Account →';
-    document.getElementById('authSwitchText').textContent =
-      authMode === 'signin' ? 'No account yet?' : 'Already have one?';
-    document.getElementById('authSwitchBtn').textContent =
-      authMode === 'signin' ? 'Create one' : 'Sign in';
-    hideAuthMsg();
-  });
-
-  document.getElementById('authSubmit').addEventListener('click', handleAuth);
-  document.getElementById('authEmail').addEventListener('keydown', e => {
-    if (e.key === 'Enter') document.getElementById('authPassword').focus();
-  });
-  document.getElementById('authPassword').addEventListener('keydown', e => {
-    if (e.key === 'Enter') handleAuth();
-  });
-
-  async function handleAuth() {
-    const email = document.getElementById('authEmail').value.trim();
-    const password = document.getElementById('authPassword').value;
-    const btn = document.getElementById('authSubmit');
-
-    if (!email || !password) { showAuthMsg('Please fill in both fields.', 'error'); return; }
-    if (password.length < 6) { showAuthMsg('Password must be at least 6 characters.', 'error'); return; }
-
-    btn.disabled = true;
-    btn.textContent = 'One moment…';
-
-    if (authMode === 'signup') {
-      const { error } = await sb.auth.signUp({ email, password });
-      if (error) { showAuthMsg(error.message, 'error'); }
-      else { showAuthMsg('Check your email to confirm your account, then sign in.', 'success'); }
-    } else {
-      const { data, error } = await sb.auth.signInWithPassword({ email, password });
-      if (error) { showAuthMsg(error.message, 'error'); }
-      else {
-        currentUser = data.user;
-        await loadData();
-        const needsOnboarding = await checkOnboarding();
-        if (!needsOnboarding) {
-          showScreen('appScreen');
-          // The universe acknowledges the user entering
-          if (typeof VoidAmbient !== 'undefined') VoidAmbient.pulse();
-        }
+      // Acknowledge the user entering the dashboard
+      if (name === 'dashboard' && typeof VoidAmbient !== 'undefined') {
+        VoidAmbient.pulse();
       }
-    }
-
-    btn.disabled = false;
-    btn.textContent = authMode === 'signin' ? 'Enter →' : 'Create Account →';
+    }, transitionDelay);
   }
 
-  function showAuthMsg(msg, type) {
+  function hideLoading() {
+    const ls = document.getElementById('loadingScreen');
+    if (ls) ls.classList.add('hidden');
+  }
+
+  // ─── AUTH MESSAGE HELPER (Pass 2.0.4) ───
+  function showAuthMessage(msg, type) {
     const el = document.getElementById('authMessage');
+    if (!el) return;
     el.textContent = msg;
-    el.className = `auth-message ${type}`;
+    el.className = 'auth-message' + (type ? ' ' + type : '');
+    el.style.display = 'block';
+    // Auto-hide after 6s so stale messages don't linger
+    clearTimeout(showAuthMessage._t);
+    showAuthMessage._t = setTimeout(() => {
+      el.style.display = 'none';
+      el.className = 'auth-message';
+    }, 6000);
+  }
+
+  function showResetMessage(msg, type) {
+    const el = document.getElementById('resetMessage');
+    if (!el) return;
+    el.textContent = msg;
+    el.className = 'auth-message' + (type ? ' ' + type : '');
     el.style.display = 'block';
   }
-  function hideAuthMsg() {
-    document.getElementById('authMessage').style.display = 'none';
+
+  // ─── INTRO HANDLERS (Pass 2.0.4) ───
+  document.getElementById('introReadyBtn').addEventListener('click', () => setView('auth'));
+  document.getElementById('introSkipBtn').addEventListener('click', () => setView('guest-session'));
+
+  // ─── GUEST SESSION HANDLERS (Pass 2.0.4 — stub) ───
+  document.querySelectorAll('.guest-duration-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      setView('auth');
+      // Defer message until view-auth is in the DOM and visible
+      setTimeout(() => {
+        showAuthMessage('Guest taste sessions are coming soon. Sign up below to begin.', 'success');
+      }, 350);
+    });
+  });
+  document.getElementById('guestBackBtn').addEventListener('click', () => setView('auth'));
+
+  // ─── AUTH HANDLERS (Pass 2.0.4) ───
+  const REDIRECT_URL = 'https://catatonica.app/app.html';
+
+  async function handleSignIn() {
+    const email = document.getElementById('authEmail').value.trim();
+    const password = document.getElementById('authPassword').value;
+    const btn = document.getElementById('authSignInBtn');
+    if (!email || !password) return showAuthMessage('Email and password required.', 'error');
+
+    btn.disabled = true;
+    const orig = btn.textContent;
+    btn.textContent = 'One moment…';
+
+    const { error } = await sb.auth.signInWithPassword({ email, password });
+    btn.disabled = false;
+    btn.textContent = orig;
+    if (error) return showAuthMessage(error.message, 'error');
+    // onAuthStateChange routes to dashboard
   }
+
+  async function handleSignUp() {
+    const email = document.getElementById('authSignUpEmail').value.trim();
+    const password = document.getElementById('authSignUpPassword').value;
+    const btn = document.getElementById('authSignUpBtn');
+    if (!email || !password) return showAuthMessage('Email and password required.', 'error');
+    if (password.length < 8) return showAuthMessage('Password must be at least 8 characters.', 'error');
+
+    btn.disabled = true;
+    const orig = btn.textContent;
+    btn.textContent = 'One moment…';
+
+    const { error } = await sb.auth.signUp({
+      email, password,
+      options: { emailRedirectTo: REDIRECT_URL }
+    });
+    btn.disabled = false;
+    btn.textContent = orig;
+    if (error) return showAuthMessage(error.message, 'error');
+    showAuthMessage('Account created. Check your email to verify.', 'success');
+  }
+
+  async function handleMagicLink() {
+    const email = document.getElementById('authEmail').value.trim();
+    if (!email) return showAuthMessage('Enter your email first.', 'error');
+
+    const { error } = await sb.auth.signInWithOtp({
+      email,
+      options: { emailRedirectTo: REDIRECT_URL }
+    });
+    if (error) return showAuthMessage(error.message, 'error');
+    showAuthMessage('Check your email for the link.', 'success');
+  }
+
+  async function handleForgotPassword() {
+    const email = document.getElementById('authEmail').value.trim();
+    if (!email) return showAuthMessage('Enter your email first.', 'error');
+
+    const { error } = await sb.auth.resetPasswordForEmail(email, {
+      redirectTo: REDIRECT_URL
+    });
+    if (error) return showAuthMessage(error.message, 'error');
+    showAuthMessage('Check your email for a password reset link.', 'success');
+  }
+
+  document.getElementById('authSignInBtn').addEventListener('click', handleSignIn);
+  document.getElementById('authMagicLinkBtn').addEventListener('click', handleMagicLink);
+  document.getElementById('authForgotBtn').addEventListener('click', handleForgotPassword);
+  document.getElementById('authSignUpBtn').addEventListener('click', handleSignUp);
+
+  // Sign-in / sign-up form toggle
+  document.getElementById('authShowSignUpBtn').addEventListener('click', () => {
+    document.getElementById('authFormSignIn').style.display = 'none';
+    document.getElementById('authFormSignUp').style.display = 'block';
+  });
+  document.getElementById('authShowSignInBtn').addEventListener('click', () => {
+    document.getElementById('authFormSignIn').style.display = 'block';
+    document.getElementById('authFormSignUp').style.display = 'none';
+  });
+
+  // Enter-key wiring on the sign-in form
+  document.getElementById('authEmail').addEventListener('keydown', e => {
+    if (e.key === 'Enter') { e.preventDefault(); document.getElementById('authPassword').focus(); }
+  });
+  document.getElementById('authPassword').addEventListener('keydown', e => {
+    if (e.key === 'Enter') { e.preventDefault(); handleSignIn(); }
+  });
+  document.getElementById('authSignUpPassword').addEventListener('keydown', e => {
+    if (e.key === 'Enter') { e.preventDefault(); handleSignUp(); }
+  });
+
+  // ─── PASSWORD RESET HANDLER (Pass 2.0.4) ───
+  document.getElementById('resetSubmitBtn').addEventListener('click', async () => {
+    const newPwd = document.getElementById('resetNewPassword').value;
+    if (!newPwd || newPwd.length < 8) return showResetMessage('Password must be at least 8 characters.', 'error');
+
+    const btn = document.getElementById('resetSubmitBtn');
+    btn.disabled = true;
+    const orig = btn.textContent;
+    btn.textContent = 'One moment…';
+
+    const { error } = await sb.auth.updateUser({ password: newPwd });
+    btn.disabled = false;
+    btn.textContent = orig;
+    if (error) return showResetMessage(error.message, 'error');
+
+    // Recovery token already authenticated the user; load data and route to dashboard
+    const { data: { user } } = await sb.auth.getUser();
+    if (user) {
+      currentUser = user;
+      await loadData();
+    }
+    setView('dashboard');
+  });
+  document.getElementById('resetNewPassword').addEventListener('keydown', e => {
+    if (e.key === 'Enter') { e.preventDefault(); document.getElementById('resetSubmitBtn').click(); }
+  });
+
+  // ─── URL FRAGMENT AUTH HANDLER (Pass 2.0.4) ───
+  // Supabase's detectSessionInUrl reads the hash on client init; we read it here for
+  // routing intent (recovery vs error vs successful sign-in), then clear it so it
+  // doesn't reappear on refresh.
+  function readAuthFragment() {
+    const hash = window.location.hash;
+    if (!hash || hash.length < 2) return null;
+    const params = new URLSearchParams(hash.substring(1));
+    const error = params.get('error');
+    if (error) {
+      const desc = (params.get('error_description') || 'Link expired or invalid.').replace(/\+/g, ' ');
+      return { kind: 'error', message: desc };
+    }
+    const type = params.get('type');
+    if (type === 'recovery') return { kind: 'recovery' };
+    if (params.get('access_token')) return { kind: 'signed-in' };
+    return null;
+  }
+
+  // ─── AUTH STATE LISTENER (Pass 2.0.4) ───
+  // Boot handles the initial routing decision. After boot, this listener handles
+  // sign-in / sign-out / recovery transitions triggered after the first paint.
+  sb.auth.onAuthStateChange(async (event, session) => {
+    if (currentView === null) return; // boot owns the first transition
+
+    if (event === 'PASSWORD_RECOVERY') {
+      setView('password-reset');
+      return;
+    }
+
+    if (event === 'SIGNED_IN' && session) {
+      currentUser = session.user;
+      if (currentView !== 'dashboard' && currentView !== 'password-reset') {
+        await loadData();
+        setView('dashboard');
+      }
+      return;
+    }
+
+    if (event === 'SIGNED_OUT') {
+      currentUser = null;
+      situations = [];
+      archive = [];
+      profile = {};
+      setView('auth');
+    }
+  });
 
   // ─── SIGN OUT ───
   document.getElementById('signOutBtn').addEventListener('click', async () => {
     await sb.auth.signOut();
+    // The auth state listener handles the rest, but we route immediately for snappiness
     currentUser = null; situations = []; archive = []; profile = {};
-    showScreen('authScreen');
+    setView('auth');
   });
 
   // ─── LOAD DATA ───
@@ -1847,8 +1883,49 @@
     navigator.serviceWorker.register('/sw.js').catch(() => {});
   }
 
-  // ─── BOOT ───
-  init();
+  // ─── BOOT (Pass 2.0.4) ───
+  async function boot() {
+    // If we're returning from a magic link, soften the loader text
+    const loaderText = document.getElementById('loaderText');
+    if (loaderText && /access_token=|type=magiclink|type=recovery/.test(window.location.hash)) {
+      loaderText.textContent = 'Entering…';
+    }
+
+    // Capture fragment intent before we clear it
+    const fragment = readAuthFragment();
+
+    // Wait for Supabase to settle whatever was in the URL hash
+    const { data: { session } } = await sb.auth.getSession();
+
+    // Clear the fragment so refresh doesn't replay it
+    if (window.location.hash && window.location.hash.length > 1) {
+      try { history.replaceState(null, '', '/app.html'); } catch (e) { /* ignore */ }
+    }
+
+    hideLoading();
+
+    // Route by fragment intent first
+    if (fragment?.kind === 'error') {
+      setView('auth');
+      setTimeout(() => showAuthMessage(fragment.message, 'error'), 350);
+      return;
+    }
+    if (fragment?.kind === 'recovery') {
+      setView('password-reset');
+      return;
+    }
+
+    // Default routing
+    if (session?.user) {
+      currentUser = session.user;
+      await loadData();
+      setView('dashboard');
+    } else {
+      setView('intro');
+    }
+  }
+
+  boot();
   </script>
 
   <script src="/void-ambient.js"></script>
