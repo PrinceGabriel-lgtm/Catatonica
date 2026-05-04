@@ -198,13 +198,34 @@
       .cat-loader-dot { animation: none; opacity: 0.7; }
     }
 
-    /* ─── Canvas layer: full viewport Field, behind content ─── */
-    #voidAmbientCanvas {
+    /* ─── Canvas layer: full viewport Field, behind content ───
+       Pass 2.5A — emergent spiral landing.
+       Wrapper hosts (1) the deep-space radial gradient backdrop,
+       (2) static nebula bloom layers (no animation), and
+       (3) the spiral canvas. See inline IIFE near end of body. */
+    .spiral-canvas-wrapper {
       position: fixed;
-      top: 0; left: 0;
-      width: 100vw; height: 100vh;
+      inset: 0;
       z-index: 0;
       pointer-events: none;
+      background: radial-gradient(ellipse at center, #0c0a1f 0%, #060512 50%, #02010a 100%);
+      overflow: hidden;
+    }
+    .spiral-nebula {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background:
+        radial-gradient(ellipse 45% 35% at 35% 35%, rgba(90,26,74,0.38) 0%, transparent 100%),
+        radial-gradient(ellipse 50% 40% at 65% 60%, rgba(58,26,106,0.34) 0%, transparent 100%),
+        radial-gradient(ellipse 35% 28% at 50% 50%, rgba(10,74,106,0.30) 0%, transparent 100%);
+    }
+    .spiral-canvas-wrapper canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
     }
     nav, .hero, .doctrine, .how, .catatons-section, .obsolescence, .pricing, .waitlist, footer, .divider {
       position: relative;
@@ -256,7 +277,10 @@
   </style>
 </head>
 <body>
-  <canvas id="voidAmbientCanvas"></canvas>
+  <div class="spiral-canvas-wrapper">
+    <div class="spiral-nebula"></div>
+    <canvas id="spiralLanding"></canvas>
+  </div>
   <div class="cursor" id="cursor"></div>
   <div class="cursor-ring" id="cursorRing"></div>
 
@@ -498,16 +522,322 @@
     document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
   </script>
 
-  <script src="/void-ambient.js"></script>
   <script>
-    VoidAmbient.init({
-      canvas: document.getElementById('voidAmbientCanvas'),
-      density: 'low',
-      temperature: 'cold',
-      catatons: 0,
-      responsive: true
-    });
-    VoidAmbient.start();
+    /* ─────────────────────────────────────────────────────────────
+       Pass 2.5A — Emergent Spiral Landing
+
+       Catatons (units of earned stillness) appear scattered across
+       deep space, then converge over ~35 seconds into a two-arm
+       logarithmic spiral with a bright weighty core. Once formed,
+       the galaxy enters a living steady state: slow rotation, field
+       pulse, individual twinkle, per-cataton drift. Convergence
+       plays once per session — the user's own continuity is honored
+       via sessionStorage. The user experiences the doctrine before
+       reading it.
+
+         — Immanuel Gabriel, Pass 2.5A
+       ───────────────────────────────────────────────────────────── */
+    (function() {
+      'use strict';
+
+      const canvas = document.getElementById('spiralLanding');
+      if (!canvas || !canvas.getContext) return;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return;
+
+      const reducedMotion = !!(window.matchMedia
+        && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+
+      let skipAnimation = false;
+      try {
+        skipAnimation = sessionStorage.getItem('catatonica_landing_seen') === '1';
+      } catch (e) { /* storage may be blocked; default to playing animation */ }
+      if (reducedMotion) skipAnimation = true;
+
+      function detectPerformance() {
+        const isMobile = window.innerWidth < 768;
+        const cores = navigator.hardwareConcurrency || 4;
+        const lowEnd = cores < 4;
+        if (isMobile || lowEnd) return { count: 250, bgStars: 30 };
+        return { count: 500, bgStars: 50 };
+      }
+
+      let perf = detectPerformance();
+      let W = 0, H = 0, CX = 0, CY = 0, maxR = 0, dpr = 1;
+      let particles = [];
+      let bgStars = [];
+      let startTime = null;
+      let running = false;
+      let convergenceComplete = false;
+
+      // Convergence flag-time. Outer-most particle finishes easing at ~43s;
+      // spec calls the visible bulk of formation "~35 seconds." Flag at 35s,
+      // begin steady-state behaviors smoothly from zero — outer arms continue
+      // to settle while rotation/pulse/drift phase in.
+      const FLAG_AT_MS = 35000;
+
+      // Two-arm logarithmic spiral parameters.
+      const ARM_OFFSETS = [0, Math.PI];
+      const TIGHTNESS = 0.32;
+      const BASE_RADIUS = 4;
+
+      function resize() {
+        const cssW = window.innerWidth;
+        const cssH = window.innerHeight;
+        dpr = Math.min(window.devicePixelRatio || 1, 2);
+        canvas.width = Math.max(1, Math.floor(cssW * dpr));
+        canvas.height = Math.max(1, Math.floor(cssH * dpr));
+        canvas.style.width = cssW + 'px';
+        canvas.style.height = cssH + 'px';
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
+        ctx.scale(dpr, dpr);
+        W = cssW;
+        H = cssH;
+        CX = W / 2;
+        CY = H / 2;
+        maxR = Math.min(W, H) * 0.46;
+      }
+
+      function nearestArmDistance(r, theta) {
+        if (r < 6) return 0;
+        const armT = Math.log(r / BASE_RADIUS) / TIGHTNESS;
+        let bestDist = Infinity;
+        for (let i = 0; i < ARM_OFFSETS.length; i++) {
+          const armTheta = armT + ARM_OFFSETS[i];
+          let diff = ((theta - armTheta) % (Math.PI * 2) + Math.PI * 3) % (Math.PI * 2) - Math.PI;
+          const arc = Math.abs(diff) * r;
+          if (arc < bestDist) bestDist = arc;
+        }
+        return bestDist;
+      }
+
+      function makeBgStar() {
+        return {
+          x: Math.random() * W,
+          y: Math.random() * H,
+          size: 0.3 + Math.random() * 0.6,
+          twinklePhase: Math.random() * Math.PI * 2,
+          twinkleSpeed: 0.3 + Math.random() * 0.8,
+          hueRoll: Math.random()
+        };
+      }
+
+      function generateParticles() {
+        particles = [];
+        bgStars = [];
+        const TARGET_COUNT = perf.count;
+        let attempts = 0;
+        while (particles.length < TARGET_COUNT && attempts < TARGET_COUNT * 25) {
+          attempts++;
+          const u = Math.random();
+          const r = Math.pow(u, 0.55) * maxR;
+          const theta = Math.random() * Math.PI * 2;
+          const armDist = nearestArmDistance(r, theta);
+          const armWidth = 14 + r * 0.18;
+          let density = Math.exp(-(armDist * armDist) / (2 * armWidth * armWidth));
+          density = density * 0.85 + 0.08;
+          if (Math.random() >= density) continue;
+
+          const tx = CX + Math.cos(theta) * r;
+          const ty = CY + Math.sin(theta) * r;
+
+          let sx, sy;
+          if (Math.random() < 0.7) {
+            sx = Math.random() * W;
+            sy = Math.random() * H;
+          } else {
+            const ang = Math.random() * Math.PI * 2;
+            const rad = maxR * (1.1 + Math.random() * 0.4);
+            sx = CX + Math.cos(ang) * rad;
+            sy = CY + Math.sin(ang) * rad;
+          }
+
+          const radialPosition = r / maxR;
+
+          particles.push({
+            baseR: r,
+            baseTheta: theta,
+            tx: tx, ty: ty,
+            sx: sx, sy: sy,
+            size: 0.35 + Math.pow(Math.random(), 1.6) * 1.5,
+            hueRoll: Math.random(),
+            twinklePhase: Math.random() * Math.PI * 2,
+            twinkleSpeed: 0.4 + Math.random() * 1.4,
+            driftPhase: Math.random() * Math.PI * 2,
+            driftAmp: 0.5 + Math.random() * 1.0,
+            driftSpeed: 0.0003 + Math.random() * 0.0007,
+            radialPosition: radialPosition,
+            particleDelay: radialPosition * 9000,
+            particleDuration: 12000 + radialPosition * 22000
+          });
+        }
+
+        for (let i = 0; i < perf.bgStars; i++) bgStars.push(makeBgStar());
+      }
+
+      function easeInOutCubic(t) {
+        return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+      }
+
+      function getColor(hueRoll, alpha) {
+        if (hueRoll < 0.45) return 'rgba(122,160,216,' + alpha + ')';
+        if (hueRoll < 0.72) return 'rgba(74,111,165,'  + alpha + ')';
+        if (hueRoll < 0.92) return 'rgba(155,184,224,' + alpha + ')';
+        return 'rgba(232,212,168,' + alpha + ')';
+      }
+
+      function render(elapsedMs) {
+        ctx.clearRect(0, 0, W, H);
+        const elapsedSec = elapsedMs / 1000;
+
+        // Steady-state global time. Zero during convergence; grows after the flag.
+        let postConvergeSec = 0;
+        if (skipAnimation) {
+          postConvergeSec = elapsedSec;
+        } else if (elapsedMs >= FLAG_AT_MS) {
+          if (!convergenceComplete) {
+            convergenceComplete = true;
+            try { sessionStorage.setItem('catatonica_landing_seen', '1'); } catch (e) {}
+          }
+          postConvergeSec = (elapsedMs - FLAG_AT_MS) / 1000;
+        }
+
+        const globalRotation = reducedMotion ? 0 : postConvergeSec * 0.011;
+        const fieldPulse = (reducedMotion || postConvergeSec === 0)
+          ? 1
+          : 1 + 0.06 * Math.sin(postConvergeSec * 0.35);
+
+        // Background "deep space" stars — never converge, only twinkle.
+        const twAmpStar = reducedMotion ? 0.05 : 0.22;
+        for (let i = 0; i < bgStars.length; i++) {
+          const s = bgStars[i];
+          const tw = (1 - twAmpStar) + twAmpStar * Math.sin(elapsedSec * s.twinkleSpeed + s.twinklePhase);
+          ctx.beginPath();
+          ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
+          ctx.fillStyle = getColor(s.hueRoll, 0.32 * tw);
+          ctx.fill();
+        }
+
+        // Bright weighty core — emerges over the first 22 seconds.
+        const coreEase = (skipAnimation || reducedMotion)
+          ? 1
+          : Math.min(1, elapsedMs / 22000);
+        if (coreEase > 0) {
+          const corePulse = (reducedMotion || postConvergeSec === 0)
+            ? 1
+            : 1 + 0.04 * Math.sin(postConvergeSec * 0.6);
+          const coreRadius = 55 * coreEase * corePulse;
+          const grad = ctx.createRadialGradient(CX, CY, 0, CX, CY, coreRadius);
+          grad.addColorStop(0,    'rgba(255,248,224,' + (0.85 * coreEase) + ')');
+          grad.addColorStop(0.25, 'rgba(244,229,200,' + (0.55 * coreEase) + ')');
+          grad.addColorStop(0.6,  'rgba(212,169,95,'  + (0.22 * coreEase) + ')');
+          grad.addColorStop(1,    'rgba(0,0,0,0)');
+          ctx.fillStyle = grad;
+          ctx.fillRect(CX - coreRadius, CY - coreRadius, coreRadius * 2, coreRadius * 2);
+        }
+
+        // Catatons.
+        const twAmp = reducedMotion ? 0.05 : 0.22;
+        for (let i = 0; i < particles.length; i++) {
+          const p = particles[i];
+
+          // "Home" = steady-state target. During convergence (postConvergeSec=0),
+          // home is fixed at (tx, ty); after the flag, home rotates/pulses/drifts.
+          const theta = p.baseTheta + globalRotation;
+          const driftR = (reducedMotion || postConvergeSec === 0)
+            ? 0
+            : p.driftAmp * Math.sin(postConvergeSec * p.driftSpeed * 1000 + p.driftPhase);
+          const r = (p.baseR + driftR) * fieldPulse;
+          const homeX = CX + Math.cos(theta) * r;
+          const homeY = CY + Math.sin(theta) * r;
+
+          let x, y, alphaMul;
+          if (skipAnimation) {
+            x = homeX; y = homeY;
+            alphaMul = 1;
+          } else {
+            const localElapsed = elapsedMs - p.particleDelay;
+            const t = localElapsed <= 0 ? 0 : Math.min(1, localElapsed / p.particleDuration);
+            const eased = easeInOutCubic(t);
+            x = p.sx + (homeX - p.sx) * eased;
+            y = p.sy + (homeY - p.sy) * eased;
+            alphaMul = 0.55 + 0.45 * eased;
+          }
+
+          const twinkle = (1 - twAmp) + twAmp * Math.sin(elapsedSec * p.twinkleSpeed + p.twinklePhase);
+          const outerFade = 1 - Math.pow(p.radialPosition, 3) * 0.35;
+          const alpha = Math.min(1, twinkle * alphaMul * outerFade);
+
+          ctx.beginPath();
+          ctx.arc(x, y, p.size, 0, Math.PI * 2);
+          ctx.fillStyle = getColor(p.hueRoll, alpha);
+          ctx.fill();
+
+          if (p.size > 1.0) {
+            ctx.beginPath();
+            ctx.arc(x, y, p.size * 2.2, 0, Math.PI * 2);
+            ctx.fillStyle = getColor(p.hueRoll, alpha * 0.18);
+            ctx.fill();
+          }
+        }
+
+        // Bright pinpoint at the very center, gently twinkling.
+        if (coreEase > 0) {
+          const coreSize = 2.5 + coreEase * 2;
+          const pinTwinkle = reducedMotion ? 1 : 0.85 + 0.15 * Math.sin(elapsedSec * 1.3);
+          ctx.beginPath();
+          ctx.arc(CX, CY, coreSize, 0, Math.PI * 2);
+          ctx.fillStyle = 'rgba(255,248,224,' + (coreEase * pinTwinkle) + ')';
+          ctx.fill();
+        }
+      }
+
+      function loop(now) {
+        if (!running) return;
+        if (startTime === null) startTime = now;
+        render(now - startTime);
+        requestAnimationFrame(loop);
+      }
+
+      function start() {
+        if (running) return;
+        running = true;
+        startTime = null;
+        requestAnimationFrame(loop);
+      }
+
+      function onResize() {
+        const oldCX = CX, oldCY = CY, oldMaxR = maxR;
+        // Re-evaluate performance tier in case the user crossed the mobile breakpoint.
+        perf = detectPerformance();
+        resize();
+        if (oldMaxR === 0) return;
+        const ratio = maxR / oldMaxR;
+        for (let i = 0; i < particles.length; i++) {
+          const p = particles[i];
+          p.tx = CX + (p.tx - oldCX) * ratio;
+          p.ty = CY + (p.ty - oldCY) * ratio;
+          p.sx = CX + (p.sx - oldCX) * ratio;
+          p.sy = CY + (p.sy - oldCY) * ratio;
+          p.baseR *= ratio;
+        }
+        bgStars = [];
+        for (let i = 0; i < perf.bgStars; i++) bgStars.push(makeBgStar());
+      }
+
+      function init() {
+        resize();
+        generateParticles();
+        window.addEventListener('resize', onResize);
+        start();
+      }
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+      } else {
+        init();
+      }
+    })();
   </script>
 </body>
 </html>
