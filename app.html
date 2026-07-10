@@ -1287,13 +1287,28 @@
       appearance: 'interaction-only'
     });
   };
-  function captchaOptions() {
-    const token = (window.turnstile && turnstileWidgetId !== null)
-      ? turnstile.getResponse(turnstileWidgetId) : '';
-    return token ? { captchaToken: token } : {};
+  function captchaToken() {
+    return (window.turnstile && turnstileWidgetId !== null)
+      ? (turnstile.getResponse(turnstileWidgetId) || '') : '';
   }
   function captchaReset() {
-    if (window.turnstile && turnstileWidgetId !== null) turnstile.reset(turnstileWidgetId);
+    if (window.turnstile && turnstileWidgetId !== null) {
+      try { turnstile.reset(turnstileWidgetId); } catch (e) { /* widget mid-cycle */ }
+    }
+  }
+  // Wait for a token at click time instead of grabbing whatever exists.
+  // Covers: script still loading, widget mid-challenge, and expired tokens
+  // (single-use, ~5 min lifetime) after the page sat open.
+  async function ensureCaptcha() {
+    let t = captchaToken();
+    if (t) return { captchaToken: t };
+    captchaReset(); // kick a fresh run if the last token expired or was consumed
+    const deadline = Date.now() + 8000;
+    while (!t && Date.now() < deadline) {
+      await new Promise(r => setTimeout(r, 250));
+      t = captchaToken();
+    }
+    return t ? { captchaToken: t } : {};
   }
 
   async function handleSignIn() {
@@ -1306,7 +1321,7 @@
     const orig = btn.textContent;
     btn.textContent = 'One moment…';
 
-    const { error } = await sb.auth.signInWithPassword({ email, password, options: captchaOptions() });
+    const { error } = await sb.auth.signInWithPassword({ email, password, options: await ensureCaptcha() });
     captchaReset();
     btn.disabled = false;
     btn.textContent = orig;
@@ -1327,7 +1342,7 @@
 
     const { error } = await sb.auth.signUp({
       email, password,
-      options: { emailRedirectTo: REDIRECT_URL, ...captchaOptions() }
+      options: { emailRedirectTo: REDIRECT_URL, ...(await ensureCaptcha()) }
     });
     captchaReset();
     btn.disabled = false;
@@ -1342,7 +1357,7 @@
 
     const { error } = await sb.auth.signInWithOtp({
       email,
-      options: { emailRedirectTo: REDIRECT_URL, ...captchaOptions() }
+      options: { emailRedirectTo: REDIRECT_URL, ...(await ensureCaptcha()) }
     });
     captchaReset();
     if (error) return showAuthMessage(error.message, 'error');
@@ -1355,7 +1370,7 @@
 
     const { error } = await sb.auth.resetPasswordForEmail(email, {
       redirectTo: REDIRECT_URL,
-      ...captchaOptions()
+      ...(await ensureCaptcha())
     });
     captchaReset();
     if (error) return showAuthMessage(error.message, 'error');
