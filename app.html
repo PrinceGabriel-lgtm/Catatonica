@@ -852,6 +852,31 @@
   </style>
 </head>
 <body>
+  <script>
+  // ─── Pass 2.5B — receive the Collapse ───
+  // If the user fell through the landing singularity, arrive from that same
+  // darkness and breathe open. No flag → no veil (direct visits unchanged).
+  (function() {
+    var arrived = false;
+    try {
+      arrived = sessionStorage.getItem('catatonica_arrival') === '1';
+      if (arrived) sessionStorage.removeItem('catatonica_arrival');
+    } catch (e) {}
+    if (!arrived) return;
+    var slow = !(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+    var v = document.createElement('div');
+    v.style.cssText = 'position:fixed;inset:0;background:#02010a;z-index:10001;opacity:1;pointer-events:none;transition:opacity ' + (slow ? '900ms ease 150ms' : '200ms ease') + ';';
+    function mount() {
+      document.body.appendChild(v);
+      requestAnimationFrame(function() {
+        requestAnimationFrame(function() { v.style.opacity = '0'; });
+      });
+      setTimeout(function() { if (v.parentNode) v.parentNode.removeChild(v); }, slow ? 1300 : 450);
+    }
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', mount);
+    else mount();
+  })();
+  </script>
 
   <canvas id="voidAmbientCanvas"></canvas>
   <div class="cursor" id="cursor"></div>

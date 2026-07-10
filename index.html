@@ -605,6 +605,16 @@
       const TIGHTNESS = 0.32;
       const BASE_RADIUS = 4;
 
+      // ─── Pass 2.5B — the Collapse ───
+      // Clicking through to the app does not cut away: the galaxy you
+      // watched form collapses into the singularity it was always pointing
+      // at, and you fall through it. ~1300ms, three beats: inhale, fall,
+      // dive. Ends on the app's darkest tone; app.html receives the
+      // arrival and breathes open.
+      const COLLAPSE_MS = 1300;
+      let collapseStartMs = null;
+      let collapseNavUrl = null;
+
       function resize() {
         const cssW = window.innerWidth;
         const cssH = window.innerHeight;
@@ -706,6 +716,8 @@
         return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
       }
 
+      function easeInCubic(t) { return t * t * t; }
+
       function getColor(hueRoll, alpha) {
         if (hueRoll < 0.45) return 'rgba(122,160,216,' + alpha + ')';
         if (hueRoll < 0.72) return 'rgba(74,111,165,'  + alpha + ')';
@@ -716,6 +728,15 @@
       function render(elapsedMs) {
         ctx.clearRect(0, 0, W, H);
         const elapsedSec = elapsedMs / 1000;
+
+        // Collapse beats (0 when not collapsing): inhale 0–15%, fall
+        // 15–70%, dive 30–100%. The field keeps living underneath — the
+        // pull simply overtakes it.
+        let cP = 0;
+        if (collapseStartMs !== null) cP = Math.min(1, (elapsedMs - collapseStartMs) / COLLAPSE_MS);
+        const cInhale = cP > 0 ? easeInOutCubic(Math.min(1, cP / 0.15)) : 0;
+        const cPull = cP > 0.15 ? easeInCubic(Math.min(1, (cP - 0.15) / 0.55)) : 0;
+        const cDive = cP > 0.3 ? easeInCubic(Math.min(1, (cP - 0.3) / 0.7)) : 0;
 
         // Steady-state global time. Zero during convergence; grows after the flag.
         let postConvergeSec = 0;
@@ -769,6 +790,8 @@
           if (elapsedMs < HOLD_END) coreGlow = 1;
           else if (elapsedMs < FLAG_AT_MS) coreGlow = 1 - 0.38 * easeInOutCubic((elapsedMs - HOLD_END) / (FLAG_AT_MS - HOLD_END));
         }
+        // Collapsing: the singularity returns to full brilliance as it feeds.
+        if (cP > 0) coreGlow = coreGlow + (1 - coreGlow) * Math.min(1, cP * 2);
         if (coreEase > 0) {
           // Pass 2.5A.1 — living singularity breath: three offset sine
           // frequencies so the breathing never repeats exactly (one sine
@@ -784,7 +807,9 @@
             const bloom = 0.15 * Math.pow(Math.max(0, bloomWave), 6);
             corePulse = 1 + breath + bloom;
           }
-          const coreRadius = CORE_R * coreScale * corePulse;
+          let coreRadius = CORE_R * coreScale * corePulse;
+          // The dive: the singularity grows to swallow the frame.
+          if (cDive > 0) coreRadius += (Math.hypot(W, H) * 0.8 - coreRadius) * cDive;
           // Broad Milky-Way halo the whole disc glows within — very faint,
           // half the field wide. This is the "milkiness."
           const haloR = maxR * 0.5;
@@ -854,7 +879,18 @@
 
           const twinkle = (1 - twAmp) + twAmp * Math.sin(elapsedSec * p.twinkleSpeed + p.twinklePhase);
           const outerFade = 1 - Math.pow(p.radialPosition, 3) * 0.35;
-          const alpha = Math.min(1, twinkle * alphaMul * outerFade);
+          let alpha = Math.min(1, twinkle * alphaMul * outerFade);
+
+          // Collapse: inhale draws the field in 8%, then the fall pulls
+          // every cataton — loose ones too — into the singularity, each
+          // dimming into the light it feeds.
+          if (cP > 0) {
+            x = CX + (x - CX) * (1 - 0.08 * cInhale);
+            y = CY + (y - CY) * (1 - 0.08 * cInhale);
+            x += (CX - x) * cPull;
+            y += (CY - y) * cPull;
+            alpha *= (1 - 0.1 * cInhale) * (1 - 0.85 * cPull);
+          }
 
           ctx.beginPath();
           ctx.arc(x, y, p.size, 0, Math.PI * 2);
@@ -896,6 +932,27 @@
             ctx.fill();
           }
         }
+
+        // Collapse finale: cream-white flash as you pass through the light,
+        // then the dark of the app's deepest tone rises. Navigate at black.
+        if (cP > 0) {
+          const flash = Math.max(0, Math.min(1, (cP - 0.55) / 0.33));
+          if (flash > 0) {
+            ctx.fillStyle = 'rgba(255,250,235,' + (0.92 * easeInOutCubic(flash)) + ')';
+            ctx.fillRect(0, 0, W, H);
+          }
+          const veil = Math.max(0, Math.min(1, (cP - 0.85) / 0.15));
+          if (veil > 0) {
+            ctx.fillStyle = 'rgba(2,1,10,' + easeInOutCubic(veil) + ')';
+            ctx.fillRect(0, 0, W, H);
+          }
+          if (cP >= 1 && collapseNavUrl) {
+            const dest = collapseNavUrl;
+            collapseNavUrl = null;
+            try { sessionStorage.setItem('catatonica_arrival', '1'); } catch (e) {}
+            window.location.href = dest;
+          }
+        }
       }
 
       function loop(now) {
@@ -931,10 +988,37 @@
         for (let i = 0; i < perf.bgStars; i++) bgStars.push(makeBgStar());
       }
 
+      // Every door into the app falls through the singularity. Plain links
+      // are the fallback: modifier/middle clicks and dead-canvas cases
+      // navigate normally.
+      function bindCollapse() {
+        document.querySelectorAll('a[href="app.html"]').forEach(function(a) {
+          a.addEventListener('click', function(ev) {
+            if (ev.metaKey || ev.ctrlKey || ev.shiftKey || ev.altKey || ev.button !== 0) return;
+            ev.preventDefault();
+            if (collapseStartMs !== null) return; // already falling
+            if (reducedMotion || !running || startTime === null) {
+              // Reduced motion / dead field: 200ms fade to the same dark.
+              try { sessionStorage.setItem('catatonica_arrival', '1'); } catch (e) {}
+              const v = document.createElement('div');
+              v.style.cssText = 'position:fixed;inset:0;background:#02010a;opacity:0;transition:opacity 200ms ease;z-index:10000;pointer-events:none;';
+              document.body.appendChild(v);
+              requestAnimationFrame(function() { v.style.opacity = '1'; });
+              setTimeout(function() { window.location.href = 'app.html'; }, 230);
+              return;
+            }
+            collapseNavUrl = this.getAttribute('href');
+            collapseStartMs = performance.now() - startTime;
+            document.body.style.pointerEvents = 'none';
+          });
+        });
+      }
+
       function init() {
         resize();
         generateParticles();
         window.addEventListener('resize', onResize);
+        bindCollapse();
         start();
       }
 
