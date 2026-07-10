@@ -235,6 +235,23 @@
       z-index: 1;
     }
 
+    /* ─── Pass 2.5A.2 — panels as regions within the universe ───
+       The words sit on Prussian glass, not opaque card stock: catatons
+       stay faintly visible behind every panel. Readability held by the
+       blur; hue family unchanged (--surface / --surface2). */
+    .how-step, .pricing-card, .stage-row, .obs-card, .waitlist-inner {
+      background: rgba(10, 22, 36, 0.58);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+    }
+    .pricing-card.featured, .stage-label {
+      background: rgba(19, 34, 53, 0.66);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+    }
+    .stage-row:hover { background: rgba(19, 34, 53, 0.72); }
+    .waitlist-input { background: rgba(5, 15, 30, 0.55); }
+
     /* ─── Mobile spacing audit (Pass 2): tight viewports ─── */
     @media (max-width: 480px) {
       nav { padding: 1rem 1.1rem; gap: 0.5rem; }
@@ -530,13 +547,14 @@
        Pass 2.5A — Emergent Spiral Landing
 
        Catatons (units of earned stillness) appear scattered across
-       deep space, then converge over ~35 seconds into a two-arm
-       logarithmic spiral with a bright weighty core. Once formed,
-       the galaxy enters a living steady state: slow rotation, field
-       pulse, individual twinkle, per-cataton drift. Convergence
-       plays once per session — the user's own continuity is honored
-       via sessionStorage. The user experiences the doctrine before
-       reading it.
+       deep space. Most collapse slowly into a single point of light
+       — many moments becoming one idea — while some stay scattered,
+       holding their ground. From the singular moment, a rotating
+       two-arm disc blooms outward; the stragglers drift in on their
+       own time. Steady state: slow rotation, field pulse, twinkle,
+       drift, a breathing chromatic core that consumes catatons
+       forever. Plays once per session (sessionStorage). The user
+       experiences the doctrine before reading it.
 
          — Immanuel Gabriel, Pass 2.5A
        ───────────────────────────────────────────────────────────── */
@@ -573,11 +591,14 @@
       let running = false;
       let convergenceComplete = false;
 
-      // Convergence flag-time. Outer-most particle finishes easing at ~43s;
-      // spec calls the visible bulk of formation "~35 seconds." Flag at 35s,
-      // begin steady-state behaviors smoothly from zero — outer arms continue
-      // to settle while rotation/pulse/drift phase in.
-      const FLAG_AT_MS = 35000;
+      // Choreography (Pass 2.5A.1 v2, founder direction): the galaxy of
+      // catatons COLLAPSES slowly into a single point of light, holds one
+      // singular moment, then a rotating disc blooms outward from the point.
+      // Slow enough to be subtle.
+      const COLLAPSE_END = 24000;  // all catatons merged into the point
+      const HOLD_END     = 27000;  // the singular moment — one point of light
+      const FLAG_AT_MS   = 42000;  // disc fully formed; steady state begins
+      const CORE_R       = 90;     // core glow radius (was 55 — too small)
 
       // Two-arm logarithmic spiral parameters.
       const ARM_OFFSETS = [0, Math.PI];
@@ -598,7 +619,7 @@
         H = cssH;
         CX = W / 2;
         CY = H / 2;
-        maxR = Math.min(W, H) * 0.46;
+        maxR = Math.min(W, H) * 0.5;
       }
 
       function nearestArmDistance(r, theta) {
@@ -670,8 +691,11 @@
             driftAmp: 0.5 + Math.random() * 1.0,
             driftSpeed: 0.0003 + Math.random() * 0.0007,
             radialPosition: radialPosition,
-            particleDelay: radialPosition * 9000,
-            particleDuration: 12000 + radialPosition * 22000
+            // ~1 in 5 catatons stays scattered through the collapse — not
+            // every moment gathers at once. The rest fall to the point.
+            loose: Math.random() < 0.22,
+            particleDelay: radialPosition * 5000,
+            particleDuration: 13000 + radialPosition * 6000
           });
         }
 
@@ -705,7 +729,10 @@
           postConvergeSec = (elapsedMs - FLAG_AT_MS) / 1000;
         }
 
-        const globalRotation = reducedMotion ? 0 : postConvergeSec * 0.011;
+        // The disc rotates from the moment it starts forming (not only after
+        // the flag) — it is born rotating.
+        const rotSec = skipAnimation ? elapsedSec : Math.max(0, (elapsedMs - HOLD_END) / 1000);
+        const globalRotation = reducedMotion ? 0 : rotSec * 0.011;
         const fieldPulse = (reducedMotion || postConvergeSec === 0)
           ? 1
           : 1 + 0.06 * Math.sin(postConvergeSec * 0.35);
@@ -721,19 +748,59 @@
           ctx.fill();
         }
 
-        // Bright weighty core — emerges over the first 22 seconds.
-        const coreEase = (skipAnimation || reducedMotion)
-          ? 1
-          : Math.min(1, elapsedMs / 22000);
+        // The core is FED by the collapse — it grows as catatons merge into
+        // it, peaks at the singular moment (1.2×), then settles as the disc
+        // blooms out of it.
+        let coreEase = 1, coreScale = 1;
+        if (!skipAnimation && !reducedMotion) {
+          if (elapsedMs < COLLAPSE_END) {
+            coreEase = Math.min(1, elapsedMs / COLLAPSE_END);
+            coreScale = 0.25 + 0.95 * easeInOutCubic(coreEase);
+          } else if (elapsedMs < FLAG_AT_MS) {
+            coreScale = 1.2 - 0.2 * ((elapsedMs - COLLAPSE_END) / (FLAG_AT_MS - COLLAPSE_END));
+          }
+        }
+        // Milky-Way settle: the singular moment stays brilliant — that is
+        // the reward for waiting — then the light softens into a broad
+        // galactic bulge as the disc forms. A glow you sit inside, not a
+        // spotlight. Steady state runs at 62% of peak brightness.
+        let coreGlow = 0.62;
+        if (!skipAnimation && !reducedMotion) {
+          if (elapsedMs < HOLD_END) coreGlow = 1;
+          else if (elapsedMs < FLAG_AT_MS) coreGlow = 1 - 0.38 * easeInOutCubic((elapsedMs - HOLD_END) / (FLAG_AT_MS - HOLD_END));
+        }
         if (coreEase > 0) {
-          const corePulse = (reducedMotion || postConvergeSec === 0)
-            ? 1
-            : 1 + 0.04 * Math.sin(postConvergeSec * 0.6);
-          const coreRadius = 55 * coreEase * corePulse;
+          // Pass 2.5A.1 — living singularity breath: three offset sine
+          // frequencies so the breathing never repeats exactly (one sine
+          // read as a metronome), plus a low-frequency bloom every ~10.5s
+          // — the core briefly intensifies ~15% then settles, like
+          // receiving a thought.
+          let corePulse = 1;
+          if (!reducedMotion && postConvergeSec > 0) {
+            const breath = 0.022 * Math.sin(postConvergeSec * 0.60)
+                         + 0.014 * Math.sin(postConvergeSec * 0.23 + 1.7)
+                         + 0.009 * Math.sin(postConvergeSec * 1.07 + 4.1);
+            const bloomWave = Math.sin(postConvergeSec * (Math.PI * 2 / 10.5) + 2.6);
+            const bloom = 0.15 * Math.pow(Math.max(0, bloomWave), 6);
+            corePulse = 1 + breath + bloom;
+          }
+          const coreRadius = CORE_R * coreScale * corePulse;
+          // Broad Milky-Way halo the whole disc glows within — very faint,
+          // half the field wide. This is the "milkiness."
+          const haloR = maxR * 0.5;
+          const halo = ctx.createRadialGradient(CX, CY, 0, CX, CY, haloR);
+          halo.addColorStop(0,   'rgba(232,220,196,' + (0.10  * coreEase * coreGlow) + ')');
+          halo.addColorStop(0.5, 'rgba(140,150,190,' + (0.045 * coreEase * coreGlow) + ')');
+          halo.addColorStop(1,   'rgba(0,0,0,0)');
+          ctx.fillStyle = halo;
+          ctx.fillRect(CX - haloR, CY - haloR, haloR * 2, haloR * 2);
+          // Pass 2.5A.1 — chromatic singularity: cream-white → gold-white →
+          // warm gold → cool blue rim. Not just bright white.
           const grad = ctx.createRadialGradient(CX, CY, 0, CX, CY, coreRadius);
-          grad.addColorStop(0,    'rgba(255,248,224,' + (0.85 * coreEase) + ')');
-          grad.addColorStop(0.25, 'rgba(244,229,200,' + (0.55 * coreEase) + ')');
-          grad.addColorStop(0.6,  'rgba(212,169,95,'  + (0.22 * coreEase) + ')');
+          grad.addColorStop(0,    'rgba(255,250,235,' + (0.88 * coreEase * coreGlow) + ')');
+          grad.addColorStop(0.18, 'rgba(248,232,196,' + (0.60 * coreEase * coreGlow) + ')');
+          grad.addColorStop(0.42, 'rgba(214,169,78,'  + (0.30 * coreEase * coreGlow) + ')');
+          grad.addColorStop(0.72, 'rgba(100,135,196,' + (0.10 * coreEase * coreGlow) + ')');
           grad.addColorStop(1,    'rgba(0,0,0,0)');
           ctx.fillStyle = grad;
           ctx.fillRect(CX - coreRadius, CY - coreRadius, coreRadius * 2, coreRadius * 2);
@@ -758,13 +825,31 @@
           if (skipAnimation) {
             x = homeX; y = homeY;
             alphaMul = 1;
-          } else {
-            const localElapsed = elapsedMs - p.particleDelay;
-            const t = localElapsed <= 0 ? 0 : Math.min(1, localElapsed / p.particleDuration);
+          } else if (p.loose) {
+            // The still-scattered: hold their ground through the collapse,
+            // then drift into the forming disc slowly — the last arrive
+            // well after the flag. Nothing disappears; some just take longer.
+            const t = Math.max(0, Math.min(1, (elapsedMs - HOLD_END - p.radialPosition * 8000) / 26000));
             const eased = easeInOutCubic(t);
             x = p.sx + (homeX - p.sx) * eased;
             y = p.sy + (homeY - p.sy) * eased;
             alphaMul = 0.55 + 0.45 * eased;
+          } else if (elapsedMs < HOLD_END) {
+            // Most catatons: fall slowly to the single point, dissolving
+            // into its light as they merge — many moments becoming one idea.
+            const t = Math.max(0, Math.min(1, (elapsedMs - p.particleDelay) / p.particleDuration));
+            const eased = easeInOutCubic(t);
+            x = p.sx + (CX - p.sx) * eased;
+            y = p.sy + (CY - p.sy) * eased;
+            alphaMul = (0.55 + 0.45 * t) * (1 - 0.9 * eased);
+          } else {
+            // The disc blooms outward from the point, born rotating —
+            // inner catatons first, the arms unfurling to the rim.
+            const t = Math.max(0, Math.min(1, (elapsedMs - HOLD_END - p.radialPosition * 6000) / 9000));
+            const eased = easeInOutCubic(t);
+            x = CX + (homeX - CX) * eased;
+            y = CY + (homeY - CY) * eased;
+            alphaMul = 0.15 + 0.85 * eased;
           }
 
           const twinkle = (1 - twAmp) + twAmp * Math.sin(elapsedSec * p.twinkleSpeed + p.twinklePhase);
@@ -786,12 +871,30 @@
 
         // Bright pinpoint at the very center, gently twinkling.
         if (coreEase > 0) {
-          const coreSize = 2.5 + coreEase * 2;
+          const coreSize = 3 + coreEase * 2.5;
           const pinTwinkle = reducedMotion ? 1 : 0.85 + 0.15 * Math.sin(elapsedSec * 1.3);
           ctx.beginPath();
           ctx.arc(CX, CY, coreSize, 0, Math.PI * 2);
-          ctx.fillStyle = 'rgba(255,248,224,' + (coreEase * pinTwinkle) + ')';
+          ctx.fillStyle = 'rgba(255,248,224,' + (coreEase * pinTwinkle * (0.55 + 0.45 * coreGlow)) + ')';
           ctx.fill();
+        }
+
+        // Pass 2.5A.1 — inner spiral: 12 tiny cool catatons forever falling
+        // into the singularity and dissolving. The core consumes catatons —
+        // moments of silence singling down to one idea. Skipped entirely
+        // under prefers-reduced-motion (it is pure motion).
+        if (coreEase > 0 && !reducedMotion) {
+          for (let i = 0; i < 12; i++) {
+            const cycle = 7 + (i % 4) * 1.35;                       // staggered fall times
+            const prog = ((elapsedSec / cycle) + i / 12) % 1;       // 0 → 1, forever
+            const rr = (1 - prog) * (CORE_R * 0.85) * coreEase;     // rim → center
+            const ang = i * 2.399 + prog * 5.5 + globalRotation * 3; // golden-angle starts, ~0.9 turn in
+            const fade = Math.sin(prog * Math.PI);                  // born faint, bright mid-fall, dissolve
+            ctx.beginPath();
+            ctx.arc(CX + Math.cos(ang) * rr, CY + Math.sin(ang) * rr, 0.9, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(190,205,235,' + (0.5 * fade * coreEase) + ')';
+            ctx.fill();
+          }
         }
       }
 
