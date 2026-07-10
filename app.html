@@ -13,6 +13,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Mono:ital,wght@0,300;0,400;1,300&family=Outfit:wght@200;300;400&display=swap" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?onload=onTurnstileReady" async defer></script>
 
   <style>
     /* ─────────────────────────────────────────────────────────────
@@ -905,6 +906,7 @@
         <p class="auth-toggle">Already have an account? <button class="auth-btn-link-inline" id="authShowSignInBtn">Sign in</button></p>
       </div>
 
+      <div id="authTurnstile" style="margin-top:0.9rem; display:flex; justify-content:center;"></div>
       <div class="auth-message" id="authMessage" style="display:none"></div>
     </div>
   </div>
@@ -1269,6 +1271,31 @@
   // ─── AUTH HANDLERS (Pass 2.0.4) ───
   const REDIRECT_URL = 'https://catatonica.app/app.html';
 
+  // ─── TURNSTILE (Pass 2.6) ───
+  // interaction-only: invisible unless Cloudflare decides a challenge is needed.
+  // Tokens are single-use — reset after every auth attempt. If the script fails
+  // to load, captchaOptions() returns {} and auth proceeds (Supabase only
+  // enforces tokens once CAPTCHA is switched on in its dashboard).
+  const TURNSTILE_SITEKEY = '0x4AAAAAADzPcphoZSk0eML9';
+  let turnstileWidgetId = null;
+  window.onTurnstileReady = () => {
+    const el = document.getElementById('authTurnstile');
+    if (!el || turnstileWidgetId !== null) return;
+    turnstileWidgetId = turnstile.render(el, {
+      sitekey: TURNSTILE_SITEKEY,
+      theme: 'dark',
+      appearance: 'interaction-only'
+    });
+  };
+  function captchaOptions() {
+    const token = (window.turnstile && turnstileWidgetId !== null)
+      ? turnstile.getResponse(turnstileWidgetId) : '';
+    return token ? { captchaToken: token } : {};
+  }
+  function captchaReset() {
+    if (window.turnstile && turnstileWidgetId !== null) turnstile.reset(turnstileWidgetId);
+  }
+
   async function handleSignIn() {
     const email = document.getElementById('authEmail').value.trim();
     const password = document.getElementById('authPassword').value;
@@ -1279,7 +1306,8 @@
     const orig = btn.textContent;
     btn.textContent = 'One moment…';
 
-    const { error } = await sb.auth.signInWithPassword({ email, password });
+    const { error } = await sb.auth.signInWithPassword({ email, password, options: captchaOptions() });
+    captchaReset();
     btn.disabled = false;
     btn.textContent = orig;
     if (error) return showAuthMessage(error.message, 'error');
@@ -1299,8 +1327,9 @@
 
     const { error } = await sb.auth.signUp({
       email, password,
-      options: { emailRedirectTo: REDIRECT_URL }
+      options: { emailRedirectTo: REDIRECT_URL, ...captchaOptions() }
     });
+    captchaReset();
     btn.disabled = false;
     btn.textContent = orig;
     if (error) return showAuthMessage(error.message, 'error');
@@ -1313,8 +1342,9 @@
 
     const { error } = await sb.auth.signInWithOtp({
       email,
-      options: { emailRedirectTo: REDIRECT_URL }
+      options: { emailRedirectTo: REDIRECT_URL, ...captchaOptions() }
     });
+    captchaReset();
     if (error) return showAuthMessage(error.message, 'error');
     showAuthMessage('Check your email for the link.', 'success');
   }
@@ -1324,8 +1354,10 @@
     if (!email) return showAuthMessage('Enter your email first.', 'error');
 
     const { error } = await sb.auth.resetPasswordForEmail(email, {
-      redirectTo: REDIRECT_URL
+      redirectTo: REDIRECT_URL,
+      ...captchaOptions()
     });
+    captchaReset();
     if (error) return showAuthMessage(error.message, 'error');
     showAuthMessage('Check your email for a password reset link.', 'success');
   }

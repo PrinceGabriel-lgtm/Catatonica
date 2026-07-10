@@ -227,7 +227,10 @@
       height: 100%;
       display: block;
     }
-    nav, .hero, .doctrine, .how, .catatons-section, .obsolescence, .pricing, .waitlist, footer, .divider {
+    /* nav is intentionally absent here — it must keep position:fixed from its
+       own rule above; adding it to this list once overrode that and made the
+       nav scroll away with the hero (Pass 2.5A.3 fix). */
+    .hero, .doctrine, .how, .catatons-section, .obsolescence, .pricing, .waitlist, footer, .divider {
       position: relative;
       z-index: 1;
     }
