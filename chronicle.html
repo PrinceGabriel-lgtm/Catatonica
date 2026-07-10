@@ -26,11 +26,12 @@
        — Immanuel Gabriel, April 24 2026, Pass 2 commit
        ───────────────────────────────────────────────────────────── */
     :root {
-      --void: #0d1b2a;
-      --void-deep: #050f1e;
-      --deep: #0a1624;
-      --surface: #0a1624;
-      --surface2: #132235;
+      /* Pass 2.5A.4 — palette continuity with the landing galaxy. */
+      --void: #0b0e1e;        /* was #0d1b2a */
+      --void-deep: #050512;   /* was #050f1e */
+      --deep: #0d0c1f;        /* was #0a1624 */
+      --surface: #0e0d20;     /* was #0a1624 */
+      --surface2: #171531;    /* was #132235 */
       --border: rgba(255,255,255,0.05);
       --border-hover: rgba(255,255,255,0.1);
       --text-primary: #d4c5a1;
@@ -61,7 +62,8 @@
     html { scroll-behavior: smooth; }
 
     body {
-      background: var(--void);
+      /* Same deep-space field as the landing — one universe, one language. */
+      background: radial-gradient(ellipse at center, #0c0a1f 0%, #060512 50%, #02010a 100%) fixed var(--void-deep);
       color: var(--text-primary);
       font-family: 'Outfit', sans-serif;
       font-weight: 300;

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#0d1b2a" />
+  <meta name="theme-color" content="#060512" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   <meta name="apple-mobile-web-app-title" content="Catatonica" />
@@ -34,18 +34,22 @@
        — Immanuel Gabriel, April 24 2026, Pass 2 commit
        ───────────────────────────────────────────────────────────── */
     :root {
-      --void: #0d1b2a;
-      --void-deep: #050f1e;
-      --deep: #0a1624;
-      --surface: #0a1624;
-      --surface2: #132235;
+      /* Pass 2.5A.4 — dashboard palette continuity. The dashboard lives in
+         the same deep space as the landing galaxy: navy-violet surfaces,
+         starlight-blue accents. Old values (2014-productivity blue) kept in
+         comments for one pass, then delete. */
+      --void: #0b0e1e;        /* was #0d1b2a */
+      --void-deep: #050512;   /* was #050f1e */
+      --deep: #0d0c1f;        /* was #0a1624 */
+      --surface: #0e0d20;     /* was #0a1624 */
+      --surface2: #171531;    /* was #132235 */
       --border: rgba(255,255,255,0.06);
       --border-hover: rgba(255,255,255,0.12);
       --text-primary: #d4c5a1;
       --text-muted: rgba(212,197,161,0.7);
       --text-dim: rgba(212,197,161,0.55);
       --accent: #c8bfad;
-      --accent-cold: #5eb8cc;
+      --accent-cold: #7aa0d8; /* was teal #5eb8cc — now landing starlight blue */
       --gold: #d4a830;
       --gold-dim: rgba(196,169,109,0.15);
       --danger: rgba(200,80,80,0.7);
@@ -70,7 +74,8 @@
     html { scroll-behavior: smooth; }
 
     body {
-      background: var(--void);
+      /* Same deep-space field as the landing — one universe, one language. */
+      background: radial-gradient(ellipse at center, #0c0a1f 0%, #060512 50%, #02010a 100%) fixed var(--void-deep);
       color: var(--text-primary);
       font-family: 'Outfit', sans-serif;
       font-weight: 300;
@@ -640,6 +645,11 @@
       width: 100vw; height: 100vh;
       z-index: 0;
       pointer-events: none;
+      /* Pass 2.5A.4 — void-ambient.js paints its own #0d1b2a base (locked
+         file); blend it into the deep-space gradient behind it and nudge
+         the hue from teal-blue toward the landing's violet-navy. */
+      opacity: 0.85;
+      filter: saturate(0.9) hue-rotate(10deg);
     }
 
     /* ─── Mobile spacing audit (Pass 2): tight viewports ─── */
