@@ -638,6 +638,20 @@
       .cat-loader-dot { animation: none; opacity: 0.7; }
     }
 
+    /* ─── Pass 2.7 — the app speaks the landing's glass language ───
+       Cards are regions within the Field, not opaque stock. A11y floor:
+       visible keyboard focus everywhere. */
+    .sit-card, .add-inner, .tier-bar {
+      background: rgba(14, 13, 32, 0.6);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+    }
+    .sit-card:hover { background: rgba(23, 21, 49, 0.66); }
+    :focus-visible {
+      outline: 1px solid rgba(122, 160, 216, 0.55);
+      outline-offset: 2px;
+    }
+
     /* ─── Canvas layer: full viewport Field, behind content ─── */
     #voidAmbientCanvas {
       position: fixed;
@@ -942,7 +956,7 @@
       </div>
 
       <div id="authTurnstile" style="margin-top:0.9rem; display:flex; justify-content:center;"></div>
-      <div class="auth-message" id="authMessage" style="display:none"></div>
+      <div class="auth-message" id="authMessage" role="alert" aria-live="assertive" style="display:none"></div>
     </div>
   </div>
 
@@ -1100,7 +1114,7 @@
   </div>
 
   <!-- ─── TOAST ─── -->
-  <div class="toast" id="toast"></div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
   <!-- ─── UPGRADE MODAL ─── -->
   <div class="overlay" id="upgradeOverlay">
@@ -1525,11 +1539,25 @@
   async function loadData() {
     const uid = currentUser.id;
 
-    const [profRes, sitRes, arcRes] = await Promise.all([
-      sb.from('profiles').select('*').eq('id', uid).single(),
-      sb.from('situations').select('*').eq('user_id', uid).order('created_at', { ascending: true }),
-      sb.from('archive').select('*').eq('user_id', uid).order('completed_at', { ascending: false }),
-    ]);
+    // Production rule: never render zeros over a failed load — a practitioner
+    // seeing "0 catatons" because of a network blip is a broken promise.
+    let profRes, sitRes, arcRes;
+    try {
+      [profRes, sitRes, arcRes] = await Promise.all([
+        sb.from('profiles').select('*').eq('id', uid).single(),
+        sb.from('situations').select('*').eq('user_id', uid).order('created_at', { ascending: true }),
+        sb.from('archive').select('*').eq('user_id', uid).order('completed_at', { ascending: false }),
+      ]);
+    } catch (netErr) {
+      console.error('loadData network failure', netErr);
+      dataLoadFailed();
+      return;
+    }
+    if (profRes.error || sitRes.error || arcRes.error) {
+      console.error('loadData query failure', profRes.error || sitRes.error || arcRes.error);
+      dataLoadFailed();
+      return;
+    }
 
     profile = profRes.data || {};
     situations = sitRes.data || [];
@@ -1541,7 +1569,24 @@
     }
 
     render();
-    checkSessionReturn();
+    checkSessionReturn().catch(function(err) {
+      console.error('session return failed', err);
+      toast('Your last session is saved and will be counted next visit.');
+    });
+  }
+
+  function dataLoadFailed() {
+    const list = document.getElementById('sitList');
+    if (list) {
+      list.innerHTML = `<div class="empty">
+        <p class="empty-title">The void did not answer.</p>
+        <p class="empty-sub">Your catatons are safe — this is only a connection problem.</p>
+        <button class="s-btn" id="retryLoadBtn" style="margin-top:1.2rem">Try again</button>
+      </div>`;
+      const btn = document.getElementById('retryLoadBtn');
+      if (btn) btn.addEventListener('click', function() { loadData(); });
+    }
+    toast('Could not load your practice. Check your connection.');
   }
 
   // ─── RENDER ───
@@ -1676,7 +1721,12 @@
   // ─── DELETE SITUATION ───
   async function deleteSituation(id) {
     if (!confirm('Remove this situation? This cannot be undone.')) return;
-    await sb.from('situations').delete().eq('id', id);
+    const { error } = await sb.from('situations').delete().eq('id', id);
+    if (error) {
+      console.error('delete failed', error);
+      toast('Could not remove it — the void did not answer. Try again.');
+      return;
+    }
     situations = situations.filter(s => s.id !== id);
     renderSituations();
     toast('Situation removed.');
@@ -1776,8 +1826,13 @@
       setTimeout(() => {
         document.getElementById('obsRelease').textContent = msgs[Math.floor(Math.random()*msgs.length)];
         document.getElementById('obsRelease').classList.add('show');
-        // Clear manifesto in DB
-        sb.from('situations').update({ manifesto: '' }).eq('id', activeSitId);
+        // Clear manifesto in DB — checked, not fire-and-forget.
+        sb.from('situations').update({ manifesto: '' }).eq('id', activeSitId).then(function(res) {
+          if (res.error) {
+            console.error('release write failed', res.error);
+            toast('The release could not be recorded — check your connection.');
+          }
+        });
         const sit = situations.find(s => s.id === activeSitId);
         if (sit) sit.manifesto = '';
       }, 1400);
@@ -1786,8 +1841,13 @@
   });
 
   async function saveManifesto() {
-    const text = document.getElementById('obsText').value;
-    await sb.from('situations').update({ manifesto: text }).eq('id', activeSitId);
+    const text = document.getElementById('obsText').value.slice(0, 4000);
+    const { error } = await sb.from('situations').update({ manifesto: text }).eq('id', activeSitId);
+    if (error) {
+      console.error('manifesto save failed', error);
+      toast('Could not save — the void did not answer. Your words are still here.');
+      return;
+    }
     const sit = situations.find(s => s.id === activeSitId);
     if (sit) sit.manifesto = text;
   }
@@ -1833,8 +1893,13 @@
 
     if (error) { toast('Error archiving situation.'); return; }
 
-    // Delete from active
-    await sb.from('situations').delete().eq('id', activeSitId);
+    // Delete from active — archived copy already exists; if this fails the
+    // situation reappears next load alongside its archive entry, so say so.
+    const delRes = await sb.from('situations').delete().eq('id', activeSitId);
+    if (delRes.error) {
+      console.error('post-archive delete failed', delRes.error);
+      toast('Archived — but the active copy could not be cleared. Refresh to reconcile.');
+    }
     situations = situations.filter(s => s.id !== activeSitId);
 
     // Update archive list
@@ -1855,48 +1920,62 @@
 
   // ─── SESSION RETURN — receive catatons from session.html ───
   async function checkSessionReturn() {
+    // NO-LOSS PROTOCOL: the result stays in sessionStorage until the database
+    // writes SUCCEED. Earned catatons are never discarded on a network
+    // failure or rate-limit — they are retried on the next load.
     const result = sessionStorage.getItem('cat_session_result');
     if (!result) return;
-    sessionStorage.removeItem('cat_session_result');
 
     let parsed;
-    try { parsed = JSON.parse(result); } catch { return; }
+    try { parsed = JSON.parse(result); }
+    catch { sessionStorage.removeItem('cat_session_result'); return; } // unparseable: drop
     const { sitId, catatonsEarned } = parsed;
 
     // Sanity check — prevent tampered values
-    if (!sitId || typeof catatonsEarned !== 'number') return;
+    if (!sitId || typeof catatonsEarned !== 'number') {
+      sessionStorage.removeItem('cat_session_result');
+      return;
+    }
     const safeCatatons = Math.min(Math.max(0, Math.round(catatonsEarned)), 60); // max 60 per session
 
     const sit = situations.find(s => s.id === sitId);
-    if (!sit) return;
+    if (!sit) { sessionStorage.removeItem('cat_session_result'); return; }
 
-    // Rate limit: no more than 1 session result processed per 60 seconds client-side
+    // Rate limit: hold the result, don't destroy it.
     const lastSession = parseInt(localStorage.getItem('cat_last_session') || '0');
     const now = Date.now();
     if (now - lastSession < 60000) {
-      toast('Slow down. Let the silence settle.');
+      toast('Let the silence settle — your catatons will be counted shortly.');
       return;
     }
-    localStorage.setItem('cat_last_session', String(now));
 
-    // Update in Supabase
+    // Update in Supabase — every write checked.
     const newCatatons = sit.catatons + safeCatatons;
     const newSessions = sit.sessions + 1;
     const newTotal = (profile.total_catatons || 0) + safeCatatons;
 
-    await Promise.all([
+    const [upSit, upProf, insLog] = await Promise.all([
       sb.from('situations').update({ catatons: newCatatons, sessions: newSessions }).eq('id', sitId),
       sb.from('profiles').update({ total_catatons: newTotal }).eq('id', currentUser.id),
       sb.from('sessions_log').insert({
         user_id: currentUser.id,
         situation_id: sitId,
         situation_name: sit.name,
-        mode: sessMode,
-        duration_minutes: sessDuration,
+        mode: parsed.mode || sessMode || 'silence',
+        duration_minutes: parsed.duration || sessDuration || null,
         catatons_earned: safeCatatons,
         completed: true,
       }),
     ]);
+    if (upSit.error || upProf.error || insLog.error) {
+      console.error('session write failed', upSit.error || upProf.error || insLog.error);
+      toast('The void did not answer — your session is safe and will be counted next visit.');
+      return; // result stays in sessionStorage; retried on next load
+    }
+
+    // Success: only now is the result consumed.
+    sessionStorage.removeItem('cat_session_result');
+    localStorage.setItem('cat_last_session', String(now));
 
     sit.catatons = newCatatons;
     sit.sessions = newSessions;
@@ -2007,7 +2086,15 @@
     }
   }
 
-  boot();
+  boot().catch(function(err) {
+    // A network failure during getSession must never strand the loader.
+    console.error('boot failed', err);
+    hideLoading();
+    setView('auth');
+    setTimeout(function() {
+      showAuthMessage('Could not reach the void. Check your connection and refresh.', 'error');
+    }, 350);
+  });
   </script>
 
   <script src="/void-ambient.js"></script>
