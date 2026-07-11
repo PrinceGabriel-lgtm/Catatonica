@@ -1,4 +1,4 @@
-const CACHE = 'catatonica-v8';
+const CACHE = 'catatonica-v9';
 const OFFLINE_ASSETS = [
   '/app.html',
   '/session.html',

@@ -812,6 +812,35 @@
       min-height: 44px;
     }
     .auth-btn-link:hover { color: var(--accent-cold); }
+    /* ─── Pass 2.6 Step 3 — Google sign-in ───
+       Quiet and gold-bordered, matching .nav-enter — not a loud white
+       Google slab. It sits above the forms: one OAuth action serves both
+       sign-in and sign-up (Supabase creates the account on first use). */
+    .auth-divider {
+      display: flex; align-items: center; gap: 0.9rem;
+      margin: 1.4rem 0 1.1rem;
+      font-family: 'DM Mono', monospace;
+      font-size: var(--text-micro); letter-spacing: 0.15em;
+      text-transform: uppercase; color: var(--text-dim);
+    }
+    .auth-divider::before, .auth-divider::after {
+      content: ''; flex: 1; height: 1px; background: var(--border);
+    }
+    .auth-btn-google {
+      width: 100%; padding: 0.9rem;
+      background: transparent;
+      border: 1px solid rgba(196,164,85,0.3);
+      color: var(--gold); cursor: pointer;
+      font-family: 'DM Mono', monospace;
+      font-size: var(--text-micro); letter-spacing: 0.15em;
+      text-transform: uppercase;
+      display: flex; align-items: center; justify-content: center; gap: 0.7rem;
+      transition: background 0.3s ease, border-color 0.3s ease;
+      min-height: 44px;
+    }
+    .auth-btn-google:hover { background: var(--gold-dim); border-color: rgba(196,164,85,0.5); }
+    .auth-btn-google:disabled { opacity: 0.4; cursor: not-allowed; }
+    .auth-btn-google svg { flex-shrink: 0; }
     .auth-btn-link-inline {
       background: none; border: none; cursor: pointer;
       font-family: 'DM Mono', monospace;
@@ -926,6 +955,17 @@
     <div class="auth-panel">
       <h1 class="auth-title">Enter the <em>void.</em></h1>
       <p class="auth-sub">Sign in to begin accumulating Catatons across all your devices.</p>
+
+      <button class="auth-btn-google" id="authGoogleBtn" type="button">
+        <svg width="16" height="16" viewBox="0 0 48 48" aria-hidden="true">
+          <path fill="#EA4335" d="M24 9.5c3.4 0 6.4 1.2 8.8 3.5l6.6-6.6C35.3 2.5 30 0 24 0 14.6 0 6.5 5.4 2.5 13.2l7.7 6C12.1 13 17.6 9.5 24 9.5z"/>
+          <path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.7c-.6 3-2.3 5.5-4.9 7.2l7.5 5.8c4.4-4.1 7.2-10.1 7.2-17.5z"/>
+          <path fill="#FBBC05" d="M10.2 19.2c-.6 1.8-1 3.7-1 5.8s.4 4 1 5.8l-7.7 6C1 33.1 0 28.7 0 24s1-9.1 2.5-12.8l7.7 6z"/>
+          <path fill="#34A853" d="M24 48c6 0 11.3-2 15-5.4l-7.5-5.8c-2 1.4-4.6 2.2-7.5 2.2-6.4 0-11.9-3.5-13.8-8.5l-7.7 6C6.5 42.6 14.6 48 24 48z"/>
+        </svg>
+        Continue with Google
+      </button>
+      <div class="auth-divider">or</div>
 
       <div class="auth-form" id="authFormSignIn">
         <label class="auth-label" for="authEmail">Email</label>
@@ -1426,6 +1466,27 @@
     showAuthMessage('Check your email for a password reset link.', 'success');
   }
 
+  async function handleGoogleSignIn() {
+    const btn = document.getElementById('authGoogleBtn');
+    btn.disabled = true;
+    const orig = btn.innerHTML;
+    btn.innerHTML = 'Redirecting…';
+    // signInWithOAuth navigates the browser to Google on success — it does
+    // not resolve normally. An error here means it failed BEFORE redirect
+    // (misconfigured provider, network down), so it is always safe to
+    // re-enable the button in that case.
+    const { error } = await sb.auth.signInWithOAuth({
+      provider: 'google',
+      options: { redirectTo: REDIRECT_URL }
+    });
+    if (error) {
+      btn.disabled = false;
+      btn.innerHTML = orig;
+      showAuthMessage(error.message, 'error');
+    }
+  }
+
+  document.getElementById('authGoogleBtn').addEventListener('click', handleGoogleSignIn);
   document.getElementById('authSignInBtn').addEventListener('click', handleSignIn);
   document.getElementById('authMagicLinkBtn').addEventListener('click', handleMagicLink);
   document.getElementById('authForgotBtn').addEventListener('click', handleForgotPassword);
