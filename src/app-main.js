@@ -7,6 +7,7 @@
   import { loadData } from './lib/data.js';
   import './views/dashboard.js';        // render + situation listeners
   import './views/overlays.js';         // modal listeners
+  import { VoidAmbient } from './engines/void-ambient.js';
 
   // ─── SERVICE WORKER ───
   if ('serviceWorker' in navigator) {
@@ -64,3 +65,30 @@
       showAuthMessage('Could not reach the void. Check your connection and refresh.', 'error');
     }, 350);
   });
+
+  // Initialize ambient void field for dashboard.
+  // Gated on window load: the engine measures canvas.offsetWidth at init,
+  // and module scripts can execute before external CSS is applied — the
+  // inline-<style> original never had that race.
+  function startAmbient() {
+    const cv = document.getElementById('voidAmbientCanvas');
+    VoidAmbient.init({
+      canvas: cv,
+      density: 'medium',
+      temperature: 'warm',
+      catatons: 0,
+      responsive: true
+    });
+    VoidAmbient.start();
+    // If init measured before layout settled (canvas bitmap left at 0),
+    // re-trigger the engine's own resize path until it sticks.
+    if (cv && cv.width === 0) {
+      const retry = setInterval(() => {
+        if (cv.offsetWidth > 0) window.dispatchEvent(new Event('resize'));
+        if (cv.width > 0) clearInterval(retry);
+      }, 200);
+      setTimeout(() => clearInterval(retry), 10000);
+    }
+  }
+  if (document.readyState === 'complete') startAmbient();
+  else window.addEventListener('load', startAmbient);

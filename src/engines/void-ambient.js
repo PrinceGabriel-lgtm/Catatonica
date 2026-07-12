@@ -295,3 +295,5 @@ const VoidAmbient = (function() {
     }
   };
 })();
+
+  export { VoidAmbient };

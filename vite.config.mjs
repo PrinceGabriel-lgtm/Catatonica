@@ -8,21 +8,19 @@
 import { defineConfig } from 'vite';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { copyFileSync } from 'node:fs';
+import { copyFileSync, mkdirSync } from 'node:fs';
 
 const root = dirname(fileURLToPath(import.meta.url));
 
 // Deployed files Vite won't see as graph assets: copied verbatim.
 // sw.js caches /app.html and /session.html by literal path — filenames
 // in dist must never change.
-// void-sounds.js stays in the repo (Pass 3 ports it to /engines) but is
-// referenced by no page, so it does not ship.
+// Engines live in src/engines and are bundled as modules since Day 3.
 const PASSTHROUGH = [
   'sw.js',
   'manifest.json',
   'icon-192.png',
   'icon-512.png',
-  'void-ambient.js',
 ];
 
 export default defineConfig({
@@ -49,7 +47,8 @@ export default defineConfig({
   plugins: [
     {
       name: 'catatonica-passthrough',
-      closeBundle() {
+      writeBundle() {
+        mkdirSync(resolve(root, 'dist'), { recursive: true });
         for (const f of PASSTHROUGH) {
           copyFileSync(resolve(root, f), resolve(root, 'dist', f));
         }

@@ -1,3 +1,4 @@
+  import { VoidAmbient } from '../engines/void-ambient.js';
   // ─── VIEW STATE MACHINE (Pass 2.0.4) ───
   let currentView = null;
   const VALID_VIEWS = ['intro', 'auth', 'guest-session', 'dashboard', 'password-reset'];
