@@ -1,3 +1,5 @@
+  import { S } from './lib/state.js';
+
   // ─── SUPABASE ───
   const { createClient } = supabase;
   const sb = createClient(
@@ -13,16 +15,6 @@
     deep: 'https://buy.stripe.com/test_4gMbJ0fUZfqvcsvcDz4Rq00',   // $9/mo — Deep
     order: 'https://buy.stripe.com/test_bJe6oGcIN7Y3fEHfPL4Rq01',  // $29/mo — The Order
   };
-
-  // ─── STATE ───
-  let currentUser = null;
-  let situations = [];
-  let archive = [];
-  let profile = {};
-  let activeSitId = null;
-  let sessMode = 'silence';
-  let sessDuration = 10;
-  let obsMode = 'manifesto';
 
   // ─── CURSOR ───
   const cursorEl = document.getElementById('cursor');
@@ -316,7 +308,7 @@
     // Recovery token already authenticated the user; load data and route to dashboard
     const { data: { user } } = await sb.auth.getUser();
     if (user) {
-      currentUser = user;
+      S.currentUser = user;
       await loadData();
     }
     setView('dashboard');
@@ -356,7 +348,7 @@
     }
 
     if (event === 'SIGNED_IN' && session) {
-      currentUser = session.user;
+      S.currentUser = session.user;
       if (currentView !== 'dashboard' && currentView !== 'password-reset') {
         await loadData();
         setView('dashboard');
@@ -365,10 +357,10 @@
     }
 
     if (event === 'SIGNED_OUT') {
-      currentUser = null;
-      situations = [];
-      archive = [];
-      profile = {};
+      S.currentUser = null;
+      S.situations = [];
+      S.archive = [];
+      S.profile = {};
       setView('auth');
     }
   });
@@ -377,13 +369,13 @@
   document.getElementById('signOutBtn').addEventListener('click', async () => {
     await sb.auth.signOut();
     // The auth state listener handles the rest, but we route immediately for snappiness
-    currentUser = null; situations = []; archive = []; profile = {};
+    S.currentUser = null; S.situations = []; S.archive = []; S.profile = {};
     setView('auth');
   });
 
   // ─── LOAD DATA ───
   async function loadData() {
-    const uid = currentUser.id;
+    const uid = S.currentUser.id;
 
     // Production rule: never render zeros over a failed load — a practitioner
     // seeing "0 catatons" because of a network blip is a broken promise.
@@ -405,13 +397,13 @@
       return;
     }
 
-    profile = profRes.data || {};
-    situations = sitRes.data || [];
-    archive = arcRes.data || [];
+    S.profile = profRes.data || {};
+    S.situations = sitRes.data || [];
+    S.archive = arcRes.data || [];
 
     // Update ambient void with user's lifetime catatons for stage awareness
     if (typeof VoidAmbient !== 'undefined') {
-      VoidAmbient.setCatatons(profile.total_catatons || 0);
+      VoidAmbient.setCatatons(S.profile.total_catatons || 0);
     }
 
     render();
@@ -443,7 +435,7 @@
 
   function updateNav() {
     document.getElementById('totalCatons').textContent =
-      (profile.total_catatons || 0).toLocaleString();
+      (S.profile.total_catatons || 0).toLocaleString();
   }
 
   function renderSituations() {
@@ -453,11 +445,11 @@
 
     // Tier bar
     document.getElementById('tierText').textContent =
-      profile.is_premium
-        ? `${profile.tier === 'order' ? 'The Order' : 'Deep'} — unlimited everything`
+      S.profile.is_premium
+        ? `${S.profile.tier === 'order' ? 'The Order' : 'Deep'} — unlimited everything`
         : `Free — unlimited situations · sessions up to 10 min`;
 
-    if (situations.length === 0) {
+    if (S.situations.length === 0) {
       lbl.style.display = 'none';
       list.innerHTML = `<div class="empty">
         <p class="empty-title">The void is clear.</p>
@@ -467,7 +459,7 @@
     }
 
     lbl.style.display = 'block';
-    situations.forEach((sit, i) => {
+    S.situations.forEach((sit, i) => {
       const progress = Math.min((sit.sessions / THRESHOLD) * 100, 100);
       const atThreshold = sit.sessions >= THRESHOLD;
 
@@ -551,13 +543,13 @@
     // No situation limit — free users can name everything they carry
 
     const { data, error } = await sb.from('situations').insert({
-      user_id: currentUser.id,
+      user_id: S.currentUser.id,
       name: safeName,
     }).select().single();
 
     if (error) { toast('Error adding situation.'); return; }
 
-    situations.push(data);
+    S.situations.push(data);
     newInput.value = '';
     enterBtn.classList.remove('show');
     renderSituations();
@@ -573,15 +565,15 @@
       toast('Could not remove it — the void did not answer. Try again.');
       return;
     }
-    situations = situations.filter(s => s.id !== id);
+    S.situations = S.situations.filter(s => s.id !== id);
     renderSituations();
     toast('Situation removed.');
   }
 
   // ─── SESSION MODAL ───
   function openSessionModal(id) {
-    activeSitId = id;
-    const sit = situations.find(s => s.id === id);
+    S.activeSitId = id;
+    const sit = S.situations.find(s => s.id === id);
     document.getElementById('sessSitName').textContent = `"${sit.name}"`;
     openOverlay('sessionOverlay');
   }
@@ -591,7 +583,7 @@
       document.getElementById('sessionOverlay').querySelectorAll('.mode-btn')
         .forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
-      sessMode = btn.dataset.mode;
+      S.sessMode = btn.dataset.mode;
     });
   });
 
@@ -599,7 +591,7 @@
     btn.addEventListener('click', () => {
       const min = parseInt(btn.dataset.min);
       // Gate longer sessions for free users
-      if (!profile.is_premium && min > FREE_SESSION_MAX) {
+      if (!S.profile.is_premium && min > FREE_SESSION_MAX) {
         closeOverlay('sessionOverlay');
         openUpgradeModal('session');
         return;
@@ -607,26 +599,26 @@
       document.getElementById('sessionOverlay').querySelectorAll('.dur-btn')
         .forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
-      sessDuration = min;
+      S.sessDuration = min;
     });
   });
 
   document.getElementById('startSessBtn').addEventListener('click', () => {
     closeOverlay('sessionOverlay');
     const params = new URLSearchParams({
-      sitId: activeSitId || '',
-      mode: sessMode,
-      duration: sessDuration,
-      userId: currentUser.id,
+      sitId: S.activeSitId || '',
+      mode: S.sessMode,
+      duration: S.sessDuration,
+      userId: S.currentUser.id,
     });
     window.location.href = 'session.html?' + params.toString();
   });
 
   // ─── OBS MODAL ───
   function openObsModal(id, mode) {
-    activeSitId = id;
-    obsMode = mode;
-    const sit = situations.find(s => s.id === id);
+    S.activeSitId = id;
+    S.obsMode = mode;
+    const sit = S.situations.find(s => s.id === id);
     document.getElementById('obsSitName').textContent = `"${sit.name}"`;
     document.getElementById('obsText').value = sit.manifesto || '';
     document.getElementById('obsText').classList.remove('dissolving');
@@ -654,11 +646,11 @@
   document.getElementById('obsSessionBtn').addEventListener('click', async () => {
     await saveManifesto();
     closeOverlay('obsOverlay');
-    openSessionModal(activeSitId);
+    openSessionModal(S.activeSitId);
   });
 
   document.getElementById('obsActionBtn').addEventListener('click', async () => {
-    if (obsMode === 'manifesto') {
+    if (S.obsMode === 'manifesto') {
       await saveManifesto();
       document.getElementById('obsActionBtn').textContent = 'Saved.';
       setTimeout(() => closeOverlay('obsOverlay'), 800);
@@ -673,13 +665,13 @@
         document.getElementById('obsRelease').textContent = msgs[Math.floor(Math.random()*msgs.length)];
         document.getElementById('obsRelease').classList.add('show');
         // Clear manifesto in DB — checked, not fire-and-forget.
-        sb.from('situations').update({ manifesto: '' }).eq('id', activeSitId).then(function(res) {
+        sb.from('situations').update({ manifesto: '' }).eq('id', S.activeSitId).then(function(res) {
           if (res.error) {
             console.error('release write failed', res.error);
             toast('The release could not be recorded — check your connection.');
           }
         });
-        const sit = situations.find(s => s.id === activeSitId);
+        const sit = S.situations.find(s => s.id === S.activeSitId);
         if (sit) sit.manifesto = '';
       }, 1400);
       setTimeout(() => closeOverlay('obsOverlay'), 3200);
@@ -688,20 +680,20 @@
 
   async function saveManifesto() {
     const text = document.getElementById('obsText').value.slice(0, 4000);
-    const { error } = await sb.from('situations').update({ manifesto: text }).eq('id', activeSitId);
+    const { error } = await sb.from('situations').update({ manifesto: text }).eq('id', S.activeSitId);
     if (error) {
       console.error('manifesto save failed', error);
       toast('Could not save — the void did not answer. Your words are still here.');
       return;
     }
-    const sit = situations.find(s => s.id === activeSitId);
+    const sit = S.situations.find(s => s.id === S.activeSitId);
     if (sit) sit.manifesto = text;
   }
 
   // ─── MASTERY MODAL ───
   function openMasteryModal(id) {
-    activeSitId = id;
-    const sit = situations.find(s => s.id === id);
+    S.activeSitId = id;
+    const sit = S.situations.find(s => s.id === id);
     document.getElementById('masteryNum').textContent = sit.catatons;
     document.getElementById('masteryText').value = '';
     document.getElementById('masteryRelease').classList.remove('show');
@@ -719,7 +711,7 @@
   document.getElementById('notYetBtn').addEventListener('click', () => closeOverlay('masteryOverlay'));
 
   document.getElementById('declareBtn').addEventListener('click', async () => {
-    const sit = situations.find(s => s.id === activeSitId);
+    const sit = S.situations.find(s => s.id === S.activeSitId);
     if (!sit) return;
 
     const genesisRaw = document.getElementById('masteryText').value.trim();
@@ -728,7 +720,7 @@
 
     // Move to archive
     const { error } = await sb.from('archive').insert({
-      user_id: currentUser.id,
+      user_id: S.currentUser.id,
       name: sit.name,
       sessions: sit.sessions,
       catatons: sit.catatons,
@@ -741,15 +733,15 @@
 
     // Delete from active — archived copy already exists; if this fails the
     // situation reappears next load alongside its archive entry, so say so.
-    const delRes = await sb.from('situations').delete().eq('id', activeSitId);
+    const delRes = await sb.from('situations').delete().eq('id', S.activeSitId);
     if (delRes.error) {
       console.error('post-archive delete failed', delRes.error);
       toast('Archived — but the active copy could not be cleared. Refresh to reconcile.');
     }
-    situations = situations.filter(s => s.id !== activeSitId);
+    S.situations = S.situations.filter(s => s.id !== S.activeSitId);
 
     // Update archive list
-    archive.unshift({ ...sit, genesis, completed_at: new Date().toISOString() });
+    S.archive.unshift({ ...sit, genesis, completed_at: new Date().toISOString() });
 
     // Release animation
     document.getElementById('masteryActions').style.opacity = '0';
@@ -784,7 +776,7 @@
     }
     const safeCatatons = Math.min(Math.max(0, Math.round(catatonsEarned)), 60); // max 60 per session
 
-    const sit = situations.find(s => s.id === sitId);
+    const sit = S.situations.find(s => s.id === sitId);
     if (!sit) { sessionStorage.removeItem('cat_session_result'); return; }
 
     // Rate limit: hold the result, don't destroy it.
@@ -798,17 +790,17 @@
     // Update in Supabase — every write checked.
     const newCatatons = sit.catatons + safeCatatons;
     const newSessions = sit.sessions + 1;
-    const newTotal = (profile.total_catatons || 0) + safeCatatons;
+    const newTotal = (S.profile.total_catatons || 0) + safeCatatons;
 
     const [upSit, upProf, insLog] = await Promise.all([
       sb.from('situations').update({ catatons: newCatatons, sessions: newSessions }).eq('id', sitId),
-      sb.from('profiles').update({ total_catatons: newTotal }).eq('id', currentUser.id),
+      sb.from('profiles').update({ total_catatons: newTotal }).eq('id', S.currentUser.id),
       sb.from('sessions_log').insert({
-        user_id: currentUser.id,
+        user_id: S.currentUser.id,
         situation_id: sitId,
         situation_name: sit.name,
-        mode: parsed.mode || sessMode || 'silence',
-        duration_minutes: parsed.duration || sessDuration || null,
+        mode: parsed.mode || S.sessMode || 'silence',
+        duration_minutes: parsed.duration || S.sessDuration || null,
         catatons_earned: safeCatatons,
         completed: true,
       }),
@@ -825,7 +817,7 @@
 
     sit.catatons = newCatatons;
     sit.sessions = newSessions;
-    profile.total_catatons = newTotal;
+    S.profile.total_catatons = newTotal;
 
     // Update ambient void stage awareness
     if (typeof VoidAmbient !== 'undefined') {
@@ -924,7 +916,7 @@
 
     // Default routing
     if (session?.user) {
-      currentUser = session.user;
+      S.currentUser = session.user;
       await loadData();
       setView('dashboard');
     } else {
