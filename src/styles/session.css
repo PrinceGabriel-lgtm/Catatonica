@@ -380,14 +380,13 @@
       .escape-handle { min-width: 28px; }
     }
 
-    /* ─── Pass 2.8 — View Transitions (app ↔ chronicle ↔ session) ───
-       Cross-document morphs between the three practice surfaces; pages
-       must opt in on both ends, so index (which owns the Collapse) is
-       untouched. Progressive enhancement — unsupporting browsers keep
-       instant navigation. */
-    @view-transition { navigation: auto; }
-    @media (prefers-reduced-motion: reduce) {
-      ::view-transition-group(*),
-      ::view-transition-old(*),
-      ::view-transition-new(*) { animation: none !important; }
-    }
+    /* ─── Pass 2.8 — View Transitions deliberately OFF for session.html ───
+       Entering/leaving the void is a hard cut, not a webpage cross-fade —
+       cross-document VT snapshots the incoming page before its canvas has
+       painted, so the transition briefly showed a bright unstyled frame
+       and cross-faded the dashboard's violet-navy into session's old-blue
+       palette. Cross-document VT requires BOTH documents to opt in, so
+       omitting the rule here kills it on both the app→session and
+       session→app legs while app↔chronicle (still opted in) is unaffected.
+       Revisit once 2.5C gives session its own palette and a real entry
+       ritual — the right transition here is a Collapse cousin, not this. */
