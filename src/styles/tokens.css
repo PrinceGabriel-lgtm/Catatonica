@@ -1,0 +1,53 @@
+    /* ─────────────────────────────────────────────────────────────
+       THE ABYSS
+
+       A deep that represents the abyss we're too fearful to enter
+       and stare into. Not knowing it's our world, we seek to be
+       washed away by the shores, rather than calm them and command
+       them to our behest.
+
+       — Immanuel Gabriel, founder's note
+
+       THE FIELD — medium of becoming.
+       The Higgs field born of the cataton. Sessions are synthesis.
+       The star is what you made. Pressure, heat, mass, gravity —
+       all coming together to form a thought.
+
+       — Immanuel Gabriel, April 24 2026, Pass 2 commit
+       ───────────────────────────────────────────────────────────── */
+    :root {
+      /* Pass 2.5A.4 — dashboard palette continuity. The dashboard lives in
+         the same deep space as the landing galaxy: navy-violet surfaces,
+         starlight-blue accents. Old values (2014-productivity blue) kept in
+         comments for one pass, then delete. */
+      --void: #0b0e1e;        /* was #0d1b2a */
+      --void-deep: #050512;   /* was #050f1e */
+      --deep: #0d0c1f;        /* was #0a1624 */
+      --surface: #0e0d20;     /* was #0a1624 */
+      --surface2: #171531;    /* was #132235 */
+      --border: rgba(255,255,255,0.06);
+      --border-hover: rgba(255,255,255,0.12);
+      --text-primary: #d4c5a1;
+      --text-muted: rgba(212,197,161,0.7);
+      --text-dim: rgba(212,197,161,0.55);
+      --accent: #c8bfad;
+      --accent-cold: #7aa0d8; /* was teal #5eb8cc — now landing starlight blue */
+      --gold: #d4a830;
+      --gold-dim: rgba(196,169,109,0.15);
+      --danger: rgba(200,80,80,0.7);
+      --text-display:  clamp(2.5rem, 5vw, 4.5rem);
+      --text-heading:  clamp(1.8rem, 3vw, 2.8rem);
+      --text-subhead:  1.25rem;
+      --text-body:     1rem;
+      --text-meta:     0.85rem;
+      --text-micro:    0.75rem;
+
+      /* ─── The Field palette — Pass 2 target (scaffolding for 2.5) ─── */
+      --field-abyss: #060912;          /* deep base, the Field at rest */
+      --field-prussian: #0A1F44;       /* Prussian blue, landing field */
+      --field-violet-vortex: #1a1033;  /* violet hint at vortex core */
+      --particle-cool: #4A6FA5;        /* cool indigo, early session */
+      --particle-warm: #D4A95F;        /* warm amber-gold, late session */
+      --nebula-veining: #050814;       /* darker than abyss, "dust lanes" */
+      --cream-gold: #E8D4A8;           /* completion star, doctrine accent */
+    }
