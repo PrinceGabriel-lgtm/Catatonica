@@ -4,7 +4,7 @@
 
 A stillness practice for high-intensity minds. Not meditation. Not a timer. A structured discipline — name what you're carrying, sit with it, earn your silence, let it go.
 
-**Live:** [catatonica.pages.dev](https://catatonica.pages.dev)
+**Live:** [catatonica.app](https://catatonica.app)
 
 ---
 
@@ -52,30 +52,30 @@ Your permanent record — sessions grouped by situation, Catatons earned, stages
 | Layer | Tool |
 |-------|------|
 | Hosting | Cloudflare Pages |
-| Auth | Supabase (magic link) |
-| Payments | Stripe Payment Links |
+| Auth | Supabase (magic link, Google) + Cloudflare Turnstile |
+| Payments | Stripe Payment Links (test mode — live processing pending) |
 | PWA | Web App Manifest + Service Worker |
-| Audio | Web Audio API (generated) + MP3 ambients |
+| Audio | Web Audio API (generated — no audio files) |
 | Frontend | Vanilla HTML/CSS/JS — no framework |
-
-No build step. No bundler. No dependencies. Ships as static files.
+| Build | Vite (multi-page) — dev-only; ships plain static files, zero runtime dependencies |
 
 ---
 
 ## File structure
 
 ```
-index.html              ← Landing page
+index.html              ← Landing page (spiral galaxy Field)
 app.html                ← Dashboard (auth-gated)
-catatonica-session.html ← Session timer (canonical)
-session.html            ← Alias — both names resolve to the same file
+session.html            ← The session (canvas void engine, three modes)
+chronicle.html          ← The Chronicle (practice history)
+void-ambient.js         ← Portable ambient particle field
+void-sounds.js          ← Web Audio synthesis engine (not yet wired in)
 manifest.json           ← PWA manifest
-sw.js                   ← Service worker (cache v2)
+sw.js                   ← Service worker (see CACHE constant for version)
 icon-192.png            ← App icon
 icon-512.png            ← App icon (high-res)
-sounds/
-  ocean.mp3             ← Ambient layer
-  rain.mp3              ← Ambient layer
+terms/privacy/refund.html  ← Legal pages
+doctrine/               ← Public IP anchor (tracked, deploy-excluded)
 ```
 
 ---
@@ -85,7 +85,7 @@ sounds/
 Session context passes from `app.html` to the session screen via **URL parameters** — not sessionStorage, which PWA environments can drop between navigations.
 
 ```
-app.html → catatonica-session.html?mode=silence&duration=10&sitId=abc123
+app.html → session.html?mode=silence&duration=10&sitId=abc123
 ```
 
 The session screen reads params on load and auto-starts immediately. No intermediate setup screen when launched from the app.
@@ -109,19 +109,18 @@ Payment links are hardcoded in `app.html` under the `STRIPE` config block. To sw
 1. Go to Stripe Dashboard → Payment Links
 2. Create live equivalents of the test links
 3. Replace `buy.stripe.com/test_...` with `buy.stripe.com/...` in `app.html`
-4. Push to main — Cloudflare deploys automatically
+4. Deploy (see below)
 
 ---
 
 ## Deploy
 
-Cloudflare Pages deploys automatically on push to `main`. No build command. Output directory: repo root.
+Deploys are manual, founder-run, from the repo root:
 
 ```bash
-git add .
-git commit -m "your message"
-git push origin main
-# live in ~60 seconds at catatonica.pages.dev
+npm run build
+npx wrangler pages deploy dist --project-name=catatonica --branch=main
+# live in ~60 seconds at catatonica.app
 ```
 
 ---

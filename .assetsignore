@@ -2,7 +2,6 @@
 node_modules/
 *.log
 .git/
-sounds/*.mp3
 
 # Doctrine kept private until founder chooses to share
 doctrine/

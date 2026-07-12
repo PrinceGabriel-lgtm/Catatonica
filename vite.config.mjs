@@ -15,13 +15,14 @@ const root = dirname(fileURLToPath(import.meta.url));
 // Deployed files Vite won't see as graph assets: copied verbatim.
 // sw.js caches /app.html and /session.html by literal path — filenames
 // in dist must never change.
+// void-sounds.js stays in the repo (Pass 3 ports it to /engines) but is
+// referenced by no page, so it does not ship.
 const PASSTHROUGH = [
   'sw.js',
   'manifest.json',
   'icon-192.png',
   'icon-512.png',
   'void-ambient.js',
-  'void-sounds.js',
 ];
 
 export default defineConfig({
