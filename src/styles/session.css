@@ -96,6 +96,11 @@
     }
     .screen.hidden { opacity: 0; pointer-events: none; }
     .screen.gone { display: none; }
+    /* Pass 2.8 — pre-paint autostart shim (see session.html head): when a
+       mode param is present we go straight to the void, so the setup screen
+       must never paint. The deferred module still runs startSession() to
+       reveal the session screen; this only suppresses the setup flash. */
+    html.autostart #setupScreen { display: none; }
 
     /* Session screen: transparent — canvas is the visual */
     #sessionScreen { background: transparent; pointer-events: none; }

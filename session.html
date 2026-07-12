@@ -4,6 +4,17 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Catatonica — The Void</title>
+  <script>
+    // Pass 2.8 — pre-paint autostart shim. When launched with a mode
+    // param we jump straight into the void; the session logic now lives
+    // in a deferred module that must fetch before it can hide the setup
+    // screen, so without this the old setup screen flashes for the whole
+    // fetch. Classic inline = runs during parse, before first paint:
+    // mark <html> so CSS hides the setup screen with zero flash.
+    if (new URLSearchParams(location.search).has('mode')) {
+      document.documentElement.classList.add('autostart');
+    }
+  </script>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;1,300&family=DM+Mono:wght@300&display=swap" rel="stylesheet"/>
