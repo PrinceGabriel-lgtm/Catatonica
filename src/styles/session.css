@@ -379,3 +379,15 @@
       .escape-panel { width: 240px; right: -260px; padding: 2rem 1.4rem; }
       .escape-handle { min-width: 28px; }
     }
+
+    /* ─── Pass 2.8 — View Transitions (app ↔ chronicle ↔ session) ───
+       Cross-document morphs between the three practice surfaces; pages
+       must opt in on both ends, so index (which owns the Collapse) is
+       untouched. Progressive enhancement — unsupporting browsers keep
+       instant navigation. */
+    @view-transition { navigation: auto; }
+    @media (prefers-reduced-motion: reduce) {
+      ::view-transition-group(*),
+      ::view-transition-old(*),
+      ::view-transition-new(*) { animation: none !important; }
+    }

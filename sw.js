@@ -1,8 +1,16 @@
-const CACHE = 'catatonica-v10';
+const CACHE = 'catatonica-v11';
+// Pass 2.8: pages no longer inline their CSS/JS — the split assets ship
+// at stable unhashed paths (vite.config.mjs pins the names) and must be
+// precached alongside their pages or offline-first-visit breaks.
 const OFFLINE_ASSETS = [
   '/app.html',
   '/session.html',
   '/manifest.json',
+  '/app.css',
+  '/session.css',
+  '/assets/app.js',
+  '/assets/session.js',
+  '/assets/modulepreload-polyfill.js',
   'https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Mono:ital,wght@0,300;0,400;1,300&family=Outfit:wght@200;300;400&display=swap',
 ];
 

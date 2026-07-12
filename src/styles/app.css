@@ -819,3 +819,15 @@
     .guest-duration-btn:hover {
       background: var(--surface2); color: var(--text-primary);
     }
+
+    /* ─── Pass 2.8 — View Transitions (app ↔ chronicle ↔ session) ───
+       Cross-document morphs between the three practice surfaces; pages
+       must opt in on both ends, so index (which owns the Collapse) is
+       untouched. Progressive enhancement — unsupporting browsers keep
+       instant navigation. */
+    @view-transition { navigation: auto; }
+    @media (prefers-reduced-motion: reduce) {
+      ::view-transition-group(*),
+      ::view-transition-old(*),
+      ::view-transition-new(*) { animation: none !important; }
+    }

@@ -29,9 +29,12 @@ export default defineConfig({
     outDir: 'dist',
     rollupOptions: {
       output: {
-        // Keep referenced assets (manifest.json) at their original
-        // root path, unhashed — sw.js caches '/manifest.json' literally.
+        // Everything ships unhashed at stable paths: sw.js precaches by
+        // literal path (OFFLINE_ASSETS), and cache-busting is the CACHE
+        // version bump on every deploy — the hand-rolled sw contract.
         assetFileNames: '[name][extname]',
+        entryFileNames: 'assets/[name].js',
+        chunkFileNames: 'assets/[name].js',
       },
       input: {
         index: resolve(root, 'index.html'),

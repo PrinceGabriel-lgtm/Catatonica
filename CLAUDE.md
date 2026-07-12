@@ -7,7 +7,7 @@
 
 **Catatonica** — a stillness practice for high-intensity minds. *"The Art of Doing Nothing."*
 Not a timer. Not a meditation app. A discipline: named, tracked, earned.
-Live at https://catatonica.app. Vanilla HTML/CSS/JS. Zero dependencies. Zero build step. That is a feature, not a gap — do not introduce frameworks, bundlers, or npm runtime deps.
+Live at https://catatonica.app. Vanilla HTML/CSS/JS — no UI framework, and **zero runtime dependencies shipped to the user**. Since Pass 2.8 (THE VESSEL) the repo builds with Vite (dev-only, multi-page mode) and tests with Vitest; the output is still plain static files. Do not add UI frameworks or runtime npm deps — dev-tooling stays minimal and the shipped page stays vanilla.
 
 ## Locked vocabulary — use verbatim, never paraphrase
 
@@ -20,7 +20,7 @@ Live at https://catatonica.app. Vanilla HTML/CSS/JS. Zero dependencies. Zero bui
 
 ## Sacred markers — never modify, verify after every pass
 
-1. The founder's-note CSS comment ("A deep that represents the abyss…") — present in `index.html`, `app.html`, `chronicle.html`, `session.html`. Never edit, never let it drop out of a rewrite.
+1. The founder's-note CSS comment ("A deep that represents the abyss…") — present in `index.html`, `app.html`, `chronicle.html`, `session.html` (each page head) AND `src/styles/tokens.css`. Never edit, never let it drop out of a rewrite.
 2. The IP footer notice on public pages.
 3. `doctrine/` — tracked in git deliberately. It is the timestamped IP anchor. Never delete, never "clean up".
 4. The palette `:root` variables — retone only inside an approved pass.
@@ -40,13 +40,18 @@ Known corrections to older planning docs (verified 2026-07-10): the session file
 
 | File | Role |
 |---|---|
-| `index.html` | Landing — spiral galaxy Field (Pass 2.5A), doctrine sections, pricing, waitlist |
-| `app.html` | Dashboard — Supabase auth, onboarding, Situations, state-machine view router (Pass 2.0.4) |
-| `session.html` | The session — canvas void engine, three modes, hidden timer (Escape panel) |
-| `chronicle.html` | The Chronicle — practice history |
-| `void-ambient.js` | Portable ambient particle field used by app.html — **load-bearing; do not modify outside a dedicated pass** |
-| `void-sounds.js` | Web Audio synthesis engine (no audio files) |
-| `sw.js` | Service worker — bump `CACHE` version when shipped assets change |
+| `index.html` | Landing page shell — head, founder's note, markup (Vite entry) |
+| `app.html` | Dashboard shell — markup + Collapse receiver + Turnstile trampoline |
+| `session.html` | Session shell — **behavior locked**; markup only since Pass 2.8 |
+| `chronicle.html` | The Chronicle shell |
+| `src/styles/` | `tokens.css` (founder's note + app `:root`), one CSS file per page |
+| `src/lib/` | `state.js` (S object), `supabase.js` (client+constants), `ui.js`, `auth.js` (all 5 flows), `data.js` (loadData + **no-loss protocol**) |
+| `src/views/` | `router.js` (view state machine), `intro.js`, `dashboard.js`, `overlays.js` |
+| `src/engines/` | `void-ambient.js` (palette is constructor input), `spiral-landing.js` (2.5A galaxy), `void-sounds.js` (unwired until Pass 3) — **load-bearing; do not modify outside a dedicated pass** |
+| `src/*-main.js` | Per-page entry modules (app-main wires lib+views; others hold page logic verbatim) |
+| `sw.js` | Hand-rolled service worker — bump `CACHE` on every deploy; `OFFLINE_ASSETS` must match dist paths (`npm test` enforces) |
+| `vite.config.mjs` | MPA entries, unhashed output names (sw contract), passthrough copies |
+| `tests/` | Vitest suite — run `npm test` before every commit |
 | `manifest.json`, icons | PWA shell |
 | `terms/privacy/refund.html` | Legal pages |
 | `supabase-migration-security.sql` | RLS migration reference |
@@ -64,12 +69,14 @@ Cloudflare Pages (hosting) · Supabase magic-link auth · Stripe sandbox (live p
 3. **Smallest possible diff.** No drive-by refactors, no "while I was here."
 4. **Root-cause before fix.** The first plausible explanation is often wrong (precedent: the 2.5A.3 nav bug was a CSS cascade override, not a missing `position: sticky`).
 5. **Verification ladder before "done":**
-   - serve locally (`python -m http.server 8000`) and exercise the change in a real browser;
+   - `npm run build` green, then `npm test` green;
+   - serve the BUILD (`npm run preview`) and exercise the change in a real browser — dist is what ships, not the source tree;
+   - parity when restructuring: identical probes against production and the preview must return identical results (computed styles, CSS rule counts, click-through state transitions);
    - test incognito + `prefers-reduced-motion` + mobile emulation;
-   - confirm all sacred markers intact (see `doctrine-check` skill);
+   - confirm all sacred markers intact (see `doctrine-check` skill) — in source AND in dist;
    - re-read the whole diff as a hostile reviewer.
 6. **Git protocol:** show `git status` + diff summary at the end of a pass. **Do not commit or push unless told "commit and push."** The founder commits; a commit exists only when its hash is on origin.
-7. **Deploy** (founder-approved, after live verification): `npx wrangler pages deploy . --project-name=catatonica --branch=main` from the repo root.
+7. **Deploy** (founder-approved, after live verification): `npm run build`, bump `sw.js` CACHE version, then `npx wrangler pages deploy dist --project-name=catatonica --branch=main`. Branch previews: same command with `--branch=<branch>` — never touches production.
 8. When something feels weird, stop and ask. Don't retry harder.
 
 ## Design floor
