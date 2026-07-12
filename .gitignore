@@ -10,3 +10,6 @@ sounds/brown-noise-raw.mp3
 
 # Local working notes
 notes/
+
+# Vite build output (Pass 2.8)
+dist/

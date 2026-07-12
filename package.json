@@ -2,7 +2,15 @@
   "name": "catatonica",
   "version": "1.0.0",
   "description": "Catatonica — The Art of Doing Nothing",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
   "dependencies": {
     "stripe": "^14.0.0"
+  },
+  "devDependencies": {
+    "vite": "^7.3.0"
   }
 }
