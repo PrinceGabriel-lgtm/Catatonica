@@ -182,6 +182,25 @@
       background: radial-gradient(ellipse at center, #0c0a1f 0%, #060512 50%, #02010a 100%);
       overflow: hidden;
     }
+
+    /* ─── Pass 2.8 "The Fall" — the singularity crossing ───
+       The Collapse (2.5B) painted its flash/veil on the canvas at z-index 0,
+       BEHIND the page — so the darkness never covered the content; on slow
+       networks the landing text just sat on the black until app.html loaded.
+       The fix is the design: the whole page falls into the point. The engine
+       drives #landingFlow's transform each frame from the same infall physics
+       as the galaxy, and the Field rises above the page at the finale so its
+       collapse-to-white genuinely swallows everything. transform-origin is
+       the singularity (screen center). */
+    #landingFlow {
+      transform-origin: 50% 50%;
+      will-change: transform, opacity, filter;
+    }
+    html.falling .spiral-canvas-wrapper { z-index: 40; }
+    html.falling #landingFlow { pointer-events: none; }
+    @media (prefers-reduced-motion: reduce) {
+      #landingFlow { will-change: auto; }
+    }
     .spiral-nebula {
       position: absolute;
       inset: 0;

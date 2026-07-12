@@ -22,6 +22,8 @@
       if (!canvas || !canvas.getContext) return;
       const ctx = canvas.getContext('2d');
       if (!ctx) return;
+      // Pass 2.8 "The Fall" — the page body that falls into the singularity.
+      let flowEl = null;
 
       const reducedMotion = !!(window.matchMedia
         && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
@@ -254,6 +256,21 @@
         const cInhale = cP > 0 ? easeInOutCubic(Math.min(1, cP / 0.15)) : 0;
         const cPull = cP > 0.15 ? easeInCubic(Math.min(1, (cP - 0.15) / 0.55)) : 0;
         const cDive = cP > 0.3 ? easeInCubic(Math.min(1, (cP - 0.3) / 0.7)) : 0;
+
+        // "The Fall": the page is drawn into the singularity on the same
+        // physics as the particles. A held breath first (inhale lifts it a
+        // hair, 1 → 1.015), then the dive collapses it to the point — shrink
+        // toward center, blur to a smear of light, fade as the Field's white
+        // overtakes. transform-origin is screen center = the singularity.
+        if (flowEl && cP > 0) {
+          const rise = 1 + 0.015 * cInhale;
+          const scale = rise - (rise - 0.42) * cDive;
+          const blur = 7 * cDive;
+          const fade = 1 - easeInCubic(Math.min(1, Math.max(0, (cP - 0.4) / 0.5)));
+          flowEl.style.transform = 'scale(' + scale.toFixed(4) + ')';
+          flowEl.style.filter = blur > 0.05 ? 'blur(' + blur.toFixed(2) + 'px)' : '';
+          flowEl.style.opacity = fade.toFixed(3);
+        }
 
         // Steady-state global time. Zero during convergence; grows after the flag.
         let postConvergeSec = 0;
@@ -563,11 +580,22 @@
             collapseNavUrl = this.getAttribute('href');
             collapseStartMs = performance.now() - startTime;
             document.body.style.pointerEvents = 'none';
+            // Pin the collapse origin to the singularity — the viewport
+            // centre, where the canvas draws the core — not the tall page's
+            // geometric middle. Scroll locks on .falling so this stays put.
+            if (flowEl) {
+              flowEl.style.transformOrigin =
+                '50% ' + (window.scrollY + window.innerHeight / 2) + 'px';
+            }
+            // Raise the Field above the page so the collapse finale swallows
+            // it; the per-frame pull (in render) does the falling.
+            document.documentElement.classList.add('falling');
           });
         });
       }
 
       function init() {
+        flowEl = document.getElementById('landingFlow');
         resize();
         generateParticles();
         window.addEventListener('resize', onResize);
