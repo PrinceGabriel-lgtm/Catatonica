@@ -2,6 +2,20 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <style>
+    /* Pass 2.8 — critical-path background. tokens.css/app.css are now
+       external stylesheets requested near the end of <head> (after the
+       Supabase CDN script, a blocking classic <script>), so the browser
+       has nothing to paint until that whole chain resolves — production
+       inlined all CSS, so its dark background was ready from the same
+       bytes as the HTML. This static fallback (same tones as the real
+       gradient, no custom properties — tokens.css isn't loaded yet)
+       guarantees app.html is never a blank/white flash on arrival from
+       the landing Collapse, regardless of network timing. Overwritten
+       instantly once app.css loads; not a themeable rule, don't retone
+       here — retone the real gradient in src/styles/app.css. */
+    html, body { background: #02010a; }
+  </style>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="theme-color" content="#060512" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
