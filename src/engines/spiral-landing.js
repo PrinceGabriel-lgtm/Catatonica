@@ -501,12 +501,24 @@
           }
         }
 
-        // Collapse finale: cream-white flash as you pass through the light,
-        // then the dark of the app's deepest tone rises. Navigate at black.
+        // Collapse finale: you pass THROUGH the core's light, then the dark
+        // of the app's deepest tone rises. Navigate at black.
         if (cP > 0) {
           const flash = Math.max(0, Math.min(1, (cP - 0.55) / 0.33));
           if (flash > 0) {
-            ctx.fillStyle = 'rgba(255,250,235,' + (0.92 * easeInOutCubic(flash)) + ')';
+            // Pass 2.5C polish — a warm bloom from the singularity, not a flat
+            // white-out. Since "The Fall" raised the Field above the page, a
+            // full-screen near-white fill read as a blinding strobe. Now the
+            // core's cream-gold light radiates from centre and peaks gently
+            // (~0.6 at the core → transparent at the rim), so the collapsing
+            // Field still reads through it. The dark veil then rises over it.
+            const f = easeInOutCubic(flash);
+            const R = Math.max(W, H) * (0.35 + 0.8 * f);
+            const g = ctx.createRadialGradient(CX, CY, 0, CX, CY, R);
+            g.addColorStop(0,    'rgba(255,248,232,' + (0.6 * f) + ')');
+            g.addColorStop(0.45, 'rgba(232,212,168,' + (0.4 * f) + ')');
+            g.addColorStop(1,    'rgba(232,212,168,0)');
+            ctx.fillStyle = g;
             ctx.fillRect(0, 0, W, H);
           }
           const veil = Math.max(0, Math.min(1, (cP - 0.85) / 0.15));
