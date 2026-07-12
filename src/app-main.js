@@ -77,7 +77,22 @@
       density: 'medium',
       temperature: 'warm',
       catatons: 0,
-      responsive: true
+      responsive: true,
+      // Pass 2.8 — the dashboard's violet-navy (2.5A.4 tokens), passed
+      // directly instead of the old CSS hue-rotate workaround. Same
+      // luminance/saturation as the engine defaults, hue in the --void family.
+      palette: {
+        trail:     [11, 14, 30],   /* --void #0b0e1e */
+        nebulaIn:  [5, 5, 18],     /* --void-deep #050512 */
+        nebulaMid: [5, 8, 20],     /* --nebula-veining #050814 */
+        wave:      [25, 35, 88],
+        dust:      [8, 13, 35],
+        variants: [
+          { r: 25, g: 36, b: 77, baseAlpha: 0.55 },
+          { r: 15, g: 23, b: 55, baseAlpha: 0.65 },
+          { r: 40, g: 50, b: 96, baseAlpha: 0.45 }
+        ]
+      }
     });
     VoidAmbient.start();
     // If init measured before layout settled (canvas bitmap left at 0),

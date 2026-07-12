@@ -53,17 +53,28 @@ const VoidAmbient = (function() {
     }
   }
 
-  const PARTICLE_VARIANTS = [
-    { r: 25, g: 45, b: 75, baseAlpha: 0.55 },
-    { r: 15, g: 30, b: 55, baseAlpha: 0.65 },
-    { r: 40, g: 60, b: 95, baseAlpha: 0.45 }
-  ];
+  // Palette (Pass 2.8) — constructor input; defaults are the original
+  // hardcoded cold-navy values, so callers that pass nothing see zero change.
+  // [r,g,b] triplets; particle variants carry their own alpha.
+  const DEFAULT_PALETTE = {
+    trail:     [13, 27, 42],
+    nebulaIn:  [5, 15, 30],
+    nebulaMid: [3, 10, 25],
+    wave:      [25, 50, 85],
+    dust:      [8, 18, 35],
+    variants: [
+      { r: 25, g: 45, b: 75, baseAlpha: 0.55 },
+      { r: 15, g: 30, b: 55, baseAlpha: 0.65 },
+      { r: 40, g: 60, b: 95, baseAlpha: 0.45 }
+    ]
+  };
+  let PAL = DEFAULT_PALETTE;
 
   function makeParticle() {
     const angle = Math.random() * Math.PI * 2;
     const maxR = Math.min(W, H) * 0.48, minR = 30;
     const dist = (minR + Math.sqrt(Math.random()) * (maxR - minR)) * (0.7 + Math.random() * 0.3);
-    const variant = PARTICLE_VARIANTS[Math.floor(Math.random() * PARTICLE_VARIANTS.length)];
+    const variant = PAL.variants[Math.floor(Math.random() * PAL.variants.length)];
     return {
       x: CX + Math.cos(angle) * dist, y: CY + Math.sin(angle) * dist,
       baseDist: dist, vx: (Math.random() - 0.5) * 0.22, vy: (Math.random() - 0.5) * 0.22,
@@ -160,15 +171,15 @@ const VoidAmbient = (function() {
 
   function render() {
     const trailAlpha = 0.08 + (1 - intensity) * 0.12;
-    ctx.fillStyle = `rgba(13,27,42,${trailAlpha})`;
+    ctx.fillStyle = `rgba(${PAL.trail},${trailAlpha})`;
     ctx.fillRect(0, 0, W, H);
 
     // Nebula glow — deep indigo wash, darker than background
     const nebRadius = 50 + intensity * Math.min(W, H) * 0.15;
     const nebAlpha = 0.05 + intensity * 0.08;
     const neb = ctx.createRadialGradient(CX, CY, 0, CX, CY, nebRadius);
-    neb.addColorStop(0, `rgba(5,15,30,${nebAlpha})`);
-    neb.addColorStop(0.6, `rgba(3,10,25,${nebAlpha * 0.5})`);
+    neb.addColorStop(0, `rgba(${PAL.nebulaIn},${nebAlpha})`);
+    neb.addColorStop(0.6, `rgba(${PAL.nebulaMid},${nebAlpha * 0.5})`);
     neb.addColorStop(1, 'rgba(0,0,0,0)');
     ctx.fillStyle = neb;
     ctx.fillRect(0, 0, W, H);
@@ -177,7 +188,7 @@ const VoidAmbient = (function() {
     pulseWaves.forEach(pw => {
       ctx.beginPath();
       ctx.arc(CX, CY, pw.radius, 0, Math.PI * 2);
-      ctx.strokeStyle = `rgba(25,50,85,${pw.alpha})`;
+      ctx.strokeStyle = `rgba(${PAL.wave},${pw.alpha})`;
       ctx.lineWidth = 1.5 * (1 - pw.radius / pw.maxRadius);
       ctx.stroke();
     });
@@ -187,7 +198,7 @@ const VoidAmbient = (function() {
       const tw = 0.5 + 0.5 * Math.sin(d.twinkle);
       ctx.beginPath();
       ctx.arc(d.x, d.y, d.size, 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(8,18,35,${d.alpha * tw * intensity})`;
+      ctx.fillStyle = `rgba(${PAL.dust},${d.alpha * tw * intensity})`;
       ctx.fill();
     });
 
@@ -252,6 +263,7 @@ const VoidAmbient = (function() {
       config.temperature = options.temperature || 'cold';
       config.catatons = options.catatons || 0;
       config.responsive = options.responsive !== false;
+      PAL = Object.assign({}, DEFAULT_PALETTE, options.palette || {});
       resize();
       initParticles();
       window.addEventListener('resize', resize);
