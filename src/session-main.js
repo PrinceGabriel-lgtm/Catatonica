@@ -452,7 +452,7 @@
         vy:      (Math.random() - 0.5) * 0.06,
         size:    0.15 + Math.random() * 0.35,
         alpha:   0.02 + Math.random() * 0.05,
-        hue:     180 + Math.random() * 50,
+        hue:     220 + Math.random() * 50,  // deep violet dust, not teal (2.5C)
         twinkle: Math.random() * Math.PI * 2,
       };
     }
@@ -575,13 +575,15 @@
         const coreProx = Math.max(0, 1 - coreDist / (Math.min(W, H) * 0.32));
         const modeWarm = mode === 'visual' ? 1.28 : mode === 'sound' ? 1.12 : 1.0;
         const warmth   = isSession ? Math.min(1, warmProg * (0.34 + coreProx * 0.66) * modeWarm) : 0;
-        const coldHue  = mode === 'sound' ? 206 : mode === 'visual' ? 222 : 214;
+        // Cold end is deep indigo-violet (not bright blue) and dark/desaturated
+        // — the water too dark to see the bottom. Warmth is the emergent light.
+        const coldHue  = mode === 'sound' ? 226 : mode === 'visual' ? 240 : 232;
 
         if (warmth < 0.30) {
           const w = warmth / 0.30;
-          p.hue = coldHue + w * (256 - coldHue); // cold anchor → deep violet
-          p.sat = 34  + w * 40;
-          p.lit = 10  + w * 18 + coreProx * 14;
+          p.hue = coldHue + w * (256 - coldHue); // deep indigo-violet → violet
+          p.sat = 24  + w * 46;
+          p.lit = 7   + w * 17 + coreProx * 12;
         } else if (warmth < 0.64) {
           const w = (warmth - 0.30) / 0.34;
           p.hue = 256 - w * 214;  // violet → amber
@@ -619,12 +621,14 @@
         sw.force *= 0.94;
       });
 
-      // Generate Threshold pressure rings on interval
-      if (mode === 'sound' && isSession && t % 72 === 0) {
-        waveRings.push({ r: 6, maxR: Math.min(W, H) * 0.52, alpha: 0.16 * (0.4 + sessionProgress * 0.6) });
+      // Threshold pressure rings — Pass 2.5C: far sparser (was every 72
+      // ticks → a thicket of rings that fractured the field) and dimmer, so
+      // they read as slow water swells, not a diagram of concentric circles.
+      if (mode === 'sound' && isSession && t % 150 === 0) {
+        waveRings.push({ r: 6, maxR: Math.min(W, H) * 0.52, alpha: 0.10 * (0.4 + sessionProgress * 0.6) });
       }
       waveRings = waveRings.filter(r => r.r < r.maxR);
-      waveRings.forEach(r => { r.r += 2.0; r.alpha *= 0.990; });
+      waveRings.forEach(r => { r.r += 1.6; r.alpha *= 0.992; });
 
       // Star flash decay
       if (starFlash > 0) starFlash *= 0.93;
@@ -641,40 +645,45 @@
       const trailAlpha = isSession
         ? 0.11 + (1 - sessionProgress) * 0.07
         : 0.22;
-      ctx.fillStyle = `rgba(13,27,42,${trailAlpha})`;
+      // Pass 2.5C — trails fade into the deep water (#05050f), not the old
+      // Prussian blue (13,27,42) that washed the whole field cold-blue.
+      ctx.fillStyle = `rgba(5,5,15,${trailAlpha})`;
       ctx.fillRect(0, 0, W, H);
 
-      // ── NEBULA BACKGROUND ──
-      // Primary nebula — expands, warms, intensifies as the session warms.
-      // Driven by warmProg (front-loaded) so the background moves off cold
-      // with the particles, not lagging behind on linear progress. A small
-      // per-mode hue bias lets each mode's field read as its own character.
-      const nebModeHue = mode === 'sound' ? 8 : mode === 'visual' ? -6 : 0;
-      const nebR   = isSession ? 70 + warmProg * Math.min(W, H) * 0.40 : 55;
-      const nebHue = 182 + nebModeHue + (isSession ? warmProg * 84 : 0);
-      const nebA   = isSession ? 0.10 + warmProg * 0.30 : 0.07;
+      // ── NEBULA BACKGROUND (Pass 2.5C — deep water warming to the star) ──
+      // Was an hsla hue sweep anchored at 182 (teal) — that cyan cast, and
+      // its soft edge, were the "weird blue circle". Now it is an RGB lerp
+      // from deep violet (the water at rest) to warm amber (the star's heat),
+      // so it genuinely reaches gold and never passes through teal. Warmth
+      // and reach are driven by warmProg (front-loaded).
+      const nebR = isSession ? 70 + warmProg * Math.min(W, H) * 0.40 : 55;
+      // cold deep-violet → warm amber; a hair warmer for sound, deepest for visual
+      const nebWp = isSession ? Math.min(1, warmProg * (mode === 'visual' ? 0.92 : mode === 'sound' ? 1.08 : 1.0)) : 0;
+      const nr = Math.round(26 + (212 - 26) * nebWp);
+      const ng = Math.round(15 + (169 - 15) * nebWp);
+      const nb = Math.round(52 + (95  - 52) * nebWp);
+      const nA = isSession ? 0.10 + warmProg * 0.30 : 0.06;
 
       const neb = ctx.createRadialGradient(CX, CY, 0, CX, CY, nebR);
       if (isSession) {
-        // Center lightness matches bg at warmth 0, rises with the warm curve
-        const centerLit = 6 + warmProg * 16;
-        neb.addColorStop(0,    `hsla(${nebHue},45%,${centerLit}%,${nebA * 0.5})`);
-        neb.addColorStop(0.35, `hsla(${nebHue},35%,${centerLit * 0.7}%,${nebA * 0.35})`);
-        neb.addColorStop(0.7,  `hsla(${nebHue},30%,5%,${nebA * 0.15})`);
+        neb.addColorStop(0,    `rgba(${nr},${ng},${nb},${nA * 0.55})`);
+        neb.addColorStop(0.4,  `rgba(${nr},${ng},${nb},${nA * 0.26})`);
+        neb.addColorStop(0.75, `rgba(${Math.round(nr*0.5)},${Math.round(ng*0.5)},${Math.round(nb*0.6)},${nA * 0.10})`);
       } else {
-        neb.addColorStop(0,    'rgba(13,27,42,0.05)');
-        neb.addColorStop(0.4,  'rgba(13,27,42,0.02)');
+        // idle: a barely-there deep-violet breath, never Prussian blue
+        neb.addColorStop(0,   'rgba(20,14,40,0.05)');
+        neb.addColorStop(0.5, 'rgba(12,8,26,0.02)');
       }
       neb.addColorStop(1, 'rgba(0,0,0,0)');
       ctx.fillStyle = neb;
       ctx.fillRect(0, 0, W, H);
 
-      // Secondary offset nebula for depth and asymmetry
+      // Secondary offset nebula for depth and asymmetry (soft, no hard edge)
       if (isSession && sessionProgress > 0.08) {
         const ox = CX + Math.sin(t * 0.00035) * 45;
         const oy = CY + Math.cos(t * 0.00028) * 32;
         const neb2 = ctx.createRadialGradient(ox, oy, 0, ox, oy, nebR * 0.55);
-        neb2.addColorStop(0, `hsla(${nebHue + 40},50%,${3 + sessionProgress*5}%,${nebA * 0.28})`);
+        neb2.addColorStop(0, `rgba(${nr},${ng},${Math.round(nb*1.1)},${nA * 0.22})`);
         neb2.addColorStop(1, 'rgba(0,0,0,0)');
         ctx.fillStyle = neb2;
         ctx.fillRect(0, 0, W, H);
@@ -702,11 +711,11 @@
         ctx.restore();
       }
 
-      // ── THRESHOLD: Pressure wave rings emanating from center ──
+      // ── THRESHOLD: pressure wave swells (deep indigo, not teal) ──
       waveRings.forEach(r => {
         ctx.beginPath();
         ctx.arc(CX, CY, r.r, 0, Math.PI * 2);
-        ctx.strokeStyle = `rgba(94,184,204,${r.alpha})`;
+        ctx.strokeStyle = `rgba(74,86,150,${r.alpha})`;
         ctx.lineWidth   = 0.7;
         ctx.stroke();
       });

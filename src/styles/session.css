@@ -21,7 +21,17 @@
       --cream-gold: #E8D4A8;           /* completion star, doctrine accent */
     }
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html, body { width: 100%; height: 100%; overflow: hidden; background: var(--void); }
+    html, body { width: 100%; height: 100%; overflow: hidden; }
+    /* Pass 2.5C overhaul — "the colour of water too dark to see the bottom."
+       The session was stuck on the pre-2.5A.4 Prussian --void (#0d1b2a) — a
+       flat bland blue. It is meant to be deep still water: a dark radial that
+       sinks toward black at the edges, one universe with the app's field.
+       The warmth (the star) is the only light, and it is earned. */
+    html, body {
+      background:
+        radial-gradient(ellipse at center, #0b0a1c 0%, #05050f 52%, #02010a 100%)
+        fixed #02010a;
+    }
     body { cursor: none; }
 
     canvas {
