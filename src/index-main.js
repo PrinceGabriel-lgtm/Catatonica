@@ -13,3 +13,28 @@
       entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); } });
     }, { threshold: 0.1, rootMargin: '0px 0px -60px 0px' });
     document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+    // Pass 2.8 "The Fall" — warm the app while the galaxy turns. The Collapse
+    // navigates to app.html; if its documents aren't cached, a slow network
+    // freezes the fall on black (the seam the founder saw at ~9 KB/s). Idle-
+    // prefetch the app's critical documents so the crossing is continuous.
+    // Honour Save-Data; unhashed asset names (vite.config) make these stable.
+    (function warmApp() {
+      try {
+        var c = navigator.connection;
+        if (c && c.saveData) return;
+      } catch (e) {}
+      // Dist paths (what the browser actually requests): Vite bundles
+      // tokens.css into app.css. In dev these 404 silently — harmless.
+      var assets = ['/app.html', '/app.css', '/assets/app.js'];
+      function prefetch() {
+        assets.forEach(function (href) {
+          var l = document.createElement('link');
+          l.rel = 'prefetch';
+          l.href = href;
+          document.head.appendChild(l);
+        });
+      }
+      if ('requestIdleCallback' in window) requestIdleCallback(prefetch, { timeout: 3000 });
+      else setTimeout(prefetch, 1800);
+    })();
