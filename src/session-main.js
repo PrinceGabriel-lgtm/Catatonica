@@ -373,7 +373,8 @@
     let waveRings  = [];   // Threshold: pressure wave rings
     let starFlash  = 0;    // 0→1, completion star burst intensity
     let t          = 0;    // global tick
-    let sessionProgress = 0; // 0→1 over session duration
+    let sessionProgress = 0; // 0→1 over session duration (linear, from timer)
+    let warmProg   = 0;    // front-loaded warmth driver = pow(sessionProgress,0.6)
     let mode       = 'silence';
     let userCatatons = 0;
     let isSession  = false;
@@ -560,34 +561,44 @@
         // Shimmer
         p.shimmer += p.sSpeed;
 
-        // ── COLOR EVOLUTION ──
-        // Proximity to core + session progress = warmth
-        // Cold teal (182°) → blue-violet (260°) → amber (38°) → warm white
+        // ── COLOR EVOLUTION (Pass 2.5C) ──
+        // The field is a temperature: cold indigo at the rim → warm gold at
+        // the core, warming as you sit. Founder read (2026-07): warmth was
+        // too back-loaded (flat blue the first half), never reached gold even
+        // late, and the three modes felt identical (mode changed motion, not
+        // palette). Fixes: warmProg front-loads the curve (set in loop); a
+        // higher base (0.34) warms the whole field, not just the core; each
+        // mode biases its temperature into a character (silence coolest,
+        // sound warmer/amber, visual hottest) — but all converge to the same
+        // gold→white star at the warm end.
         const coreDist = Math.sqrt((p.x - CX) ** 2 + (p.y - CY) ** 2);
-        const coreProx = Math.max(0, 1 - coreDist / (Math.min(W, H) * 0.30));
-        const warmth   = isSession ? sessionProgress * (0.18 + coreProx * 0.82) : 0;
+        const coreProx = Math.max(0, 1 - coreDist / (Math.min(W, H) * 0.32));
+        const modeWarm = mode === 'visual' ? 1.28 : mode === 'sound' ? 1.12 : 1.0;
+        const warmth   = isSession ? Math.min(1, warmProg * (0.34 + coreProx * 0.66) * modeWarm) : 0;
+        const coldHue  = mode === 'sound' ? 206 : mode === 'visual' ? 222 : 214;
 
-        if (warmth < 0.28) {
-          const w = warmth / 0.28;
-          p.hue = 214 + w * 42;   // dark indigo → deep violet
-          p.sat = 30  + w * 40;
-          p.lit = 8   + w * 16 + coreProx * 12;
-        } else if (warmth < 0.62) {
-          const w = (warmth - 0.28) / 0.34;
-          p.hue = 256 - w * 218;  // violet → amber/gold
-          p.sat = 70  + w * 12;
-          p.lit = 24  + w * 34 + coreProx * 22;
+        if (warmth < 0.30) {
+          const w = warmth / 0.30;
+          p.hue = coldHue + w * (256 - coldHue); // cold anchor → deep violet
+          p.sat = 34  + w * 40;
+          p.lit = 10  + w * 18 + coreProx * 14;
+        } else if (warmth < 0.64) {
+          const w = (warmth - 0.30) / 0.34;
+          p.hue = 256 - w * 214;  // violet → amber
+          p.sat = 74  + w * 12;
+          p.lit = 28  + w * 32 + coreProx * 24;
         } else {
-          const w = (warmth - 0.62) / 0.38;
-          p.hue = 38  + w * 18;   // gold → warm white
-          p.sat = 82  - w * 68;
-          p.lit = 57  + w * 38;
+          const w = (warmth - 0.64) / 0.36;
+          p.hue = 42  - w * 6;    // amber → gold
+          p.sat = 86  - w * 62;   // desaturate toward warm white
+          p.lit = 60  + w * 34;
         }
 
         const shimVal = Math.sin(p.shimmer) * 0.055;
-        p.alpha = 0.05
-          + coreProx * (isSession ? sessionProgress * 0.78 : 0.08)
-          + (isSession ? Math.min(1, sessionProgress * 1.8) * 0.07 : 0)
+        p.alpha = 0.06
+          + coreProx * (isSession ? warmProg * 0.90 : 0.08)
+          + (isSession ? Math.min(1, warmProg * 1.8) * 0.09 : 0)
+          + warmth * 0.10   // warm particles carry more light
           + shimVal;
         p.alpha = Math.max(0.03, Math.min(0.98, p.alpha));
       });
@@ -634,15 +645,19 @@
       ctx.fillRect(0, 0, W, H);
 
       // ── NEBULA BACKGROUND ──
-      // Primary nebula — expands, warms, intensifies as session progresses
-      const nebR   = isSession ? 70 + sessionProgress * Math.min(W, H) * 0.38 : 55;
-      const nebHue = 182 + (isSession ? sessionProgress * 78 : 0);
-      const nebA   = isSession ? 0.1 + sessionProgress * 0.28 : 0.07;
+      // Primary nebula — expands, warms, intensifies as the session warms.
+      // Driven by warmProg (front-loaded) so the background moves off cold
+      // with the particles, not lagging behind on linear progress. A small
+      // per-mode hue bias lets each mode's field read as its own character.
+      const nebModeHue = mode === 'sound' ? 8 : mode === 'visual' ? -6 : 0;
+      const nebR   = isSession ? 70 + warmProg * Math.min(W, H) * 0.40 : 55;
+      const nebHue = 182 + nebModeHue + (isSession ? warmProg * 84 : 0);
+      const nebA   = isSession ? 0.10 + warmProg * 0.30 : 0.07;
 
       const neb = ctx.createRadialGradient(CX, CY, 0, CX, CY, nebR);
       if (isSession) {
-        // Center lightness matches bg at warmth 0, rises with session progress
-        const centerLit = 6 + sessionProgress * 14;
+        // Center lightness matches bg at warmth 0, rises with the warm curve
+        const centerLit = 6 + warmProg * 16;
         neb.addColorStop(0,    `hsla(${nebHue},45%,${centerLit}%,${nebA * 0.5})`);
         neb.addColorStop(0.35, `hsla(${nebHue},35%,${centerLit * 0.7}%,${nebA * 0.35})`);
         neb.addColorStop(0.7,  `hsla(${nebHue},30%,5%,${nebA * 0.15})`);
@@ -851,6 +866,9 @@
       if (isSession && state.totalSeconds > 0) {
         sessionProgress = Math.max(0, Math.min(1, 1 - (state.secondsLeft / state.totalSeconds)));
       }
+      // Front-loaded warmth: rises fast early so the first minutes already
+      // move off cold blue (pow<1). Idle sessionProgress is 0 → warmProg 0.
+      warmProg = Math.pow(sessionProgress, 0.6);
       if (!reduceMotion) update();
       render();
       if (!firstFrameRendered) { firstFrameRendered = true; hideLoader(); }
