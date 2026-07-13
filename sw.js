@@ -1,4 +1,4 @@
-const CACHE = 'catatonica-v11';
+const CACHE = 'catatonica-v12';
 // Pass 2.8: pages no longer inline their CSS/JS — the split assets ship
 // at stable unhashed paths (vite.config.mjs pins the names) and must be
 // precached alongside their pages or offline-first-visit breaks.
