@@ -642,11 +642,14 @@
       // motion arcs, the sense that something moved through space.
       // Lower alpha = longer trails (more ghostly history).
       // ─────────────────────────────────────────────────────────
-      const trailAlpha = isSession
-        ? 0.11 + (1 - sessionProgress) * 0.07
-        : 0.22;
       // Pass 2.5C — trails fade into the deep water (#05050f), not the old
-      // Prussian blue (13,27,42) that washed the whole field cold-blue.
+      // Prussian blue that washed the field cold. And the persistence now
+      // RISES with progress (0.15→0.21) instead of falling — the old curve
+      // made trails longest exactly as the star formed, which read as radial
+      // "spaghetti". Shorter trails near the star = a clean birth, still alive.
+      const trailAlpha = isSession
+        ? 0.15 + sessionProgress * 0.06
+        : 0.22;
       ctx.fillStyle = `rgba(5,5,15,${trailAlpha})`;
       ctx.fillRect(0, 0, W, H);
 
@@ -752,9 +755,13 @@
         ctx.save();
         ctx.translate(p.x, p.y);
 
-        const fragFade = sessionProgress / 0.52; // fragments fully resolve by 52% session
+        // Pass 2.5C — shards resolve into points by 35% (was 52%). The
+        // line-segments read as "spaghetti" and stayed on too long; now the
+        // void's debris transforms into clustering particles much sooner,
+        // and the field is line-clutter for far less of the session.
+        const fragFade = sessionProgress / 0.35;
 
-        if (p.fragment && sessionProgress < 0.52) {
+        if (p.fragment && sessionProgress < 0.35) {
           // Rotating broken shard — the void's debris
           const len = p.size * (2.8 - fragFade * 1.8);
           ctx.rotate(p.fragAngle);

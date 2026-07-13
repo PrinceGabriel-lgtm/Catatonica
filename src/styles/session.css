@@ -209,7 +209,9 @@
 
     /* ── COMPLETE SCREEN ── */
     #completeScreen {
-      background: radial-gradient(ellipse at center, rgba(13,27,42,0.98) 0%, rgba(5,15,30,0.99) 65%);
+      /* Pass 2.5C — deep water, was Prussian rgba(13,27,42). The born star
+         settles into the same dark it emerged from. */
+      background: radial-gradient(ellipse at center, rgba(11,10,28,0.97) 0%, rgba(2,1,10,0.99) 65%);
     }
     .complete-inner {
       text-align: center; max-width: 400px; padding: 2rem;
@@ -344,7 +346,10 @@
     .cat-loader {
       position: fixed; inset: 0;
       display: flex; flex-direction: column; align-items: center; justify-content: center;
-      background: var(--void);
+      /* Pass 2.5C — was var(--void) #0d1b2a (Prussian). That was the brief
+         blue flash on session entry: this overlay covers boot, then hides.
+         Now the deep water, matching the crossing's dark and the field. */
+      background: #02010a;
       z-index: 9999;
       transition: opacity 0.6s ease;
     }
